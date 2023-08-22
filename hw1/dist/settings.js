@@ -64,16 +64,22 @@ exports.app.post('/videos', (req, res) => {
     if (!author || !author.length || author.trim().length > 20) {
         errors.errorsMessages.push({ message: 'Invalid author ', field: 'author' });
     }
-    if (Array.isArray(availableResolutions) && availableResolutions.length) {
-        availableResolutions.map((r) => {
-            !AvailableResolutions[r] && errors.errorsMessages.push({
-                message: 'Invalid availableResolutions',
-                field: 'availableResolutions'
-            });
+    // if (Array.isArray(availableResolutions) && availableResolutions.length) {
+    //     availableResolutions.map((r: AvailableResolutions) => {
+    //         !AvailableResolutions[r] && errors.errorsMessages.push({
+    //             message: 'Invalid availableResolutions',
+    //             field: 'availableResolutions'
+    //         })
+    //     })
+    // }
+    // else {
+    //     availableResolutions = []
+    // }
+    if (!availableResolutions || !Array.isArray(availableResolutions) || !availableResolutions.every(el => Object.values(AvailableResolutions).includes(el))) {
+        errors.errorsMessages.push({
+            message: 'Invalid availableResolutions',
+            field: 'availableResolutions'
         });
-    }
-    else {
-        availableResolutions = [];
     }
     if (errors.errorsMessages.length) {
         res.status(400).send(errors);
@@ -109,32 +115,17 @@ exports.app.put('/videos/:id', (req, res) => {
     if (!title || !title.trim().length || title.trim().length > 40) {
         errors.errorsMessages.push({ message: 'Invalid  title', field: 'title' });
     }
-    else {
-        video.title = title;
-    }
     if (!author || !author.length || author.trim().length > 20) {
         errors.errorsMessages.push({ message: 'Invalid author ', field: 'author' });
-    }
-    else {
-        video.author = author;
     }
     if (typeof canBeDownloaded === 'undefined' || typeof canBeDownloaded !== 'boolean') {
         errors.errorsMessages.push({ message: 'Invalid canBeDownloaded ', field: 'canBeDownloaded' });
     }
-    else {
-        video.canBeDownloaded = canBeDownloaded;
-    }
     if (typeof minAgeRestriction === 'undefined' || typeof minAgeRestriction !== 'number' || minAgeRestriction < 1 || minAgeRestriction > 18) {
         errors.errorsMessages.push({ message: 'Invalid minAgeRestriction ', field: 'minAgeRestriction' });
     }
-    else {
-        video.minAgeRestriction = minAgeRestriction;
-    }
     if (!publicationDate || !publicationDate.trim().length || publicationDate.trim().length > 30) {
         errors.errorsMessages.push({ message: 'Invalid  publicationDate', field: 'publicationDate' });
-    }
-    else {
-        video.publicationDate = publicationDate;
     }
     if (availableResolutions) {
         const validResolutions = Object.values(AvailableResolutions);
@@ -150,28 +141,28 @@ exports.app.put('/videos/:id', (req, res) => {
         res.status(400).send(errors);
         return;
     }
+    video.title = title;
+    video.author = author;
+    video.canBeDownloaded = canBeDownloaded;
+    video.minAgeRestriction = minAgeRestriction;
+    video.publicationDate = publicationDate;
     res.sendStatus(204);
 });
 exports.app.delete('/testing/all-data', (req, res) => {
     videoDb.length = 0;
-    // res.sendStatus(204)
-    res.status(204).send(videoDb);
+    res.sendStatus(204);
+    // res.status(204).send(videoDb)
 });
 exports.app.delete('/videos/:id', (req, res) => {
     const id = +req.params.id;
-    const video = videoDb.find(video => video.id === id);
-    if (!video) {
-        res.sendStatus(404);
-        return;
-    }
-    res.send(video);
-    //----------------
-    const idToDelete = 1; // Пример id для удаления
-    const indexToDelete = videoDb.findIndex(video => video.id === idToDelete);
+    const indexToDelete = videoDb.findIndex(video => video.id === id);
     if (indexToDelete !== -1) {
         videoDb.splice(indexToDelete, 1);
+        res.sendStatus(204);
+        return;
     }
     else {
-        console.log(`Video with id ${idToDelete} not found.`);
+        res.sendStatus(404);
+        return;
     }
 });
