@@ -8,7 +8,7 @@ type RequestWithParams<P> = Request<P, {}, {}, {}>
 type RequestWithBody<B> = Request<{}, {}, B, {}>
 type RequestWithBodyAndParams<P, B> = Request<P, {}, B, {}>
 
-enum AvailableResolutions {
+export enum AvailableResolutions {
     P144 = 'P144',
     P240 = 'P240',
     P360 = 'P360',
@@ -27,7 +27,7 @@ type RequestWithBodyAndParamsBType = {
     minAgeRestriction: number
     publicationDate: string
 }
-type VideoType = {
+export type VideoType = {
     "id": number
     "title": string
     "author": string
@@ -45,29 +45,32 @@ type ErrorType = {
     errorsMessages: ErrorMessages[]
 }
 
-const videoDb: VideoType[] = [{
-    "id": 0,
-    "title": "string",
-    "author": "string",
-    "canBeDownloaded": true,
-    "minAgeRestriction": null,
-    "createdAt": "2023-08-14T16:16:48.040Z",
-    "publicationDate": "2023-08-14T16:16:48.040Z",
-    "availableResolutions": [
-        AvailableResolutions.P144
+const videoDb: VideoType[] = [
+    {
+        "id": 0,
+        "title": "string",
+        "author": "string",
+        "canBeDownloaded": true,
+        "minAgeRestriction": null,
+        "createdAt": "2023-08-14T16:16:48.040Z",
+        "publicationDate": "2023-08-14T16:16:48.040Z",
+        "availableResolutions": [
+            AvailableResolutions.P144
+        ]
+    }, {
+        "id": 1,
+        "title": "Scary",
+        "author": "Movie",
+        "canBeDownloaded": true,
+        "minAgeRestriction": null,
+        "createdAt": "2023-08-14T16:16:48.040Z",
+        "publicationDate": "2023-08-14T16:16:48.040Z",
+        "availableResolutions": [
+            AvailableResolutions.P240
+        ]
+    }
     ]
-}, {
-    "id": 1,
-    "title": "Scary",
-    "author": "Movie",
-    "canBeDownloaded": true,
-    "minAgeRestriction": null,
-    "createdAt": "2023-08-14T16:16:48.040Z",
-    "publicationDate": "2023-08-14T16:16:48.040Z",
-    "availableResolutions": [
-        AvailableResolutions.P240
-    ]
-}]
+
 
 app.get('/videos', (req: Request, res: Response) => {
     res.status(200).send(videoDb)

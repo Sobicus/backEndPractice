@@ -51,7 +51,7 @@ exports.app.get('/videos/:id', (req, res) => {
         res.sendStatus(404);
         return;
     }
-    res.status(200).send(video);
+    res.send(video);
 });
 exports.app.post('/videos', (req, res) => {
     let errors = {
@@ -151,6 +151,7 @@ exports.app.put('/videos/:id', (req, res) => {
 exports.app.delete('/testing/all-data', (req, res) => {
     videoDb.length = 0;
     res.sendStatus(204);
+    // res.status(204).send(videoDb)
 });
 exports.app.delete('/videos/:id', (req, res) => {
     const id = +req.params.id;
@@ -158,8 +159,10 @@ exports.app.delete('/videos/:id', (req, res) => {
     if (indexToDelete !== -1) {
         videoDb.splice(indexToDelete, 1);
         res.sendStatus(204);
+        return;
     }
     else {
         res.sendStatus(404);
+        return;
     }
 });
