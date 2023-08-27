@@ -69,7 +69,7 @@ const videoDb: VideoType[] = [
             AvailableResolutions.P240
         ]
     }
-    ]
+]
 
 
 app.get('/videos', (req: Request, res: Response) => {
@@ -113,9 +113,8 @@ app.post('/videos', (req: RequestWithBody<{
     // }
     // else {
     //     availableResolutions = []
-
     // }
-    if (!availableResolutions || !Array.isArray(availableResolutions) || !availableResolutions.every(el => Object.values(AvailableResolutions).includes(el))) {
+    if (!availableResolutions || availableResolutions.length < 1 || !Array.isArray(availableResolutions) || !availableResolutions.every(el => Object.values(AvailableResolutions).includes(el))) {
         errors.errorsMessages.push({
             message: 'Invalid availableResolutions',
             field: 'availableResolutions'
@@ -197,7 +196,6 @@ app.put('/videos/:id', (req: RequestWithBodyAndParams<{
 app.delete('/testing/all-data', (req: Request, res: Response) => {
         videoDb.length = 0
         res.sendStatus(204)
-        // res.status(204).send(videoDb)
     }
 )
 app.delete('/videos/:id', (req: RequestWithParams<{ id: number }>, res: Response) => {
