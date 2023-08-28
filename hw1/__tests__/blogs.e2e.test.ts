@@ -1,5 +1,7 @@
 import request from "supertest";
-import {AvailableResolutions, VideoType, app} from "../src/settings";
+import {app} from "../src/settings";
+import {AvailableResolutions, VideoType} from "../src/routes/videos-router";
+
 
 
 describe('check videos', () => {
