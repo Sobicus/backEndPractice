@@ -13,7 +13,7 @@ describe('check videos', () => {
     it('should return 404', async () => {
         await request(app).get('/videos/0').expect(404)
     })
-    it('should`t create course with incorect title data return error message and 400', async () => {
+    it('should`t create videos with incorect title data return error message and 400', async () => {
         await request(app).post('/videos').send({
             title: "",
             author: "With out title",
@@ -22,7 +22,7 @@ describe('check videos', () => {
         await request(app).get('/videos').expect(200, [])
 
     })
-    it('should`t create course with incorect author data return error message and 400', async () => {
+    it('should`t create videos with incorect author data return error message and 400', async () => {
         await request(app).post('/videos').send({
             title: "With out author",
             author: "",
@@ -30,7 +30,7 @@ describe('check videos', () => {
         }).expect(400, {errorsMessages: [{message: 'Invalid author ', field: 'author'}]})
         await request(app).get('/videos').expect(200, [])
     })
-    it('should`t create course with incorect availableResolutions data return error message and 400', async () => {
+    it('should`t create videos with incorect availableResolutions data return error message and 400', async () => {
         await request(app).post('/videos').send({
             title: "With out availableResolutions",
             author: "availableResolutions",
@@ -43,7 +43,8 @@ describe('check videos', () => {
         })
         await request(app).get('/videos').expect(200, [])
     })
-    it('should create course with correct input date', async () => {
+    let createdVideo: any = null
+    it('should create videos with correct input date', async () => {
         const createResponse = await request(app).post('/videos').send(
             {
                 title: "Test Object",
@@ -51,8 +52,8 @@ describe('check videos', () => {
                 availableResolutions: ["P144"]
             }
         ).expect(201)
-        const createdCourse = createResponse.body
-        expect(createdCourse).toEqual({
+        createdVideo = createResponse.body
+        expect(createdVideo).toEqual({
             id: expect.any(Number),
             "canBeDownloaded": false,
             "minAgeRestriction": null,
@@ -63,7 +64,45 @@ describe('check videos', () => {
             availableResolutions: ["P144"]
         } as VideoType)
 
-        await request(app).get('/videos').expect(200, [createdCourse])
+        await request(app).get('/videos').expect(200, [createdVideo])
+        await request(app).get('/videos/' + createdVideo.id).expect(200, createdVideo)
+    })
+    it('should`t update videos with incorrect input data', async () => {
+        await request(app)
+            .put('/videos/' + createdVideo.id)
+            .send({
+                title: "",
+                author: "Test Object",
+                availableResolutions: ["P144"]
+            })
+            .expect(400)
+        await request(app).get('/videos/' + createdVideo.id).expect(200, createdVideo)
+    })
+    it('should`t update videos that not exist', async () => {
+        await request(app)
+            .put('/videos/' + -777)
+            .send({
+                title: "Test Object",
+                author: "Test Object",
+                availableResolutions: ["P144"]
+            })
+            .expect(404)
+    })
+    it('should update videos with correct input data', async () => {
+        await request(app)
+            .put('/videos/' + createdVideo.id)
+            .send({
+                title: "Change And Check",
+                author: "Change And Check",
+                availableResolutions: ["P2160"]
+            })
+            .expect(204)
+
+        await request(app).get('/videos/' + createdVideo.id).expect(200, {
+            ...createdVideo, title: "Change And Check",
+            author: "Change And Check",
+            availableResolutions: ["P2160"]
+        })
     })
 })
 
