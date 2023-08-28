@@ -104,6 +104,12 @@ describe('check videos', () => {
             availableResolutions: ["P2160"]
         })
     })
+    it('should delete video',async ()=>{
+        await request(app).delete('/videos/'+ createdVideo.id).expect(204)
+        await request(app).delete('/videos/'+ createdVideo.id).expect(404)
+        await request(app).get('/videos/' + createdVideo.id).expect(404)
+        await request(app).get('/videos').expect(200, [])
+    })
 })
 
 
