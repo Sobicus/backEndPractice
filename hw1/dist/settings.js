@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.app = void 0;
+exports.AvailableResolutions = exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 exports.app = (0, express_1.default)();
 exports.app.use(express_1.default.json());
@@ -17,8 +17,9 @@ var AvailableResolutions;
     AvailableResolutions["P1080"] = "P1080";
     AvailableResolutions["P1440"] = "P1440";
     AvailableResolutions["P2160"] = "P2160";
-})(AvailableResolutions || (AvailableResolutions = {}));
-const videoDb = [{
+})(AvailableResolutions || (exports.AvailableResolutions = AvailableResolutions = {}));
+const videoDb = [
+    {
         "id": 0,
         "title": "string",
         "author": "string",
@@ -40,7 +41,8 @@ const videoDb = [{
         "availableResolutions": [
             AvailableResolutions.P240
         ]
-    }];
+    }
+];
 exports.app.get('/videos', (req, res) => {
     res.status(200).send(videoDb);
 });
@@ -75,7 +77,7 @@ exports.app.post('/videos', (req, res) => {
     // else {
     //     availableResolutions = []
     // }
-    if (!availableResolutions || !Array.isArray(availableResolutions) || !availableResolutions.every(el => Object.values(AvailableResolutions).includes(el))) {
+    if (!availableResolutions || availableResolutions.length < 1 || !Array.isArray(availableResolutions) || !availableResolutions.every(el => Object.values(AvailableResolutions).includes(el))) {
         errors.errorsMessages.push({
             message: 'Invalid availableResolutions',
             field: 'availableResolutions'
@@ -151,7 +153,6 @@ exports.app.put('/videos/:id', (req, res) => {
 exports.app.delete('/testing/all-data', (req, res) => {
     videoDb.length = 0;
     res.sendStatus(204);
-    // res.status(204).send(videoDb)
 });
 exports.app.delete('/videos/:id', (req, res) => {
     const id = +req.params.id;

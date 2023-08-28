@@ -1,9 +1,9 @@
 import request from "supertest";
-// import {describe} from "node:test";
 import {AvailableResolutions, VideoType, app} from "../src/settings";
 
 
 describe('check videos', () => {
+    let createdVideo: any = null
     beforeAll(async () => {
         await request(app).delete('/testing/all-data')
     })
@@ -43,7 +43,7 @@ describe('check videos', () => {
         })
         await request(app).get('/videos').expect(200, [])
     })
-    let createdVideo: any = null
+
     it('should create videos with correct input date', async () => {
         const createResponse = await request(app).post('/videos').send(
             {
@@ -80,7 +80,7 @@ describe('check videos', () => {
     })
     it('should`t update videos that not exist', async () => {
         await request(app)
-            .put('/videos/' + -777)
+            .put('/videos/' + 777)
             .send({
                 title: "Test Object",
                 author: "Test Object",
@@ -94,15 +94,18 @@ describe('check videos', () => {
             .send({
                 title: "Change And Check",
                 author: "Change And Check",
-                availableResolutions: ["P2160"]
+                availableResolutions: [AvailableResolutions.P2160]
             })
             .expect(204)
 
-        await request(app).get('/videos/' + createdVideo.id).expect(200, {
-            ...createdVideo, title: "Change And Check",
+        const expectedResult = {
+            ...createdVideo,
+            title: "Change And Check",
             author: "Change And Check",
-            availableResolutions: ["P2160"]
-        })
+            availableResolutions: [AvailableResolutions.P2160]
+        }
+
+        await request(app).get('/videos/' + createdVideo.id).expect(200, expectedResult)
     })
     it('should delete video',async ()=>{
         await request(app).delete('/videos/'+ createdVideo.id).expect(204)

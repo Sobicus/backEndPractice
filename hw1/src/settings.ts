@@ -24,7 +24,7 @@ type RequestWithBodyAndParamsBType = {
     author: string
     availableResolutions: AvailableResolutions[]
     canBeDownloaded: boolean
-    minAgeRestriction: number
+    minAgeRestriction: number | null
     publicationDate: string
 }
 export type VideoType = {
@@ -97,12 +97,13 @@ app.post('/videos', (req: RequestWithBody<{
         errorsMessages: []
     }
     let {title, author, availableResolutions} = req.body
-    if (!title || !title.length || title.trim().length > 40) {
+    if (!title || !title.length ||  title.trim().length < 1 || title.trim().length > 40) {
         errors.errorsMessages.push({message: 'Invalid  title', field: 'title'})
     }
     if (!author || !author.length || author.trim().length > 20) {
         errors.errorsMessages.push({message: 'Invalid author ', field: 'author'})
     }
+    //v1
     // if (Array.isArray(availableResolutions) && availableResolutions.length) {
     //     availableResolutions.map((r: AvailableResolutions) => {
     //         !AvailableResolutions[r] && errors.errorsMessages.push({
@@ -114,6 +115,8 @@ app.post('/videos', (req: RequestWithBody<{
     // else {
     //     availableResolutions = []
     // }
+
+    //v.2
     if (!availableResolutions || availableResolutions.length < 1 || !Array.isArray(availableResolutions) || !availableResolutions.every(el => Object.values(AvailableResolutions).includes(el))) {
         errors.errorsMessages.push({
             message: 'Invalid availableResolutions',
@@ -130,7 +133,7 @@ app.post('/videos', (req: RequestWithBody<{
     publicationDate.setDate(createdAt.getDate() + 1)
     const newVideo: VideoType = {
         id: +(new Date()),
-        "canBeDownloaded": false,
+        canBeDownloaded: false,
         "minAgeRestriction": null,
         "createdAt": createdAt.toDateString(),
         "publicationDate": publicationDate.toISOString(),
@@ -148,6 +151,8 @@ app.put('/videos/:id', (req: RequestWithBodyAndParams<{
 
     const video = videoDb.find(video => video.id === id)
 
+    const videoIndex = videoDb.findIndex((v) => v.id === id)
+
     if (!video) {
         res.sendStatus(404)
         return
@@ -162,34 +167,47 @@ app.put('/videos/:id', (req: RequestWithBodyAndParams<{
     if (!author || !author.length || author.trim().length > 20) {
         errors.errorsMessages.push({message: 'Invalid author ', field: 'author'})
     }
-    if (typeof canBeDownloaded === 'undefined' || typeof canBeDownloaded !== 'boolean') {
-        errors.errorsMessages.push({message: 'Invalid canBeDownloaded ', field: 'canBeDownloaded'})
+    if (typeof canBeDownloaded === 'undefined') {
+       canBeDownloaded = video.canBeDownloaded
     }
-    if (typeof minAgeRestriction === 'undefined' || typeof minAgeRestriction !== 'number' || minAgeRestriction < 1 || minAgeRestriction > 18) {
+    if ((typeof minAgeRestriction !== 'undefined' && typeof minAgeRestriction !== 'number') || minAgeRestriction < 1 || minAgeRestriction > 18) {
         errors.errorsMessages.push({message: 'Invalid minAgeRestriction ', field: 'minAgeRestriction'})
+    }else {
+        minAgeRestriction = video.minAgeRestriction
     }
-    if (!publicationDate || !publicationDate.trim().length || publicationDate.trim().length > 30) {
-        errors.errorsMessages.push({message: 'Invalid  publicationDate', field: 'publicationDate'})
+    if (!publicationDate ) {
+        publicationDate = video.publicationDate
     }
     if (availableResolutions) {
-        const validResolutions = Object.values(AvailableResolutions);
-        for (const resolution of availableResolutions) {
-            if (!validResolutions.includes(resolution)) {
-                errors.errorsMessages.push({message: 'Invalid availableResolutions', field: 'availableResolutions'});
-                break;
+        if(Array.isArray(availableResolutions)){
+            const validResolutions = Object.values(AvailableResolutions);
+            for (const resolution of availableResolutions) {
+                if (!validResolutions.includes(resolution)) {
+                    errors.errorsMessages.push({message: 'Invalid availableResolutions', field: 'availableResolutions'});
+                    break;
+                }
             }
+            video.availableResolutions = availableResolutions;
+        }else {
+            errors.errorsMessages.push({message: 'Invalid availableResolutions ', field: 'availableResolutions'})
         }
-        video.availableResolutions = availableResolutions;
     }
     if (errors.errorsMessages.length) {
         res.status(400).send(errors)
         return
     }
-    video.title = title
-    video.author = author
-    video.canBeDownloaded = canBeDownloaded
-    video.minAgeRestriction = minAgeRestriction
-    video.publicationDate = publicationDate
+
+    const newItem = {
+        ...video,
+        canBeDownloaded,
+        title,
+        author,
+        minAgeRestriction,
+        publicationDate,
+        availableResolutions
+    }
+
+    videoDb.splice(videoIndex, 1, newItem)
 
     res.sendStatus(204)
 })
