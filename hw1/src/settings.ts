@@ -8,6 +8,6 @@ app.use(express.json())
 app.use('/videos', videosRouter)
 
 app.delete('/testing/all-data', (req: Request, res: Response) => {
-        videoDb.length = 0
-        res.sendStatus(204)
-    })
+    videoDb.length = 0
+    res.sendStatus(204)
+})

@@ -7,7 +7,7 @@ exports.app = void 0;
 const express_1 = __importDefault(require("express"));
 const blogs_router_1 = require("./routes/blogs-router");
 exports.app = (0, express_1.default)();
-exports.app.use(bodyParser());
+exports.app.use(express_1.default.json());
 // app.use(express.json())
 exports.app.use('/blogs', blogs_router_1.blogsRouter);
 exports.app.get('/', (req, res) => {

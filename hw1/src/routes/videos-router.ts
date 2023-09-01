@@ -66,10 +66,10 @@ export const videoDb: VideoType[] = [
         ]
     }
 ]
-export const videosRouter = Router({})
+export const videosRouter = Router()
 videosRouter.get('/', (req: Request, res: Response) => {
     res.status(200).send(videoDb)
-})
+});
 videosRouter.get('/:id', (req: RequestWithParams<{ id: number }>, res: Response) => {
     const id = +req.params.id
 
@@ -80,7 +80,7 @@ videosRouter.get('/:id', (req: RequestWithParams<{ id: number }>, res: Response)
         return
     }
     res.send(video)
-})
+});
 videosRouter.post('/', (req: RequestWithBody<{
     title: string,
     author: string,
@@ -135,7 +135,7 @@ videosRouter.post('/', (req: RequestWithBody<{
     }
     videoDb.push(newVideo)
     res.status(201).send(newVideo)
-})
+});
 videosRouter.put('/:id', (req: RequestWithBodyAndParams<{id: number}, RequestWithBodyAndParamsBType>, res: Response) => {
     const id = +req.params.id
     const video = videoDb.find(video => video.id === id)
@@ -171,7 +171,7 @@ videosRouter.put('/:id', (req: RequestWithBodyAndParams<{id: number}, RequestWit
             for (const resolution of availableResolutions) {
                 if (!validResolutions.includes(resolution)) {
                     errors.errorsMessages.push({message: 'Invalid availableResolutions', field: 'availableResolutions'});
-                    break;
+                    break
                 }
             }
             video.availableResolutions = availableResolutions;
@@ -194,7 +194,7 @@ videosRouter.put('/:id', (req: RequestWithBodyAndParams<{id: number}, RequestWit
     }
     videoDb.splice(videoIndex, 1, newItem)
     res.sendStatus(204)
-})
+});
 videosRouter.delete('/:id', (req: RequestWithParams<{ id: number }>, res: Response) => {
     const id = +req.params.id
     const indexToDelete = videoDb.findIndex(video => video.id === id);

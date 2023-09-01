@@ -2,7 +2,8 @@ import express, {Request, Response} from 'express'
 import {blogsRouter} from './routes/blogs-router'
 
 export const app = express()
-app.use(bodyParser())
+app.use(express.json())
+
 // app.use(express.json())
 app.use('/blogs', blogsRouter)
 
