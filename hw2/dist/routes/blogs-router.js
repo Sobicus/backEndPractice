@@ -3,11 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRouter = void 0;
 const express_1 = require("express");
 const blogs_repository_1 = require("../repositories/blogs-repository");
+const express_validator_1 = require("express-validator");
 exports.blogsRouter = (0, express_1.Router)();
 function checkAuthorization(req, res, next) {
     const authorizationHeader = req.header("Authorization");
     if (!authorizationHeader) {
-        return res.sendStatus(401); // Отсутствие заголовка Authorization в запросе, не авторизовано
+        res.sendStatus(401); // Отсутствие заголовка Authorization в запросе, не авторизовано
+        return;
     }
     // Извлечение логина и пароля из заголовка
     const [, base64Credentials] = authorizationHeader.split(" ");
@@ -16,7 +18,7 @@ function checkAuthorization(req, res, next) {
     // Здесь вы можете выполнить проверку логина и пароля, например, сравнение с ожидаемыми значениями
     if (username === "admin" && password === "qwerty") {
         // Успешная авторизация
-        return next();
+        next();
     }
     else {
         // Неверные учетные данные
@@ -34,7 +36,21 @@ exports.blogsRouter.get('/:id', (req, res) => {
     }
     res.status(200).send(blog);
 });
-exports.blogsRouter.post('/', (req, res) => {
+const errorValidator = (req, res, next) => {
+    const result = (0, express_validator_1.validationResult)(req);
+    if (result.isEmpty()) {
+        next();
+        return;
+    }
+    res.send({ errors: result.array() });
+};
+const x = [
+    (0, express_validator_1.body)('name').isString().is,
+    (0, express_validator_1.body)('description').isString(),
+    (0, express_validator_1.body)('websiteUrl').isURL(),
+    errorValidator
+];
+exports.blogsRouter.post('/', checkAuthorization, ...x, (req, res) => {
     let { name, description, websiteUrl } = req.body;
     const newBlog = {
         id: (+new Date() + ''),

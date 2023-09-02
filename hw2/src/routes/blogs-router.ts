@@ -1,6 +1,7 @@
 import {Locals, NextFunction, Request, Response, Router} from "express";
 import {app} from "../settings";
 import {blogsRepository, blogsRepositoryType} from "../repositories/blogs-repository";
+import {body, validationResult} from "express-validator";
 
 export const blogsRouter = Router()
 
@@ -8,7 +9,8 @@ function checkAuthorization(req: Request, res: Response, next: NextFunction) {
     const authorizationHeader = req.header("Authorization");
 
     if (!authorizationHeader) {
-        return res.sendStatus(401); // Отсутствие заголовка Authorization в запросе, не авторизовано
+        res.sendStatus(401); // Отсутствие заголовка Authorization в запросе, не авторизовано
+        return
     }
 
     // Извлечение логина и пароля из заголовка
@@ -19,7 +21,7 @@ function checkAuthorization(req: Request, res: Response, next: NextFunction) {
     // Здесь вы можете выполнить проверку логина и пароля, например, сравнение с ожидаемыми значениями
     if (username === "admin" && password === "qwerty") {
         // Успешная авторизация
-        return next();
+        next();
     } else {
         // Неверные учетные данные
         res.sendStatus(403); // Запретено
@@ -41,7 +43,22 @@ blogsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) 
     }
     res.status(200).send(blog)
 })
-blogsRouter.post('/', (req: postRequestWithBody<blogPostBodyRequest>, res: Response) => {
+
+const errorValidator=(req: Request, res: Response, next: NextFunction)=>{
+    const result = validationResult(req);
+    if (result.isEmpty()) {
+        next()
+        return
+    }
+    res.send({ errors: result.array() });
+}
+const x=[
+    body('name').isString().is,
+    body('description').isString(),
+    body('websiteUrl').isURL(),
+    errorValidator
+]
+blogsRouter.post('/', checkAuthorization,...x,(req: postRequestWithBody<blogPostBodyRequest>, res: Response) => {
     let {name, description, websiteUrl} = req.body
     const newBlog: blogsRepositoryType = {
         id: (+new Date() + ''),
@@ -49,6 +66,7 @@ blogsRouter.post('/', (req: postRequestWithBody<blogPostBodyRequest>, res: Respo
         description,
         websiteUrl,
     }
+
     blogsRepository.push(newBlog)
     res.status(201).send(newBlog)
 })
