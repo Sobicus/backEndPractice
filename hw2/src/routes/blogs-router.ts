@@ -1,36 +1,10 @@
-import {Locals, NextFunction, Request, Response, Router} from "express";
+import {NextFunction, Request, Response, Router} from "express";
 import {blogsRepository, blogsRepositoryType} from "../repositories/blogs-repository";
-import {body, ErrorFormatter, validationResult} from "express-validator";
+import {validationMidleware} from "../midlewares/input-validation-middleware";
+import { checkAuthorization } from "../midlewares/authorization-check-middleware";
 
 export const blogsRouter = Router()
 
-function checkAuthorization(req: Request, res: Response, next: NextFunction) {
-    const authorizationHeader = req.header("Authorization");
-
-    if (!authorizationHeader) {
-        res.sendStatus(401); // Отсутствие заголовка Authorization в запросе, не авторизовано
-        return
-    }
-
-    // Извлечение логина и пароля из заголовка
-    const [, base64Credentials] = authorizationHeader.split(" ");
-    const credentials = Buffer.from(base64Credentials, "base64").toString("utf-8");
-    const [username, password] = credentials.split(":");
-
-    // Здесь вы можете выполнить проверку логина и пароля, например, сравнение с ожидаемыми значениями
-    if (username === "admin" && password === "qwerty") {
-        // Успешная авторизация
-        next();
-    } else {
-        // Неверные учетные данные
-        res.sendStatus(403); // Запретено
-    }
-}
-
-type UserCredentials = {
-    username: string;
-    password: string;
-}
 blogsRouter.get('/', (req: Request, res: Response) => {
     res.status(200).send(blogsRepository)
 })
@@ -43,34 +17,6 @@ blogsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) 
     res.status(200).send(blog)
 })
 
-const errorValidator = (req: Request, res: Response, next: NextFunction) => {
-    const result = validationResult(req);
-    if (result.isEmpty()) {
-        next()
-        return
-    }
-    const errors = result.array().map(error => ({
-        message: error.msg,
-        field: error.path
-    }));
-    res.status(400).send({errorsMessages: errors});
-}
-const validationMidleware = [
-    body('name').isString().trim().isLength({max: 15}).notEmpty(),
-    body('description').isString().trim().isLength({max: 500}).notEmpty(),
-    body('websiteUrl').custom(value => {
-        // проверяем, соответствует ли значение регулярному выражению для URL
-        const regex = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
-        if (regex.test(value)) {
-            // если да, то возвращаем true
-            return true;
-        } else {
-            // если нет, то выбрасываем ошибку с сообщением
-            throw new Error('Invalid website URL');
-        }
-    }).isLength({max: 100}).notEmpty(),
-    errorValidator
-]
 blogsRouter.post('/', checkAuthorization, ...validationMidleware, (req: postRequestWithBody<blogPostBodyRequest>, res: Response) => {
     let {name, description, websiteUrl} = req.body
     const newBlog: blogsRepositoryType = {
@@ -116,10 +62,3 @@ type blogPostBodyRequest = {
     websiteUrl: string
 }
 type putRequestChangeBlog<P, B> = Request<P, {}, B, {}>
-type ErrorMessages = {
-    message: string
-    field: string
-}
-type ErrorType = {
-    errorsMessages: ErrorMessages[]
-}
