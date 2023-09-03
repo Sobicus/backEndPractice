@@ -1,7 +1,6 @@
 import {Locals, NextFunction, Request, Response, Router} from "express";
-import {app} from "../settings";
 import {blogsRepository, blogsRepositoryType} from "../repositories/blogs-repository";
-import {body, validationResult} from "express-validator";
+import {body, ErrorFormatter, validationResult} from "express-validator";
 
 export const blogsRouter = Router()
 
@@ -44,21 +43,35 @@ blogsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) 
     res.status(200).send(blog)
 })
 
-const errorValidator=(req: Request, res: Response, next: NextFunction)=>{
+const errorValidator = (req: Request, res: Response, next: NextFunction) => {
     const result = validationResult(req);
     if (result.isEmpty()) {
         next()
         return
     }
-    res.send({ errors: result.array() });
+    const errors = result.array().map(error => ({
+        message: error.msg,
+        field: error.path
+    }));
+    res.status(400).send({errorsMessages: errors});
 }
-const x=[
-    body('name').isString().is,
-    body('description').isString(),
-    body('websiteUrl').isURL(),
+const validationMidleware = [
+    body('name').isString().trim().isLength({max: 15}).notEmpty(),
+    body('description').isString().trim().isLength({max: 500}).notEmpty(),
+    body('websiteUrl').custom(value => {
+        // проверяем, соответствует ли значение регулярному выражению для URL
+        const regex = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
+        if (regex.test(value)) {
+            // если да, то возвращаем true
+            return true;
+        } else {
+            // если нет, то выбрасываем ошибку с сообщением
+            throw new Error('Invalid website URL');
+        }
+    }).isLength({max: 100}).notEmpty(),
     errorValidator
 ]
-blogsRouter.post('/', checkAuthorization,...x,(req: postRequestWithBody<blogPostBodyRequest>, res: Response) => {
+blogsRouter.post('/', checkAuthorization, ...validationMidleware, (req: postRequestWithBody<blogPostBodyRequest>, res: Response) => {
     let {name, description, websiteUrl} = req.body
     const newBlog: blogsRepositoryType = {
         id: (+new Date() + ''),
@@ -70,7 +83,7 @@ blogsRouter.post('/', checkAuthorization,...x,(req: postRequestWithBody<blogPost
     blogsRepository.push(newBlog)
     res.status(201).send(newBlog)
 })
-blogsRouter.put('/:id', (req: putRequestChangeBlog<{ id: string }, blogPostBodyRequest>, res: Response) => {
+blogsRouter.put('/:id', checkAuthorization, ...validationMidleware,(req: putRequestChangeBlog<{ id: string }, blogPostBodyRequest>, res: Response) => {
     const blog = blogsRepository.find(b => b.id === req.params.id)
     const blogIndex = blogsRepository.findIndex(b => b.id === req.params.id)
     let {name, description, websiteUrl} = req.body
@@ -103,4 +116,10 @@ type blogPostBodyRequest = {
     websiteUrl: string
 }
 type putRequestChangeBlog<P, B> = Request<P, {}, B, {}>
-
+type ErrorMessages = {
+    message: string
+    field: string
+}
+type ErrorType = {
+    errorsMessages: ErrorMessages[]
+}

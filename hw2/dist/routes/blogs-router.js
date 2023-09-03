@@ -42,15 +42,30 @@ const errorValidator = (req, res, next) => {
         next();
         return;
     }
-    res.send({ errors: result.array() });
+    const errors = result.array().map(error => ({
+        message: error.msg,
+        field: error.path
+    }));
+    res.status(400).send({ errorsMessages: errors });
 };
-const x = [
-    (0, express_validator_1.body)('name').isString().is,
-    (0, express_validator_1.body)('description').isString(),
-    (0, express_validator_1.body)('websiteUrl').isURL(),
+const validationMidleware = [
+    (0, express_validator_1.body)('name').isString().trim().isLength({ max: 15 }).notEmpty(),
+    (0, express_validator_1.body)('description').isString().trim().isLength({ max: 500 }).notEmpty(),
+    (0, express_validator_1.body)('websiteUrl').custom(value => {
+        // проверяем, соответствует ли значение регулярному выражению для URL
+        const regex = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
+        if (regex.test(value)) {
+            // если да, то возвращаем true
+            return true;
+        }
+        else {
+            // если нет, то выбрасываем ошибку с сообщением
+            throw new Error('Invalid website URL');
+        }
+    }).isLength({ max: 100 }).notEmpty(),
     errorValidator
 ];
-exports.blogsRouter.post('/', checkAuthorization, ...x, (req, res) => {
+exports.blogsRouter.post('/', checkAuthorization, ...validationMidleware, (req, res) => {
     let { name, description, websiteUrl } = req.body;
     const newBlog = {
         id: (+new Date() + ''),
@@ -61,7 +76,7 @@ exports.blogsRouter.post('/', checkAuthorization, ...x, (req, res) => {
     blogs_repository_1.blogsRepository.push(newBlog);
     res.status(201).send(newBlog);
 });
-exports.blogsRouter.put('/:id', (req, res) => {
+exports.blogsRouter.put('/:id', checkAuthorization, ...validationMidleware, (req, res) => {
     const blog = blogs_repository_1.blogsRepository.find(b => b.id === req.params.id);
     const blogIndex = blogs_repository_1.blogsRepository.findIndex(b => b.id === req.params.id);
     let { name, description, websiteUrl } = req.body;
