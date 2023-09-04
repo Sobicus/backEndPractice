@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validationMidleware = void 0;
+exports.validationBlogsMidleware = void 0;
 const express_validator_1 = require("express-validator");
 const errorValidator = (req, res, next) => {
     const result = (0, express_validator_1.validationResult)(req);
@@ -14,7 +14,7 @@ const errorValidator = (req, res, next) => {
     }));
     res.status(400).send({ errorsMessages: errors });
 };
-exports.validationMidleware = [
+exports.validationBlogsMidleware = [
     (0, express_validator_1.body)('name').isString().trim().isLength({ max: 15 }).notEmpty(),
     (0, express_validator_1.body)('description').isString().trim().isLength({ max: 500 }).notEmpty(),
     (0, express_validator_1.body)('websiteUrl').custom(value => {

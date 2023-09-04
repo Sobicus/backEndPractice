@@ -19,6 +19,7 @@ const checkAuthorization = (req, res, next) => {
     else {
         // Неверные учетные данные
         res.sendStatus(403); // Запретено
+        return;
     }
 };
 exports.checkAuthorization = checkAuthorization;

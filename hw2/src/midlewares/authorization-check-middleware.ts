@@ -20,5 +20,6 @@ export const checkAuthorization=(req: Request, res: Response, next: NextFunction
     } else {
         // Неверные учетные данные
         res.sendStatus(403); // Запретено
+        return;
     }
 }

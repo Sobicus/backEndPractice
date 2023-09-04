@@ -1,15 +1,16 @@
-import {NextFunction, Request, Response, Router} from "express";
-import {blogsRepository, blogsRepositoryType} from "../repositories/blogs-repository";
-import {validationMidleware} from "../midlewares/input-validation-middleware";
+import { Request, Response, Router} from "express";
+import {BlogRepository, blogsRepositoryType} from "../repositories/blogs-repository";
 import { checkAuthorization } from "../midlewares/authorization-check-middleware";
+import {validationBlogsMidleware} from "../midlewares/input-blogs-validation-middleware";
 
 export const blogsRouter = Router()
-
 blogsRouter.get('/', (req: Request, res: Response) => {
-    res.status(200).send(blogsRepository)
+    const blogs = BlogRepository.findAllBlogs()
+    res.status(200).send(blogs)
 })
 blogsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) => {
-    const blog = blogsRepository.find(blog => blog.id === req.params.id)
+    const blog = BlogRepository.findBlogById(req.params.id)
+
     if (!blog) {
         res.sendStatus(404)
         return
@@ -17,46 +18,37 @@ blogsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) 
     res.status(200).send(blog)
 })
 
-blogsRouter.post('/', checkAuthorization, ...validationMidleware, (req: postRequestWithBody<blogPostBodyRequest>, res: Response) => {
+blogsRouter.post('/', checkAuthorization, ...validationBlogsMidleware, (req: postRequestWithBody<blogPostBodyRequest>, res: Response) => {
     let {name, description, websiteUrl} = req.body
-    const newBlog: blogsRepositoryType = {
-        id: (+new Date() + ''),
-        name,
-        description,
-        websiteUrl,
-    }
+    const createdBlog = BlogRepository.createBlog({name, description, websiteUrl})
 
-    blogsRepository.push(newBlog)
-    res.status(201).send(newBlog)
+    res.status(201).send(createdBlog)
 })
-blogsRouter.put('/:id', checkAuthorization, ...validationMidleware,(req: putRequestChangeBlog<{ id: string }, blogPostBodyRequest>, res: Response) => {
-    const blog = blogsRepository.find(b => b.id === req.params.id)
-    const blogIndex = blogsRepository.findIndex(b => b.id === req.params.id)
+blogsRouter.put('/:id', checkAuthorization, ...validationBlogsMidleware,(req: putRequestChangeBlog<{ id: string }, blogPostBodyRequest>, res: Response) => {
     let {name, description, websiteUrl} = req.body
+    const blogIsUpdated = BlogRepository.updateBlog(req.params.id, {name, description, websiteUrl} )
 
-    if (!blog) {
+    if(!blogIsUpdated){
         res.sendStatus(404)
         return
     }
-    const changeBlog = {...blog, name, description, websiteUrl}
-    blogsRepository.splice(blogIndex, 1, changeBlog)
+
     res.sendStatus(204)
 })
 blogsRouter.delete('/:id', checkAuthorization, (req: RequestWithParams<{ id: string }>, res: Response) => {
-    const indexToDelete = blogsRepository.findIndex(b => b.id === req.params.id)
-    if (indexToDelete !== -1) {
-        blogsRepository.splice(indexToDelete, 1)
-        res.sendStatus(204)
-        return
-    } else {
-        res.sendStatus(404)
-        return
-    }
+   const blogIsDeleted = BlogRepository.deleteBlog(req.params.id);
+
+   if(!blogIsDeleted){
+       res.sendStatus(404)
+       return
+   }
+
+   res.sendStatus(201)
 })
 
 type RequestWithParams<P> = Request<P, {}, {}, {}>
 type postRequestWithBody<B> = Request<{}, {}, B, {}>
-type blogPostBodyRequest = {
+export  type blogPostBodyRequest = {
     name: string
     description: string
     websiteUrl: string
