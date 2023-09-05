@@ -1,4 +1,4 @@
-import {blogPostBodyRequest} from "../routes/blogs-router";
+import {blogBodyRequest} from "../routes/blogs-router";
 
 export type blogsRepositoryType = {
     id: string
@@ -11,7 +11,7 @@ export const blogsDb: Array<blogsRepositoryType> = [{
     name: "string",
     description: "string",
     websiteUrl: "string"
-},{
+}, {
     id: "2q",
     name: "string",
     description: "string",
@@ -21,14 +21,15 @@ export const blogsDb: Array<blogsRepositoryType> = [{
 
 class blogsRepository {
 
-    findAllBlogs (): blogsRepositoryType[]  {
+    findAllBlogs(): blogsRepositoryType[] {
         return blogsDb
     }
-    findBlogById (blogId: string): blogsRepositoryType | undefined  {
+
+    findBlogById(blogId: string): blogsRepositoryType | undefined {
         return blogsDb.find((b) => b.id === blogId)
     }
 
-    updateBlog (blogId: string, updateModel: blogPostBodyRequest): boolean {
+    updateBlog(blogId: string, updateModel: blogBodyRequest): boolean {
         const blog = this.findBlogById(blogId);
 
         if (!blog) {
@@ -44,10 +45,10 @@ class blogsRepository {
         return true
     }
 
-    createBlog(createModel: blogPostBodyRequest): blogsRepositoryType{
+    createBlog(createModel: blogBodyRequest): blogsRepositoryType {
         const newBlog: blogsRepositoryType = {
             id: (+new Date() + ''),
-           ...createModel
+            ...createModel
         }
 
         blogsDb.push(newBlog)
@@ -55,15 +56,12 @@ class blogsRepository {
         return newBlog
     }
 
-    deleteBlog(blogId: string): boolean{
+    deleteBlog(blogId: string): boolean {
         const indexToDelete = blogsDb.findIndex(b => b.id === blogId)
-
         if (indexToDelete === -1) {
             return false;
         }
-
         blogsDb.splice(indexToDelete, 1)
-
         return true
     }
 }

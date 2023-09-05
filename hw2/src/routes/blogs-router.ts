@@ -1,5 +1,5 @@
 import { Request, Response, Router} from "express";
-import {BlogRepository, blogsRepositoryType} from "../repositories/blogs-repository";
+import {BlogRepository} from "../repositories/blogs-repository";
 import { checkAuthorization } from "../midlewares/authorization-check-middleware";
 import {validationBlogsMidleware} from "../midlewares/input-blogs-validation-middleware";
 
@@ -18,13 +18,13 @@ blogsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) 
     res.status(200).send(blog)
 })
 
-blogsRouter.post('/', checkAuthorization, ...validationBlogsMidleware, (req: postRequestWithBody<blogPostBodyRequest>, res: Response) => {
+blogsRouter.post('/', checkAuthorization, ...validationBlogsMidleware, (req: postRequestWithBody<blogBodyRequest>, res: Response) => {
     let {name, description, websiteUrl} = req.body
     const createdBlog = BlogRepository.createBlog({name, description, websiteUrl})
 
     res.status(201).send(createdBlog)
 })
-blogsRouter.put('/:id', checkAuthorization, ...validationBlogsMidleware,(req: putRequestChangeBlog<{ id: string }, blogPostBodyRequest>, res: Response) => {
+blogsRouter.put('/:id', checkAuthorization, ...validationBlogsMidleware,(req: putRequestChangeBlog<{ id: string }, blogBodyRequest>, res: Response) => {
     let {name, description, websiteUrl} = req.body
     const blogIsUpdated = BlogRepository.updateBlog(req.params.id, {name, description, websiteUrl} )
 
@@ -43,12 +43,12 @@ blogsRouter.delete('/:id', checkAuthorization, (req: RequestWithParams<{ id: str
        return
    }
 
-   res.sendStatus(201)
+   res.sendStatus(204)
 })
 
 type RequestWithParams<P> = Request<P, {}, {}, {}>
 type postRequestWithBody<B> = Request<{}, {}, B, {}>
-export  type blogPostBodyRequest = {
+export  type blogBodyRequest = {
     name: string
     description: string
     websiteUrl: string

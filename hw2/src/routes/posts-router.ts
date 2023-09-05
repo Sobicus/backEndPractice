@@ -1,48 +1,53 @@
 import {Response, Request, Router} from "express";
-import {postsRepository, postsRepositoryType} from "../repositories/posts-repository";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
+import {postRepository} from "../repositories/posts-repository";
+import {validationPostsMidleware} from "../midlewares/input-posts-validation-middleware";
 
 export const postsRouter = Router()
 
 postsRouter.get('/', (req: Request, res: Response) => {
-    res.status(200).send(postsRepository)
+    const blogs = postRepository.findAllPosts()
+    res.status(200).send(blogs)
 })
-postsRouter.get('/:id', (req: RequestWithParam<{ id: string }>, res: Response) => {
-    const post = postsRepository.find(el => el.id === req.params.id)
+postsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) => {
+    const post = postRepository.findPostById(req.params.id)
     if (!post) {
         res.sendStatus(404)
         return
     }
     res.status(200).send(post)
 })
-postsRouter.post('/', checkAuthorization, async (req: postRequestWithBody<postAddBodyRequest>, res: Response) => {
+postsRouter.post('/', checkAuthorization, ...validationPostsMidleware, (req: postRequestWithBody<postBodyRequest>, res: Response) => {
     let {title, shortDescription, content, blogId} = req.body
-    const blog = await blogsRepository.find(b => b.id === blogId)
-
-    if (!blog) {
-        res.sendStatus(404)
-    } else {
-        const newPost: postsRepositoryType = {
-            id: (+new Date() + ''),
-            title,
-            shortDescription,
-            content,
-            blogId,
-            blogName: blog.description
-        }
-        postsRepository.push(newPost)
-        res.status(201).send(newPost)
-    }
+    const newPost = postRepository.createPost(title, shortDescription, content, blogId)
+    res.status(201).send(newPost)
 })
-postsRouter.put('/', checkAuthorization, async()=>{
+postsRouter.put('/:id', checkAuthorization, ...validationPostsMidleware, (req: putRequesrChangePost<{
+    id: string
+}, postBodyRequest>, res: Response) => {
+    let {title, shortDescription, content, blogId} = req.body
+    const postIsUpdated = postRepository.updatePost(req.params.id, {title, shortDescription, content, blogId})
+    if (!postIsUpdated) {
+        res.sendStatus(404)
+        return
+    }
+    res.sendStatus(204)
+})
+postsRouter.delete('/:id', checkAuthorization, (req: RequestWithParams<{ id: string }>, res: Response) => {
+    const postIsDelete = postRepository.deletePost(req.params.id)
+    if (!postIsDelete) {
+        res.sendStatus(404)
+        return
+    }
+    res.sendStatus(204)
+})
 
-} )
-
-type RequestWithParam<P> = Request<P, {}, {}, {}>
+type RequestWithParams<P> = Request<P, {}, {}, {}>
 type postRequestWithBody<B> = Request<{}, {}, B, {}>
-type postAddBodyRequest = {
-    title: "string"
-    shortDescription: "string"
-    content: "string"
-    blogId: "string"
+export type postBodyRequest = {
+    title: string
+    shortDescription: string
+    content: string
+    blogId: string
 }
+type putRequesrChangePost<P, B> = Request<P, {}, B, {}>

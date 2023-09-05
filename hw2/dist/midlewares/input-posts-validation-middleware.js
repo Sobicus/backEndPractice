@@ -14,10 +14,20 @@ const express_validator_1 = require("express-validator");
 const blogs_repository_1 = require("../repositories/blogs-repository");
 const errorValidator_1 = require("./errorValidator");
 exports.validationPostsMidleware = [
-    (0, express_validator_1.body)('title').isString().trim().isLength({ max: 15 }).notEmpty(),
-    (0, express_validator_1.body)('description').isString().trim().isLength({ max: 500 }).notEmpty(),
+    (0, express_validator_1.body)('title')
+        .isString().withMessage('Title not a string')
+        .trim().notEmpty().withMessage('Title can`t be empty and cannot consist of only spaces')
+        .trim().isLength({ max: 30 }).withMessage('Title cannot be more than 30 characters'),
+    (0, express_validator_1.body)('shortDescription')
+        .isString().withMessage('ShortDescription not a string')
+        .trim().notEmpty().withMessage('ShortDescription can`t be empty and cannot consist of only spaces')
+        .isString().trim().isLength({ max: 100 }).withMessage('ShortDescription cannot be more than 100 characters'),
+    (0, express_validator_1.body)('content')
+        .isString().withMessage('Content not a string')
+        .trim().notEmpty().withMessage('Content can`t be empty and cannot consist of only spaces')
+        .isString().trim().isLength({ max: 1000 }).withMessage('Content cannot be more than 1000 characters'),
     (0, express_validator_1.body)('blogId').custom((value) => __awaiter(void 0, void 0, void 0, function* () {
-        const blogIsExist = yield blogs_repository_1.BlogRepository.findBlog(value);
+        const blogIsExist = yield blogs_repository_1.BlogRepository.findBlogById(value);
         if (!blogIsExist) {
             throw new Error("Blog not exist");
         }

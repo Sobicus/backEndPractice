@@ -38,5 +38,5 @@ exports.blogsRouter.delete('/:id', authorization_check_middleware_1.checkAuthori
         res.sendStatus(404);
         return;
     }
-    res.sendStatus(201);
+    res.sendStatus(204);
 });
