@@ -1,41 +1,70 @@
 import {blogBodyRequest} from "../routes/blogs-router";
 import {client, dataBaseName} from "./db";
+import {ObjectId} from "mongodb";
 
 export type blogsRepositoryType = {
-    id: string
+    //id: string
     name: string
     description: string
     websiteUrl: string
+    createdAt: string
+    isMembership: boolean
 }
+
+export type BlogViewType = {
+    id: string,
+    name: string
+    description: string
+    websiteUrl: string
+    createdAt: string
+    isMembership: boolean
+}
+
 class blogsRepository {
 
     async findAllBlogs(): Promise<blogsRepositoryType[]> {
-        return await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').find({}).toArray()
+        const blogs = await client.db(dataBaseName).collection<BlogViewType>('blogs').find({}).toArray();
+        return blogs.map(b => ({
+            id: b._id.toString(),
+            name: b.name,
+            websiteUrl: b.websiteUrl,
+            description: b.description,
+            createdAt: b.createdAt,
+            isMembership: b.isMembership
+        }))
     }
 
-// тут был undefined поменял на налл это так работает мангошка?????
-    async findBlogById(blogId: string): Promise<blogsRepositoryType | null> {
-        let blog: blogsRepositoryType | null = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').findOne({id: blogId})
-        return blog
-        // blogsDb.find((b) => b.id === blogId)
+    async findBlogById(blogId: string): Promise<BlogViewType | null> {
+        let blog = await client.db(dataBaseName).collection<BlogViewType>('blogs').findOne({_id: new ObjectId(blogId)})
+        if (!blog) {
+            return null
+        }
+        return {
+            id: blog._id.toString(),
+            name: blog.name,
+            websiteUrl: blog.websiteUrl,
+            description: blog.description,
+            createdAt: blog.createdAt,
+            isMembership: blog.isMembership
+        }
     }
 
     async updateBlog(blogId: string, updateModel: blogBodyRequest): Promise<boolean> {
-        const resultUpdateModel = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').updateOne({id: blogId}, {$set: updateModel})
+        const resultUpdateModel = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').updateOne({_id: new ObjectId(blogId)}, {$set: updateModel})
         return resultUpdateModel.matchedCount === 1
     }
 
-    async createBlog(createModel: blogBodyRequest): Promise<blogsRepositoryType> {
-        const newBlog: blogsRepositoryType = {
-            id: (+new Date() + ''),
-            ...createModel
-        }
-        const resultNewBlog = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').insertOne(newBlog)
-        return newBlog
+    async createBlog(createModel: blogBodyRequest): Promise<BlogViewType> {
+        const createdAt = new Date().toISOString()
+        const isMembership = true
+        const resultNewBlog = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs')
+            .insertOne({...createModel, createdAt, isMembership})
+
+        return {id: resultNewBlog.insertedId.toString(), ...createModel, createdAt, isMembership}
     }
 
     async deleteBlog(blogId: string): Promise<boolean> {
-        const resultDeleteBlog = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').deleteOne({id: blogId})
+        const resultDeleteBlog = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').deleteOne({_id: new ObjectId(blogId)})
         return resultDeleteBlog.deletedCount === 1
     }
 }

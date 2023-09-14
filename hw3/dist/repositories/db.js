@@ -8,10 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.runDb = exports.dataBaseName = exports.client = void 0;
 const mongodb_1 = require("mongodb");
-const mongoUri = process.env.mongoUri || 'mongodb://0.0.0.0:27017';
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const mongoUri = process.env.MONGO_URL || 'mongodb://0.0.0.0:27017';
+console.log(process.env.MONGO_URL);
 exports.client = new mongodb_1.MongoClient(mongoUri);
 exports.dataBaseName = 'dataBaseHW';
 function runDb() {
@@ -20,7 +26,7 @@ function runDb() {
             // Connect the client to the server
             yield exports.client.connect();
             // Establish and verufy connection
-            yield exports.client.db('dataBaseHW3').command({ ping: 1 });
+            yield exports.client.db('dataBaseHW').command({ ping: 1 });
             console.log('Connected successfully to mongo server');
         }
         catch (_a) {

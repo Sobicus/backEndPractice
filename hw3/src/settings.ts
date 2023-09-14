@@ -1,8 +1,9 @@
 import express, {Request, Response} from 'express'
 import {blogsRouter} from './routes/blogs-router'
 import {postsRouter} from './routes/posts-router'
-import {postDb} from "./repositories/posts-repository";
-import {blogsDb} from "./repositories/blogs-repository";
+import {client, dataBaseName} from "./repositories/db";
+import {postsRepositoryType} from "./repositories/posts-repository";
+import {blogsRepositoryType} from "./repositories/blogs-repository";
 
 export const app = express()
 app.use(express.json())
@@ -15,8 +16,8 @@ app.use('/posts', postsRouter)
 app.get('/', (req: Request, res: Response) => {
     res.send('This first page if we connect to localhost:3000')
 })
-app.delete('/testing/all-data', (req: Request, res: Response) => {
-    postDb.length = 0
-    blogsDb.length = 0
+app.delete('/testing/all-data', async (req: Request, res: Response) => {
+   await client.db(dataBaseName).collection<postsRepositoryType>('posts').deleteMany({})
+   await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').deleteMany({})
     res.sendStatus(204)
 })

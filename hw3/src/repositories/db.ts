@@ -1,6 +1,10 @@
 import {MongoClient} from 'mongodb'
+import dotenv from 'dotenv'
+dotenv.config()
 
-const mongoUri = process.env.mongoUri || 'mongodb://0.0.0.0:27017'
+const mongoUri = process.env.MONGO_URL || 'mongodb://0.0.0.0:27017'
+console.log(process.env.MONGO_URL)
+
 export const client = new MongoClient(mongoUri)
 export const dataBaseName = 'dataBaseHW'
 export async function runDb() {
@@ -8,7 +12,7 @@ export async function runDb() {
         // Connect the client to the server
         await client.connect()
         // Establish and verufy connection
-        await client.db('dataBaseHW3').command({ping: 1})
+        await client.db('dataBaseHW').command({ping: 1})
         console.log('Connected successfully to mongo server')
     } catch {
         console.log('Can`t connect to db')

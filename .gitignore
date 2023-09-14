@@ -1,5 +1,4 @@
-# Игнорировать папки .idea везде
 .idea/
-
-# Игнорировать папки node_modules везде
 node_modules/
+.env
+dist

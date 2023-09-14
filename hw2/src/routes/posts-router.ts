@@ -13,14 +13,15 @@ postsRouter.get('/:id', (req: RequestWithParams<{ id: string }>, res: Response) 
     const post = postRepository.findPostById(req.params.id)
     if (!post) {
         res.sendStatus(404)
-        return
+        return;
     }
-    res.status(200).send(post)
+   return res.status(200).send(post);
 })
 postsRouter.post('/', checkAuthorization, ...validationPostsMidleware, (req: postRequestWithBody<postBodyRequest>, res: Response) => {
     let {title, shortDescription, content, blogId} = req.body
     const newPost = postRepository.createPost(title, shortDescription, content, blogId)
-    res.status(201).send(newPost)
+    if(!newPost) return res.sendStatus(404);
+   return res.status(201).send(newPost);
 })
 postsRouter.put('/:id', checkAuthorization, ...validationPostsMidleware, (req: putRequesrChangePost<{
     id: string

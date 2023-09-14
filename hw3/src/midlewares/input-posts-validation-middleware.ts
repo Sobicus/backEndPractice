@@ -1,5 +1,5 @@
 import {body} from "express-validator";
-import {BlogRepository, blogsDb} from "../repositories/blogs-repository";
+import {BlogRepository} from "../repositories/blogs-repository";
 import {inputVal} from "./errorValidator";
 
 

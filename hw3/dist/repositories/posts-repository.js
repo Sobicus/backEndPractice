@@ -10,57 +10,67 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postRepository = void 0;
-const blogs_repository_1 = require("./blogs-repository");
 const db_1 = require("./db");
+const mongodb_1 = require("mongodb");
 class postsRepository {
     findAllPosts() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield db_1.client.db(db_1.dataBaseName).collection('posts').find({}).toArray();
+            const posts = yield db_1.client.db(db_1.dataBaseName).collection('posts').find({}).toArray();
+            return posts.map(p => ({
+                id: p._id.toString(),
+                title: p.title,
+                shortDescription: p.shortDescription,
+                content: p.content,
+                blogId: p.blogId,
+                blogName: p.blogName,
+                createdAt: p.createdAt
+            }));
         });
     }
     findPostById(postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            let post = yield db_1.client.db(db_1.dataBaseName).collection('posts').find({ id: postId });
-            return post;
+            let post = yield db_1.client.db(db_1.dataBaseName).collection('posts').findOne({ _id: new mongodb_1.ObjectId(postId) });
+            if (!post) {
+                return null;
+            }
+            return {
+                id: post._id.toString(),
+                title: post.title,
+                shortDescription: post.shortDescription,
+                content: post.content,
+                blogId: post.blogId,
+                blogName: post.blogName,
+                createdAt: post.createdAt
+            };
         });
     }
     createPost(title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blog = yield blogs_repository_1.BlogRepository.findBlogById(blogId);
+            let blog = yield db_1.client.db(db_1.dataBaseName).collection('blogs').findOne({ _id: new mongodb_1.ObjectId(blogId) });
             if (!blog)
                 return null;
             const newPost = {
-                id: (+new Date() + ''),
                 title,
                 shortDescription,
                 content,
                 blogId,
-                blogName: blog.name
+                blogName: blog.name,
+                createdAt: new Date().toISOString()
             };
-            postDb.push(newPost);
-            return newPost;
+            let newPostByDb = yield db_1.client.db(db_1.dataBaseName).collection('posts').insertOne(Object.assign({}, newPost));
+            return Object.assign({ id: newPostByDb.insertedId.toString() }, newPost);
         });
     }
     updatePost(postId, updateModel) {
         return __awaiter(this, void 0, void 0, function* () {
-            const post = yield this.findPostById(postId);
-            if (!post) {
-                return false;
-            }
-            const postIndex = postDb.findIndex(p => p.id === postId);
-            const changePost = Object.assign(Object.assign({}, post), updateModel);
-            postDb.splice(postIndex, 1, changePost);
-            return true;
+            const resultUpdateModel = yield db_1.client.db(db_1.dataBaseName).collection('posts').updateOne({ id: postId }, { $set: updateModel });
+            return resultUpdateModel.matchedCount === 1;
         });
     }
     deletePost(postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const indexToDelete = postDb.findIndex(p => p.id === postId);
-            if (indexToDelete === -1) {
-                return false;
-            }
-            postDb.splice(indexToDelete, 1);
-            return true;
+            const resultDeletePost = yield db_1.client.db(db_1.dataBaseName).collection('posts').deleteOne({ _id: new mongodb_1.ObjectId(postId) });
+            return resultDeletePost.deletedCount === 1;
         });
     }
 }

@@ -34,20 +34,21 @@ class postsRepository {
         return postDb.find(p => p.id === postId)
     }
 
-    createPost(title: string, shortDescription: string, content: string, blogId: string): postsRepositoryType {
-        const blogName = BlogRepository.findBlogById(blogId)?.name
-        if (typeof (blogName) === 'string' && typeof (blogName) !== 'undefined') {
+    createPost(title: string, shortDescription: string, content: string, blogId: string): postsRepositoryType | null {
+        const blog =  BlogRepository.findBlogById(blogId);
+        if (!blog) return null;
+
             const newPost = {
                 id: (+new Date() + ''),
                 title,
                 shortDescription,
                 content,
                 blogId,
-                blogName
-            }
-            postDb.push(newPost)
-        }
-        return postDb[postDb.length - 1]
+                blogName: blog.name
+            };
+            postDb.push(newPost);
+
+        return newPost;
     }
 
     updatePost(postId: string, updateModel: postBodyRequest): boolean {
