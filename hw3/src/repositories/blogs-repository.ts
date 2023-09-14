@@ -56,7 +56,7 @@ class blogsRepository {
 
     async createBlog(createModel: blogBodyRequest): Promise<BlogViewType> {
         const createdAt = new Date().toISOString()
-        const isMembership = true
+        const isMembership = false
         const resultNewBlog = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs')
             .insertOne({...createModel, createdAt, isMembership})
 

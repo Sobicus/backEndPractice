@@ -60,7 +60,7 @@ class postsRepository {
     }
 
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
-        const resultUpdateModel = await client.db(dataBaseName).collection<postsRepositoryType>('posts').updateOne({id: postId}, {$set: updateModel})
+        const resultUpdateModel = await client.db(dataBaseName).collection<postsRepositoryType>('posts').updateOne({_id: new ObjectId(postId)}, {$set: updateModel})
         return resultUpdateModel.matchedCount === 1
     }
 
