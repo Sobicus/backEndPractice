@@ -60,7 +60,6 @@ export class BlogsRepository {
         const resultNewBlog = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs')
             .insertOne(createModel)
         return resultNewBlog.insertedId.toString()
-        /* return {id: resultNewBlog.insertedId.toString(), ...createModel, createdAt, isMembership}*/
     }
 
     async deleteBlog(blogId: string): Promise<boolean> {

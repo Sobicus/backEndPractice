@@ -1,5 +1,5 @@
 import {PostsRepository, postsRepositoryType} from "../repositories/posts-repository";
-import { postBodyRequest } from "../routes/posts-router";
+import {postBodyRequest} from "../routes/posts-router";
 
 export class PostsService {
     postRepo: PostsRepository
@@ -24,13 +24,13 @@ export class PostsService {
             blogId,
             createdAt: new Date().toISOString()
         };
-        const mongoResponse=await this.postRepo.createPost(newPost)
-        if(!mongoResponse) return null
-        return {id: mongoResponse.blogId,blogName:mongoResponse.blogName, ...newPost};
+        const mongoResponse = await this.postRepo.createPost(newPost)
+        if (!mongoResponse) return null
+        return {id: mongoResponse.blogId, blogName: mongoResponse.blogName, ...newPost};
     }
 
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
-        return await this.postRepo.updatePost(postId,updateModel)
+        return await this.postRepo.updatePost(postId, updateModel)
     }
 
     async deletePost(postId: string): Promise<boolean> {
