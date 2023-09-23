@@ -2,9 +2,23 @@ import {Request, Response, Router} from "express";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
 import {validationBlogsMidleware} from "../midlewares/input-blogs-validation-middleware";
 import {blogsService} from "../domain/blogs-service";
+import {BlogsRepository} from "../repositories/blogs-repository";
 
 export const blogsRouter = Router()
 blogsRouter.get('/', async (req: Request, res: Response) => {
+    console.log(req.query)
+    const {
+        searchNameTerm,
+        sortBy,
+        sortDirection,
+        pageNumber,
+        pageSize
+    } = req.query
+    console.log(searchNameTerm)
+    console.log(sortBy)
+    console.log(sortDirection)
+    console.log(pageNumber)
+    console.log(pageSize)
     const blogs = await blogsService.findAllBlogs()
     res.status(200).send(blogs)
 })
@@ -17,7 +31,6 @@ blogsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res: Resp
     }
     res.status(200).send(blog)
 })
-
 blogsRouter.post('/', checkAuthorization, ...validationBlogsMidleware, async (req: postRequestWithBody<blogBodyRequest>, res: Response) => {
     let {name, description, websiteUrl} = req.body
     const createdBlog = await blogsService.createBlog({name, description, websiteUrl})
