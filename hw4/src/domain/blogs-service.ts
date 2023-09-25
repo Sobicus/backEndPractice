@@ -1,5 +1,6 @@
-import {BlogsRepository, BlogViewType} from "../repositories/blogs-repository";
+import {BlogsRepository, BlogViewType, Paginated} from "../repositories/blogs-repository";
 import {blogBodyRequest} from "../routes/blogs-router";
+import {IBlockPagination} from "../types/paggination-type";
 
 class BlogsService {
     blogRepo: BlogsRepository
@@ -8,8 +9,8 @@ class BlogsService {
         this.blogRepo = new BlogsRepository()
     }
 
-    async findAllBlogs(): Promise<BlogViewType[]> {
-        return this.blogRepo.findAllBlogs()
+    async findAllBlogs(pagination: IBlockPagination): Promise<Paginated<BlogViewType>> {
+        return this.blogRepo.findAllBlogs(pagination)
     }
 
     async findBlogById(blogId: string): Promise<BlogViewType | null> {
