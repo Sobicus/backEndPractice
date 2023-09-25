@@ -19,18 +19,19 @@ export type BlogViewType = {
     createdAt: string
     isMembership: boolean
 }
-export type Paginated<T>={
+export type Paginated<T> = {
     "pagesCount": number
     "page": number
     "pageSize": number
     "totalCount": number
-    "items":T[]
+    "items": T[]
 }
+
 export class BlogsRepository {
     async findAllBlogs(pagination: IBlockPagination): Promise<Paginated<BlogViewType>> {
         const filter: Filter<BlogViewType> = {name: {$regex: pagination.searchNameTerm, $options: 'i'}}
-        const blogs = await client.db(dataBaseName).collection<BlogViewType>('blogs').find(filter).sort({[pagination.sortBy]:pagination.sortDirection}).skip(pagination.skip).limit(pagination.pageSize).toArray();
-        const allBlogs=blogs.map(b => ({
+        const blogs = await client.db(dataBaseName).collection<BlogViewType>('blogs').find(filter).sort({[pagination.sortBy]: pagination.sortDirection}).skip(pagination.skip).limit(pagination.pageSize).toArray();
+        const allBlogs = blogs.map(b => ({
             id: b._id.toString(),
             name: b.name,
             websiteUrl: b.websiteUrl,
@@ -38,16 +39,18 @@ export class BlogsRepository {
             createdAt: b.createdAt,
             isMembership: b.isMembership
         }))
-        const totalCount= await client.db(dataBaseName).collection<BlogViewType>('blogs').countDocuments(filter)
-        const pagesCount= Math.floor(totalCount/pagination.pageSize)
+        const totalCount = await client.db(dataBaseName).collection<BlogViewType>('blogs').countDocuments(filter)
+        const pagesCount = Math.floor(totalCount / pagination.pageSize)
 
-        return{"pagesCount": pagesCount===0?1:pagesCount,
+        return {
+            "pagesCount": pagesCount === 0 ? 1 : pagesCount,
             "page": pagination.pageNumber,
             "pageSize": pagination.pageSize,
             "totalCount": totalCount,
-            "items":allBlogs
+            "items": allBlogs
         }
     }
+
     async findBlogById(blogId: string): Promise<BlogViewType | null> {
         let blog = await client.db(dataBaseName).collection<BlogViewType>('blogs').findOne({_id: new ObjectId(blogId)})
         if (!blog) {
