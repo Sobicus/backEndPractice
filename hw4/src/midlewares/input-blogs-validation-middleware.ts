@@ -1,6 +1,5 @@
 import {body} from "express-validator";
 import {inputVal} from "./errorValidator";
-// import {errorValidator} from "./errorValidator";
 
 
 export const validationBlogsMidleware = [

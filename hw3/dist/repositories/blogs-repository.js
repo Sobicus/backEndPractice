@@ -51,9 +51,10 @@ class blogsRepository {
     createBlog(createModel) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdAt = new Date().toISOString();
-            const isMembership = true;
-            const resultNewBlog = yield db_1.client.db(db_1.dataBaseName).collection('blogs')
+            const isMembership = false;
+            const resultNewBlog = yield db_1.client.db().collection('blogs')
                 .insertOne(Object.assign(Object.assign({}, createModel), { createdAt, isMembership }));
+            console.log(resultNewBlog);
             return Object.assign(Object.assign({ id: resultNewBlog.insertedId.toString() }, createModel), { createdAt, isMembership });
         });
     }

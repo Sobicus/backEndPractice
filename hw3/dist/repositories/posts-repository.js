@@ -63,7 +63,7 @@ class postsRepository {
     }
     updatePost(postId, updateModel) {
         return __awaiter(this, void 0, void 0, function* () {
-            const resultUpdateModel = yield db_1.client.db(db_1.dataBaseName).collection('posts').updateOne({ id: postId }, { $set: updateModel });
+            const resultUpdateModel = yield db_1.client.db(db_1.dataBaseName).collection('posts').updateOne({ _id: new mongodb_1.ObjectId(postId) }, { $set: updateModel });
             return resultUpdateModel.matchedCount === 1;
         });
     }

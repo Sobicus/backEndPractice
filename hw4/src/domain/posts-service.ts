@@ -28,7 +28,6 @@ export class PostsService {
         if (!mongoResponse) return null
         return {id: mongoResponse.blogId, blogName: mongoResponse.blogName, ...newPost};
     }
-
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
         return await this.postRepo.updatePost(postId, updateModel)
     }

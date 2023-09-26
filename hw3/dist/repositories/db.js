@@ -19,7 +19,7 @@ dotenv_1.default.config();
 const mongoUri = process.env.MONGO_URL || 'mongodb://0.0.0.0:27017';
 console.log(process.env.MONGO_URL);
 exports.client = new mongodb_1.MongoClient(mongoUri);
-exports.dataBaseName = 'dataBaseHW';
+exports.dataBaseName = 'dataBaseHW1';
 function runDb() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
