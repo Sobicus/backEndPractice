@@ -2,11 +2,14 @@ import {Response, Request, Router} from "express";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
 import {validationPostsMidleware} from "../midlewares/input-posts-validation-middleware";
 import {postService} from "../domain/posts-service";
+import {getDefaultPagination, getPostsPagination} from "../helpers/pagination-helpers";
+import {IQuery, SortPostsByEnum} from "../types/paggination-type";
 
 export const postsRouter = Router()
 
-postsRouter.get('/', async (req: Request, res: Response) => {
-    const blogs = await postService.findAllPosts()
+postsRouter.get('/', async (req: Request<{},{},{},IQuery<SortPostsByEnum>>, res: Response) => {
+    const postsPagination = getPostsPagination(req.query)
+    const blogs = await postService.findAllPosts(postsPagination)
     res.status(200).send(blogs)
 })
 postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res: Response) => {

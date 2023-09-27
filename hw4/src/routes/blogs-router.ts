@@ -9,9 +9,10 @@ import {BlogViewType} from "../repositories/blogs-repository";
 import {postsRepositoryType} from "../repositories/posts-repository";
 import {validationPostsByBlogIdMidleware} from "../midlewares/input-postsByBlogId-validation-middleware";
 import {postService} from "../domain/posts-service";
+import {IQuery, SortByEnum} from "../types/paggination-type";
 
 export const blogsRouter = Router()
-blogsRouter.get('/', async (req: Request, res: Response) => {
+blogsRouter.get('/', async (req: Request<{}, {}, {}, IQuery<SortByEnum>>, res: Response) => {
     const pagination = getBlogsPagination(req.query)
 
     const blogs = await blogsService.findAllBlogs(pagination)
@@ -27,7 +28,7 @@ blogsRouter.get('/:id/', async (req: RequestWithParams<{ id: string }>, res: Res
     res.status(200).send(blog)
 })
 //--------- Find all posts createt byID---------------------------
-blogsRouter.get('/:id/posts', async (req: RequestWithParams<{ id: string }>, res: Response) => {
+blogsRouter.get('/:id/posts', async (req: RequestWithParamsAmdQuery<{ id: string }, IQuery<SortByEnum>>, res: Response) => {
     let blog = await client.db(dataBaseName).collection<BlogViewType>('blogs').findOne({_id: new ObjectId(req.params.id)})
     if (!blog) {
         res.sendStatus(404)
@@ -57,7 +58,7 @@ blogsRouter.get('/:id/posts', async (req: RequestWithParams<{ id: string }>, res
         "page": pagination.pageNumber,
         "pageSize": pagination.pageSize,
         "totalCount": totalCount,
-        "items": posts
+        "items": allPosts
     })
 })
 //----------------------------------------------------------------
@@ -68,8 +69,8 @@ blogsRouter.post('/:id/posts', checkAuthorization, ...validationPostsByBlogIdMid
     const blogId = req.params.id
     const {title, shortDescription, content} = req.body
     const createdPostByBlogId = await postService.createPost(title, shortDescription, content, blogId)
-    if (!createdPostByBlogId) return res.status(404)
-    res.status(201).send(createdPostByBlogId)
+    if (!createdPostByBlogId) return res.sendStatus(404)
+    return res.status(201).send(createdPostByBlogId)
 })
 //----------------------------------------------------------------
 blogsRouter.post('/', checkAuthorization, ...validationBlogsMidleware, async (req: postRequestWithBody<blogBodyRequest>, res: Response) => {
@@ -103,6 +104,7 @@ blogsRouter.delete('/:id', checkAuthorization, async (req: RequestWithParams<{ i
 })
 
 type RequestWithParams<P> = Request<P, {}, {}, {}>
+type RequestWithParamsAmdQuery<P,Q> = Request<P, {}, {}, Q>
 type postRequestWithBody<B> = Request<{}, {}, B, {}>
 export  type blogBodyRequest = {
     name: string
