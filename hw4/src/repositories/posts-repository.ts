@@ -1,10 +1,10 @@
 import {postBodyRequest} from "../routes/posts-router";
-import {blogsRepositoryType} from "./blogs-repository";
+import {blogsRepositoryType, Paginated} from "./blogs-repository";
 import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
-import {IDefaultPagination, IPostPagination} from "../types/paggination-type";
+import {IPostPagination} from "../types/paggination-type";
 
-export type postsRepositoryType = {
+export type postsViewType = {
     id: string
     title: string
     shortDescription: string
@@ -22,24 +22,56 @@ export type createPostType = {
 }
 
 export class PostsRepository {
-    async findAllPosts(postsPagination:IPostPagination): Promise<Array<postsRepositoryType>> {
-        const posts = await client.db(dataBaseName).collection<postsRepositoryType>('posts')
+    async findAllPosts(postsPagination: IPostPagination): Promise<Paginated<postsViewType>> {
+        const posts = await client.db(dataBaseName).collection<postsViewType>('posts')
             .find({})
-            .sort({[postsPagination.sortBy]:postsPagination.sortDirection})
+            .sort({[postsPagination.sortBy]: postsPagination.sortDirection})
+            .limit(postsPagination.pageSize)
+            .skip(postsPagination.skip)
             .toArray()
-        return posts.map(p => ({
-            id: p._id.toString(),
-            title: p.title,
-            shortDescription: p.shortDescription,
-            content: p.content,
-            blogId: p.blogId,
-            blogName: p.blogName,
-            createdAt: p.createdAt
-        }))
+        const totalCount = await client.db(dataBaseName)
+            .collection<postsViewType>('posts')
+            .countDocuments()
+        const pagesCount = Math.ceil(totalCount / postsPagination.pageSize)
+        // return posts.map(p => (
+        //     {
+        //         pagesCount: pagesCount,
+        //         page: postsPagination.pageNumber,
+        //         pageSize: postsPagination.pageSize,
+        //         totalCount: totalCount,
+        //         items: [
+        //             {
+        //                 id: p._id.toString(),
+        //                 title: p.title,
+        //                 shortDescription: p.shortDescription,
+        //                 content: p.content,
+        //                 blogId: p.blogId,
+        //                 blogName: p.blogName,
+        //                 createdAt: p.createdAt
+        //             }
+        //         ]
+        //     }
+        const allPosts = posts.map(p => (
+            {
+                id: p._id.toString(),
+                title: p.title,
+                shortDescription: p.shortDescription,
+                content: p.content,
+                blogId: p.blogId,
+                blogName: p.blogName,
+                createdAt: p.createdAt
+            }))
+        return {
+            pagesCount: pagesCount,
+            page: postsPagination.pageNumber,
+            pageSize: postsPagination.pageSize,
+            totalCount: totalCount,
+            items: allPosts
+        }
     }
 
-    async findPostById(postId: string): Promise<postsRepositoryType | null> {
-        let post = await client.db(dataBaseName).collection<postsRepositoryType>('posts').findOne({_id: new ObjectId(postId)})
+    async findPostById(postId: string): Promise<postsViewType | null> {
+        let post = await client.db(dataBaseName).collection<postsViewType>('posts').findOne({_id: new ObjectId(postId)})
         if (!post) {
             return null
         }
@@ -64,12 +96,12 @@ export class PostsRepository {
     }
 
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
-        const resultUpdateModel = await client.db(dataBaseName).collection<postsRepositoryType>('posts').updateOne({_id: new ObjectId(postId)}, {$set: updateModel})
+        const resultUpdateModel = await client.db(dataBaseName).collection<postsViewType>('posts').updateOne({_id: new ObjectId(postId)}, {$set: updateModel})
         return resultUpdateModel.matchedCount === 1
     }
 
     async deletePost(postId: string): Promise<boolean> {
-        const resultDeletePost = await client.db(dataBaseName).collection<postsRepositoryType>('posts').deleteOne({_id: new ObjectId(postId)})
+        const resultDeletePost = await client.db(dataBaseName).collection<postsViewType>('posts').deleteOne({_id: new ObjectId(postId)})
         return resultDeletePost.deletedCount === 1
     }
 }

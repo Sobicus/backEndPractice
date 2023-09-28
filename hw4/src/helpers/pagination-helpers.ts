@@ -1,16 +1,16 @@
 import {
     Description,
     IBlockPagination,
-    IDefaultPagination, IPostPagination, IQuery,
-    SortByEnum,
+    IDefaultPagination, InputDescription, IPostPagination, IQuery,
+    SortBlogsByEnum,
     SortPostsByEnum
 } from "../types/paggination-type";
 
-export const getBlogsPagination = (query: IQuery<SortByEnum>): IBlockPagination => {
+export const getBlogsPagination = (query: IQuery<SortBlogsByEnum>): IBlockPagination => {
     const values = getDefaultValuesBlogs()
 
     const defaultValues: IBlockPagination = {
-        ...getDefaultPagination<SortByEnum>(query, values),
+        ...getDefaultPagination<SortBlogsByEnum>(query, values),
         searchNameTerm: ''
     }
     if (query.searchNameTerm) {
@@ -19,9 +19,9 @@ export const getBlogsPagination = (query: IQuery<SortByEnum>): IBlockPagination 
 
     return defaultValues
 }
-const getDefaultValuesBlogs = (): IDefaultPagination<SortByEnum> => {
+const getDefaultValuesBlogs = (): IDefaultPagination<SortBlogsByEnum> => {
     return {
-        sortBy: SortByEnum.createdAt,
+        sortBy: SortBlogsByEnum.createdAt,
         sortDirection: Description.desc,
         pageNumber: 1,
         pageSize: 10,
@@ -42,11 +42,12 @@ const getDefaultValuesPosts = (): IDefaultPagination<SortPostsByEnum> => {
         skip: 0
     }
 }
+
 export const getDefaultPagination = <T>(query: IQuery<T>, defaultValues: IDefaultPagination<T>): IDefaultPagination<T> => {
     if (query.sortBy) {
         defaultValues.sortBy = query.sortBy
     }
-    if (query.sortDirection && query.sortDirection === Description.asc) {
+    if (query.sortDirection && query.sortDirection === InputDescription.asc) {
         defaultValues.sortDirection = Description.asc
     }
     if (query.pageNumber && !isNaN(parseInt(query.pageNumber.toString(), 10)) && parseInt(query.pageNumber.toString(), 10) > 0) {

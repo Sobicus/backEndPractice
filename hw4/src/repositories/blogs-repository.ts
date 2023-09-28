@@ -34,8 +34,8 @@ export class BlogsRepository {
             .collection<BlogViewType>('blogs')
             .find(filter)
             .sort({[pagination.sortBy]: pagination.sortDirection})
-            .skip(pagination.skip)
             .limit(pagination.pageSize)
+            .skip(pagination.skip)
             .toArray();
         const allBlogs = blogs.map(b => ({
             id: b._id.toString(),
@@ -51,7 +51,7 @@ export class BlogsRepository {
         const pagesCount = Math.ceil(totalCount / pagination.pageSize)
 
         return {
-            pagesCount: pagesCount === 0 ? 1 : pagesCount,
+            pagesCount: pagesCount /*=== 0 ? 1 : pagesCount*/,
             page: pagination.pageNumber,
             pageSize: pagination.pageSize,
             totalCount: totalCount,

@@ -1,4 +1,4 @@
-export enum SortByEnum {
+export enum SortBlogsByEnum {
     id = 'id',
     name = 'name',
     description = 'description',
@@ -20,6 +20,11 @@ export enum Description {
     desc = -1
 }
 
+export enum InputDescription{
+    asc= 'asc',
+    desc = 'desc'
+}
+
 export interface IDefaultPagination<S> {
     sortBy: S/* SortByEnum*/
     sortDirection: Description
@@ -30,14 +35,14 @@ export interface IDefaultPagination<S> {
 
 export interface IQuery<S> {
     sortBy: S/* SortByEnum*/
-    sortDirection: Description
+    sortDirection: InputDescription
     pageNumber: number
     pageSize: number
     searchNameTerm: string
 }
 
-export interface IBlockPagination extends IDefaultPagination<SortByEnum> {
-    searchNameTerm: string
+export interface IBlockPagination extends IDefaultPagination<SortBlogsByEnum> {
+    searchNameTerm: string// +sortBy, +pageSize,...
 }
 
 export interface IPostPagination extends IDefaultPagination<SortPostsByEnum>{

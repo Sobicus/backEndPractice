@@ -1,4 +1,4 @@
-import {PostsRepository, postsRepositoryType} from "../repositories/posts-repository";
+import {PostsRepository, postsViewType} from "../repositories/posts-repository";
 import {postBodyRequest} from "../routes/posts-router";
 import {IDefaultPagination, SortPostsByEnum} from "../types/paggination-type";
 
@@ -9,15 +9,15 @@ export class PostsService {
         this.postRepo = new PostsRepository()
     }
 
-    async findAllPosts(postsPagination: IDefaultPagination<SortPostsByEnum>): Promise<Array<postsRepositoryType>> {
+    async findAllPosts(postsPagination: IDefaultPagination<SortPostsByEnum>): Promise<Array<postsViewType>> {
         return await this.postRepo.findAllPosts(postsPagination)
     }
 
-    async findPostById(postId: string): Promise<postsRepositoryType | null> {
+    async findPostById(postId: string): Promise<postsViewType | null> {
         return await this.postRepo.findPostById(postId)
     }
 
-    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postsRepositoryType | null> {
+    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postsViewType | null> {
         const newPost = {
             title,
             shortDescription,

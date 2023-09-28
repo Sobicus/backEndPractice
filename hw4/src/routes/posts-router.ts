@@ -9,8 +9,8 @@ export const postsRouter = Router()
 
 postsRouter.get('/', async (req: Request<{},{},{},IQuery<SortPostsByEnum>>, res: Response) => {
     const postsPagination = getPostsPagination(req.query)
-    const blogs = await postService.findAllPosts(postsPagination)
-    res.status(200).send(blogs)
+    const posts = await postService.findAllPosts(postsPagination)
+    res.status(200).send(posts)
 })
 postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res: Response) => {
     const post = await postService.findPostById(req.params.id)
