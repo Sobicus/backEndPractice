@@ -1,7 +1,10 @@
 import {blogBodyRequest} from "../routes/blogs-router";
 import {client, dataBaseName} from "./db";
 import {Filter, ObjectId} from "mongodb";
-import {IBlockPagination} from "../types/paggination-type";
+import {IBlockPagination, IQuery, SortBlogsByEnum} from "../types/paggination-type";
+import {postService} from "../domain/posts-service";
+import {postsViewType} from "./posts-repository";
+import {getBlogsPagination} from "../helpers/pagination-helpers";
 
 export type blogsRepositoryType = {
     name: string
@@ -76,9 +79,41 @@ export class BlogsRepository {
         }
     }
 
-    async updateBlog(blogId: string, updateModel: blogBodyRequest): Promise<boolean> {
-        const resultUpdateModel = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').updateOne({_id: new ObjectId(blogId)}, {$set: updateModel})
-        return resultUpdateModel.matchedCount === 1
+    async findPostByBlogId(blogId: string, query: IQuery<SortBlogsByEnum>): Promise<Paginated<postsViewType> | null> {
+        let blog = await client.db(dataBaseName)
+            .collection<BlogViewType>('blogs')
+            .findOne({_id: new ObjectId(blogId)})
+        if (!blog) {
+            return null
+        }
+        /*const blogId = blog._id.toString()*/
+        const pagination = getBlogsPagination(query)
+        const posts = await client.db(dataBaseName)
+            .collection<postsViewType>('posts')
+            .find({blogId: blogId})
+            .sort({[pagination.sortBy]: pagination.sortDirection})
+            .skip(pagination.skip).limit(pagination.pageSize)
+            .toArray();
+        const allPosts = posts.map(p => ({
+            id: p._id.toString(),
+            title: p.title,
+            shortDescription: p.shortDescription,
+            content: p.content,
+            blogId: p.blogId,
+            blogName: p.blogName,
+            createdAt: p.createdAt
+        }))
+        const totalCount = await client.db(dataBaseName)
+            .collection<postsViewType>('posts')
+            .countDocuments({blogId: blogId})
+        const pagesCount = Math.ceil(totalCount / pagination.pageSize)
+        return {
+            "pagesCount": pagesCount,
+            "page": pagination.pageNumber,
+            "pageSize": pagination.pageSize,
+            "totalCount": totalCount,
+            "items": allPosts
+        }
     }
 
     async createBlog(createModel: blogsRepositoryType): Promise<string>/*Promise<InsertOneResult>*/ /*Promise<BlogViewType>*/ {
@@ -86,6 +121,17 @@ export class BlogsRepository {
         const resultNewBlog = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs')
             .insertOne(createModel)
         return resultNewBlog.insertedId.toString()
+    }
+
+    async createPostByBlogId(title: string, shortDescription: string, content: string, blogId: string): Promise<postsViewType | null> {
+        const createdPostByBlogId = await postService.createPost(title, shortDescription, content, blogId)
+        if (!createdPostByBlogId) return null
+        return createdPostByBlogId
+    }
+
+    async updateBlog(blogId: string, updateModel: blogBodyRequest): Promise<boolean> {
+        const resultUpdateModel = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').updateOne({_id: new ObjectId(blogId)}, {$set: updateModel})
+        return resultUpdateModel.matchedCount === 1
     }
 
     async deleteBlog(blogId: string): Promise<boolean> {
