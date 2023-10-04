@@ -49,6 +49,11 @@ export class UsersRepository {
         return resultCreatedUser.insertedId.toString()
     }
 
-    async deleteUser() {
+    async deleteUser(userId: string) {
+        const resultDeleteUser = await client.db(dataBaseName)
+            .collection<UsersRepositoryType>('users')
+            .deleteOne({_id: new ObjectId(userId)})
+        return resultDeleteUser.deletedCount === 1
+    }
     }
 }
