@@ -9,7 +9,8 @@ usersRouter.get('/', async (req: Request, res: Response) => {
     const users = userService.findAllPosts()
     res.status(200).send(users)
 })
-usersRouter.post('/', checkAuthorization,validationUsersMidleware, async (req: postRequestWithBody<userBodyRequest>, res: Response) => {
+usersRouter.post('/', checkAuthorization,validationUsersMidleware,
+    async (req: postRequestWithBody<UsersInputRequest>, res: Response) => {
     const {login, password, email} = req.body
     const newUser = await userService.createUser(login, password, email)
     res.status(201).send(newUser)
@@ -17,7 +18,7 @@ usersRouter.post('/', checkAuthorization,validationUsersMidleware, async (req: p
 
 
 type postRequestWithBody<B> = Request<{}, {}, B, {}>
-export  type userBodyRequest = {
+export  type UsersInputRequest = {
     login: string
     password: string
     email: string

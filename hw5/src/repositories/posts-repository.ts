@@ -87,7 +87,9 @@ export class PostsRepository {
     }
 
     async deletePost(postId: string): Promise<boolean> {
-        const resultDeletePost = await client.db(dataBaseName).collection<postsViewType>('posts').deleteOne({_id: new ObjectId(postId)})
+        const resultDeletePost = await client.db(dataBaseName)
+            .collection<postsViewType>('posts')
+            .deleteOne({_id: new ObjectId(postId)})
         return resultDeletePost.deletedCount === 1
     }
 }

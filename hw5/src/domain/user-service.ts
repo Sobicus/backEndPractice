@@ -1,4 +1,5 @@
-import {UsersRepository, UsersOutputType} from "../repositories/users-repository";
+import {UsersRepository, UsersOutputType, UserServiceType} from "../repositories/users-repository";
+import {ObjectId} from "mongodb";
 
 export class UsersService {
     userRepo: UsersRepository
@@ -13,7 +14,7 @@ export class UsersService {
 
     async createUser(login: string, passwordOut: string, email: string): Promise<UsersOutputType> {
         const createdAt = new Date().toISOString()
-        let createUserModel = {login, password: passwordOut, email, createdAt}
+        let createUserModel: UserServiceType  = {login, password: passwordOut, email, createdAt}
         const id = await this.userRepo.createUser(createUserModel)
         return {id, login, email, createdAt}
     }

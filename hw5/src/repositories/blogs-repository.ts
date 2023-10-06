@@ -129,7 +129,9 @@ export class BlogsRepository {
     }
 
     async deleteBlog(blogId: string): Promise<boolean> {
-        const resultDeleteBlog = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs').deleteOne({_id: new ObjectId(blogId)})
+        const resultDeleteBlog = await client.db(dataBaseName)
+            .collection<blogsRepositoryType>('blogs')
+            .deleteOne({_id: new ObjectId(blogId)})
         return resultDeleteBlog.deletedCount === 1
     }
 }
