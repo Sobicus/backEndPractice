@@ -1,5 +1,6 @@
 import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
+import {PaginationType} from "../types/paggination-type";
 
 //response:
 export type UsersOutputType = {
@@ -25,31 +26,33 @@ export type UsersDbType = {
     createdAt: string
 }
 
-export type PaginationType<I> = {
+/*export type PaginationType<I> = {
     pagesCount: number
     page: number
     pageSize: number
     totalCount: number
     items: I
-}
+}*/
 
 export class UsersRepository {
-    async findAllUsers(): Promise<PaginationType<UsersOutputType[]>> {
+    async findAllUsers(): Promise<PaginationType<UsersOutputType>> {
         const users = await client.db(dataBaseName)
             .collection</*UsersOutputType*/ UsersDbType>('users')
             .find({})
             .toArray()
+
+        const allusers = users.map(u => ({
+            id: u._id.toString(),
+            login: u.login,
+            email: u.email,
+            createdAt: u.createdAt
+        }))
         return {
             pagesCount: 1,
             page: 1,
             pageSize: 1,
             totalCount: 1,
-            items: users.map(u => ({
-                id: u._id.toString(),
-                login: u.login,
-                email: u.email,
-                createdAt: u.createdAt
-            }))
+            items: allusers
         }
     }
 
@@ -57,11 +60,11 @@ export class UsersRepository {
 
         const resultCreatedUser = await client.db(dataBaseName)
             .collection<UsersDbType>('users')
-            .insertOne({_id: new ObjectId(),...createUserModel})
+            .insertOne({_id: new ObjectId(), ...createUserModel})
         return resultCreatedUser.insertedId.toString()
     }
 
-    async deleteUser(userId: string):Promise<boolean> {
+    async deleteUser(userId: string): Promise<boolean> {
         const resultDeleteUser = await client.db(dataBaseName)
             .collection<UsersDbType>('users')
             .deleteOne({_id: new ObjectId(userId)})

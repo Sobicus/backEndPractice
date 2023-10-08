@@ -49,10 +49,10 @@ export interface IPostPagination extends IDefaultPagination<SortPostsByEnum>{
 
 }
 
-export type Paginated<T> = {
-    "pagesCount": number
-    "page": number
-    "pageSize": number
-    "totalCount": number
-    "items": T[]
+export type PaginationType<I> = {
+    pagesCount: number
+    page: number
+    pageSize: number
+    totalCount: number
+    items: I[]
 }

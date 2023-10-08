@@ -1,6 +1,6 @@
 import {BlogsRepository, BlogViewType} from "../repositories/blogs-repository";
 import {blogBodyRequest} from "../routes/blogs-router";
-import {IBlockPagination, IQuery, Paginated, SortBlogsByEnum} from "../types/paggination-type";
+import {IBlockPagination, IQuery, PaginationType, SortBlogsByEnum} from "../types/paggination-type";
 import {postsViewType} from "../repositories/posts-repository";
 
 class BlogsService {
@@ -10,7 +10,7 @@ class BlogsService {
         this.blogRepo = new BlogsRepository()
     }
 
-    async findAllBlogs(pagination: IBlockPagination): Promise<Paginated<BlogViewType>> {
+    async findAllBlogs(pagination: IBlockPagination): Promise<PaginationType<BlogViewType>> {
         return this.blogRepo.findAllBlogs(pagination)
     }
 
@@ -18,7 +18,7 @@ class BlogsService {
         return await this.blogRepo.findBlogById(blogId)
     }
 
-    async findPostByBlogId(blogId: string, query: IQuery<SortBlogsByEnum>): Promise<Paginated<postsViewType> | null> {
+    async findPostByBlogId(blogId: string, query: IQuery<SortBlogsByEnum>): Promise<PaginationType<postsViewType> | null> {
         return await this.blogRepo.findPostByBlogId(blogId, query)
     }
 
