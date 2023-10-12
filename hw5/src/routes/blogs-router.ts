@@ -1,6 +1,6 @@
 import {Request, Response, Router} from "express";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
-import {validationBlogsMidleware} from "../midlewares/input-blogs-validation-middleware";
+import {validationBlogsMiddleware} from "../midlewares/input-blogs-validation-middleware";
 import {blogsService} from "../domain/blogs-service";
 import {getBlogsPagination} from "../helpers/pagination-helpers";
 import {validationPostsByBlogIdMidleware} from "../midlewares/input-postsByBlogId-validation-middleware";
@@ -42,14 +42,14 @@ blogsRouter.post('/:id/posts', checkAuthorization, ...validationPostsByBlogIdMid
         if (!post) return res.sendStatus(404)
         return res.status(201).send(post)
     })
-blogsRouter.post('/', checkAuthorization, ...validationBlogsMidleware,
+blogsRouter.post('/', checkAuthorization, ...validationBlogsMiddleware,
     async (req: postRequestWithBody<blogBodyRequest>, res: Response) => {
         const {name, description, websiteUrl} = req.body
         const createdBlog = await blogsService.createBlog({name, description, websiteUrl})
 
         res.status(201).send(createdBlog)
     })
-blogsRouter.put('/:id', checkAuthorization, ...validationBlogsMidleware, async (req: RequestChangeBlog<{
+blogsRouter.put('/:id', checkAuthorization, ...validationBlogsMiddleware, async (req: RequestChangeBlog<{
     id: string
 }, blogBodyRequest>, res: Response) => {
     let {name, description, websiteUrl} = req.body

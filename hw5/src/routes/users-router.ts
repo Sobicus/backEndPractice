@@ -1,24 +1,27 @@
 import {Request, Response, Router} from "express";
 import {userService} from "../domain/user-service";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
-import {validationUsersMidleware} from "../midlewares/input-user-validation-middleware";
+import {validationUsersMiddleware} from "../midlewares/input-user-validation-middleware";
+import {IQueryUsers, getPaginationUsersHelpers} from "../helpers/pagination-users-helpers";
 
 export const usersRouter = Router()
 
-usersRouter.get('/', async (req: Request, res: Response) => {
-    const users = userService.findAllPosts()
+usersRouter.get('/', checkAuthorization, async (req: Request<{}, {}, {}, IQueryUsers>, res: Response) => {
+    const usersPagination = getPaginationUsersHelpers(req.query)
+    const users = await userService.findAllPosts(usersPagination)
     res.status(200).send(users)
 })
-usersRouter.post('/', checkAuthorization, validationUsersMidleware,
+usersRouter.post('/', checkAuthorization, validationUsersMiddleware,
     async (req: postRequestWithBody<UsersInputRequest>, res: Response) => {
         const {login, password, email} = req.body
         const newUser = await userService.createUser(login, password, email)
         res.status(201).send(newUser)
     })
 usersRouter.delete('/:id', checkAuthorization, async (req: RequestWithParams<{ id: string }>, res: Response) => {
-        const deleteuser = userService.deleteUser(req.params.id)
-        if (!deleteuser) {
-            return res.sendStatus(404)
+        const deleteUser = await userService.deleteUser(req.params.id)
+        if (!deleteUser) {
+            res.sendStatus(404)
+            return
         }
         return res.sendStatus(204)
     }

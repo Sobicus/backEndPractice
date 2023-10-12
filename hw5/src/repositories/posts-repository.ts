@@ -23,7 +23,8 @@ export type createPostType = {
 
 export class PostsRepository {
     async findAllPosts(postsPagination: IPostPagination): Promise<PaginationType<postsViewType>> {
-        const posts = await client.db(dataBaseName).collection<postsViewType>('posts')
+        const posts = await client.db(dataBaseName)
+            .collection<postsViewType>('posts')
             .find({})
             .sort({[postsPagination.sortBy]: postsPagination.sortDirection})
             .limit(postsPagination.pageSize)

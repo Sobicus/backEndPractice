@@ -1,9 +1,11 @@
 import { app } from './settings'
 import {runDb} from "./repositories/db";
+/*
 process.on('uncaughtException',(error)=>{
     console.log(error)})
 process.on('unhandledRejection',(reason)=>{
     console.log(reason)})
+ */
 const port = process.env.PORT || 3000
 const startApp = async ()=> {
     await runDb()
@@ -13,5 +15,3 @@ const startApp = async ()=> {
 }
 
 startApp()
-const promise = new Promise(()=>{})
-promise.then().catch().catch()

@@ -2,7 +2,7 @@ import {body} from "express-validator";
 import {inputVal} from "./errorValidator";
 
 
-export const validationBlogsMidleware = [
+export const validationBlogsMiddleware = [
     body('name')
         .isString().withMessage('Name not a string')
         .trim().notEmpty().withMessage('name can`t be empty and cannot consist of only spaces')

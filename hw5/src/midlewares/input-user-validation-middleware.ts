@@ -1,7 +1,7 @@
 import {body} from "express-validator";
 import {inputVal} from "./errorValidator";
 
-export const validationUsersMidleware = [
+export const validationUsersMiddleware = [
     body('login')
         .matches('^[a-zA-Z0-9_-]*$').withMessage('Login should be included only a-z (Uppercase, Lowercase and number)')
         .isString().withMessage('Login not a string')

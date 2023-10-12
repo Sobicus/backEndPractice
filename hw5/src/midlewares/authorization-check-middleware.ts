@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 
-export const checkAuthorization=(req: Request, res: Response, next: NextFunction)=> {
+export const checkAuthorization=(req: Request<any,any,any,any>, res: Response, next: NextFunction)=> {
     const authorizationHeader = req.header("Authorization");//'Basic fhdlkglgljf"
 
 

@@ -1,6 +1,7 @@
 import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 import {PaginationType} from "../types/paggination-type";
+import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
 
 //response:
 export type UsersOutputType = {
@@ -12,7 +13,8 @@ export type UsersOutputType = {
 // service:
 export type UserServiceType = {
     login: string
-    password: string
+    passwordSalt: string
+    passwordHash: string
     email: string
     createdAt: string
 }
@@ -21,43 +23,61 @@ export type UserServiceType = {
 export type UsersDbType = {
     _id: ObjectId
     login: string
-    password: string
+    passwordSalt: string
+    passwordHash: string
     email: string
     createdAt: string
 }
 
-/*export type PaginationType<I> = {
-    pagesCount: number
-    page: number
-    pageSize: number
-    totalCount: number
-    items: I
-}*/
-
 export class UsersRepository {
-    async findAllUsers(): Promise<PaginationType<UsersOutputType>> {
-        const users = await client.db(dataBaseName)
-            .collection</*UsersOutputType*/ UsersDbType>('users')
-            .find({})
-            .toArray()
+    async findAllUsers(pagination: IQueryUsersPagination): Promise<PaginationType<UsersOutputType>> {
+        const filter = {
+            $or: [{login: {$regex: pagination.searchLoginTerm ?? '', $options: 'i'}},
+                {email: {$regex: pagination.searchEmailTerm ?? '', $options: 'i'}}]
+        }
+        /* const createFilter = (searchLoginTerm?: string, searchEmailTerm?: string) => {
+             if (searchLoginTerm && searchEmailTerm) {
+                 return {
+                     $or: [{login: {$regex: pagination.searchLoginTerm ?? '', $options: 'i'}},
+                         {email: {$regex: pagination.searchEmailTerm ?? '', $options: 'i'}}]
+                 }
+             }
+             if (searchLoginTerm) return {login: {$regex: searchLoginTerm}}
+             if (searchEmailTerm) return {email: {$regex: searchEmailTerm}}
+             return {}
 
-        const allusers = users.map(u => ({
+         }
+
+         const filter = createFilter()*/
+
+        const users = await client.db(dataBaseName)
+            .collection<UsersDbType>('users')
+            .find(filter)
+            .sort({[pagination.sortBy]: pagination.sortDirection})
+            .limit(pagination.pageSize)
+            .skip(pagination.skip)
+            .toArray()
+        const allUsers = users.map(u => ({
             id: u._id.toString(),
             login: u.login,
             email: u.email,
             createdAt: u.createdAt
         }))
+        const totalCount = await client.db(dataBaseName)
+            .collection<UsersDbType>('users')
+            .countDocuments(filter)
+        const pageCount = Math.ceil(totalCount / pagination.pageSize)
         return {
-            pagesCount: 1,
-            page: 1,
-            pageSize: 1,
-            totalCount: 1,
-            items: allusers
+            pagesCount: pageCount,
+            page: pagination.pageNumber,
+            pageSize: pagination.pageSize,
+            totalCount: totalCount,
+            items: allUsers
         }
     }
 
-    async createUser(createUserModel: UserServiceType): Promise<string> {
-
+    async createUser(createUserModel: UserServiceType):
+        Promise<string> {
         const resultCreatedUser = await client.db(dataBaseName)
             .collection<UsersDbType>('users')
             .insertOne({_id: new ObjectId(), ...createUserModel})
@@ -69,5 +89,13 @@ export class UsersRepository {
             .collection<UsersDbType>('users')
             .deleteOne({_id: new ObjectId(userId)})
         return resultDeleteUser.deletedCount === 1
+    }
+
+    async findByLoginOrEmail(loginOrEmail: string): Promise<UsersDbType | null> {
+        const user = await client.db(dataBaseName)
+            .collection<UsersDbType>('users').findOne({
+                $or: [{login: loginOrEmail}, {email: loginOrEmail}]
+            })
+        return user
     }
 }

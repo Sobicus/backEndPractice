@@ -49,10 +49,12 @@ export const getDefaultPagination = <T>(query: IQuery<T>, defaultValues: IDefaul
     if (query.sortDirection && query.sortDirection === InputDescription.asc) {
         defaultValues.sortDirection = Description.asc
     }
-    if (query.pageNumber && !isNaN(parseInt(query.pageNumber.toString(), 10)) && parseInt(query.pageNumber.toString(), 10) > 0) {
+    if (query.pageNumber && !isNaN(parseInt(query.pageNumber.toString(), 10))
+        && parseInt(query.pageNumber.toString(), 10) > 0) {
         defaultValues.pageNumber = parseInt(query.pageNumber.toString(), 10)
     }
-    if (query.pageSize && !isNaN(parseInt(query.pageSize.toString(), 10)) && parseInt(query.pageSize.toString(), 10) > 0) {
+    if (query.pageSize && !isNaN(parseInt(query.pageSize.toString(), 10))
+        && parseInt(query.pageSize.toString(), 10) > 0) {
         defaultValues.pageSize = parseInt(query.pageSize.toString(), 10)
     }
     defaultValues.skip = (defaultValues.pageNumber - 1) * defaultValues.pageSize

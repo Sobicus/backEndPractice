@@ -12,8 +12,7 @@ export const errorValidator = (req: Request, res: Response, next: NextFunction) 
     }));
     res.status(400).send({errorsMessages: errors});
 }*/
-import {validationResult, ValidationError, ErrorFormatter} from 'express-validator';
-import {FieldValidationError} from "express-validator/src/base";
+import {validationResult} from 'express-validator';
 
 // определяем функцию форматирования ошибок с типами
 export const inputVal = (req: Request, res: Response, next: NextFunction) => {
