@@ -45,7 +45,7 @@ export class UsersService {
         const user = await this.userRepo.findByLoginOrEmail(loginOrMail)
         if (!user) return false
         const passwordHash = await this._generateHash(password, user.passwordSalt)
-        return user.passwordHash === passwordHash;
+        return user.passwordHash === passwordHash; // if this true return users
     }
 }
 
