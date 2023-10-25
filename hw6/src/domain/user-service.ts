@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt"
-import {UsersRepository, UsersOutputType, UserServiceType} from "../repositories/users-repository";
+import {UsersRepository, UsersOutputType, UserServiceType, UsersDbType} from "../repositories/users-repository";
 import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
 
 export class UsersService {
@@ -41,12 +41,17 @@ export class UsersService {
         return hash
     }
 
-    async checkCredentials(loginOrMail: string, password: string): Promise<boolean /*| string*/> {
+    async checkCredentials(loginOrMail: string, password: string): Promise<null | UsersDbType> {
         const user = await this.userRepo.findByLoginOrEmail(loginOrMail)
-        if (!user) return false
+        if (!user) return null
         const passwordHash = await this._generateHash(password, user.passwordSalt)
-        return user.passwordHash === passwordHash; // if this true return users
+        //return user.passwordHash === passwordHash; // if this true return users
         // return user._id.toString()
+        if(user.passwordHash !== passwordHash) return null
+        return user
+    }
+    async findUserById(userId:string){
+
     }
 }
 
