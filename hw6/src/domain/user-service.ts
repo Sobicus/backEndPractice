@@ -32,7 +32,6 @@ export class UsersService {
 
     async deleteUser(userId: string): Promise<boolean> {
         return await this.userRepo.deleteUser(userId)
-
     }
 
     async _generateHash(password: string, salt: string): Promise<string> {
@@ -41,18 +40,20 @@ export class UsersService {
         return hash
     }
 
-    async checkCredentials(loginOrMail: string, password: string): Promise<null | UsersDbType> {
+    async checkCredentials(loginOrMail: string, password: string): Promise<null | UserServiceType> {
         const user = await this.userRepo.findByLoginOrEmail(loginOrMail)
         if (!user) return null
         const passwordHash = await this._generateHash(password, user.passwordSalt)
         //return user.passwordHash === passwordHash; // if this true return users
         // return user._id.toString()
-        if(user.passwordHash !== passwordHash) return null
+        if (user.passwordHash !== passwordHash) return null
         return user
     }
-    async findUserById(userId:string){
 
+    async findUserById(userId: string): Promise<UsersOutputType | null> {
+        return await this.userRepo.findUserById(userId)
     }
+
 }
 
 export const userService = new UsersService()

@@ -12,6 +12,7 @@ export type UsersOutputType = {
 }
 // service:
 export type UserServiceType = {
+    id?: string
     login: string
     passwordSalt: string
     passwordHash: string
@@ -91,11 +92,34 @@ export class UsersRepository {
         return resultDeleteUser.deletedCount === 1
     }
 
-    async findByLoginOrEmail(loginOrEmail: string): Promise<UsersDbType | null> {
+    async findByLoginOrEmail(loginOrEmail: string): Promise<UserServiceType | null> {
         const user = await client.db(dataBaseName)
             .collection<UsersDbType>('users').findOne({
                 $or: [{login: loginOrEmail}, {email: loginOrEmail}]
             })
-        return user
+        return (user ? {
+            id: user._id.toString(),
+            login: user.login,
+            email: user.email,
+            createdAt: user.createdAt,
+            passwordHash: user.passwordHash,
+            passwordSalt: user.passwordSalt
+
+        } : null)
     }
+
+    async findUserById(userId: string):Promise<UsersOutputType|null> {
+        const user = await client.db(dataBaseName)
+            .collection<UsersDbType>('users').findOne({_id: new ObjectId(userId)})
+        if (!user) {
+            return null
+        }
+        return {
+            id: user._id.toString(),
+            login:user.login,
+            email:user.email,
+            createdAt:user.createdAt,
+        }
+    }
+
 }
