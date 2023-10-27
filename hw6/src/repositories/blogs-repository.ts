@@ -111,8 +111,8 @@ export class BlogsRepository {
     }
 
     async createBlog(createModel: blogsRepositoryType): Promise<string>/*Promise<InsertOneResult>*/ /*Promise<BlogViewType>*/ {
-
-        const resultNewBlog = await client.db(dataBaseName).collection<blogsRepositoryType>('blogs')
+        const resultNewBlog = await client.db(dataBaseName)
+            .collection<blogsRepositoryType>('blogs')
             .insertOne(createModel)
         return resultNewBlog.insertedId.toString()
     }

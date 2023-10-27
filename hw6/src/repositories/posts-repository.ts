@@ -36,14 +36,14 @@ export class PostsRepository {
         const pagesCount = Math.ceil(totalCount / postsPagination.pageSize)
         const allPosts = posts.map(p => (
             {
-            id: p._id.toString(),
-            title: p.title,
-            shortDescription: p.shortDescription,
-            content: p.content,
-            blogId: p.blogId,
-            blogName: p.blogName,
-            createdAt: p.createdAt
-        }))
+                id: p._id.toString(),
+                title: p.title,
+                shortDescription: p.shortDescription,
+                content: p.content,
+                blogId: p.blogId,
+                blogName: p.blogName,
+                createdAt: p.createdAt
+            }))
         return {
             pagesCount: pagesCount,
             page: postsPagination.pageNumber,
@@ -83,7 +83,9 @@ export class PostsRepository {
     }
 
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
-        const resultUpdateModel = await client.db(dataBaseName).collection<postsViewType>('posts').updateOne({_id: new ObjectId(postId)}, {$set: updateModel})
+        const resultUpdateModel = await client.db(dataBaseName)
+            .collection<postsViewType>('posts')
+            .updateOne({_id: new ObjectId(postId)}, {$set: updateModel})
         return resultUpdateModel.matchedCount === 1
     }
 
@@ -93,4 +95,26 @@ export class PostsRepository {
             .deleteOne({_id: new ObjectId(postId)})
         return resultDeletePost.deletedCount === 1
     }
+
+//-----------------------------------------------------------------------------------------
+    async findCommentsByPostId(postId: string) {
+        const allCommetsByPostId = await client.db(dataBaseName)
+            .collection<commentsViewType>('comments').find({_id: new ObjectId(postId)})
+        return allCommetsByPostId
+    }
+    async createCommetByPostId(postId: string, content: string) {
+        const newCommentData = { postId, content}
+        const post = await client.db(dataBaseName)
+            .collection<postsViewType>('posts')
+            .findOne({_id:new ObjectId(newCommentData.postId)})
+        if(!post)return null
+        const newComment = await client.db(dataBaseName)
+            .collection<commentsViewType>('comments').insertOne(newCommentData)
+        return newComment
+    }
+
+}
+type commentsViewType={
+    postId:string
+    content:string
 }
