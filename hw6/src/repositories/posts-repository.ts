@@ -3,6 +3,7 @@ import {blogsRepositoryType} from "./blogs-repository";
 import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 import {IPostPagination, PaginationType} from "../types/paggination-type";
+import {CommentsRepositoryType} from "./comments-repository";
 
 export type postsViewType = {
     id: string
@@ -96,25 +97,19 @@ export class PostsRepository {
         return resultDeletePost.deletedCount === 1
     }
 
-//-----------------------------------------------------------------------------------------
     async findCommentsByPostId(postId: string) {
         const allCommetsByPostId = await client.db(dataBaseName)
             .collection<commentsViewType>('comments').find({_id: new ObjectId(postId)})
         return allCommetsByPostId
     }
-    async createCommetByPostId(postId: string, content: string) {
-        const newCommentData = { postId, content}
+
+    async createCommetByPostId(postId: string, content: string, createdAt: string) {
         const post = await client.db(dataBaseName)
             .collection<postsViewType>('posts')
-            .findOne({_id:new ObjectId(newCommentData.postId)})
-        if(!post)return null
+            .findOne({_id: new ObjectId(postId)})
+        if (!post) return null
         const newComment = await client.db(dataBaseName)
-            .collection<commentsViewType>('comments').insertOne(newCommentData)
+            .collection<CommentsRepositoryType>('comments').insertOne(newCommentData)
         return newComment
     }
-
-}
-type commentsViewType={
-    postId:string
-    content:string
 }

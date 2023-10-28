@@ -29,6 +29,7 @@ export class PostsService {
         if (!mongoResponse) return null
         return {id: mongoResponse.blogId, blogName: mongoResponse.blogName, ...newPost};
     }
+
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
         return await this.postRepo.updatePost(postId, updateModel)
     }
@@ -36,6 +37,21 @@ export class PostsService {
     async deletePost(postId: string): Promise<boolean> {
         const resultDeletePost = await this.postRepo.deletePost(postId)
         return resultDeletePost
+    }
+
+    async createCommetByPostId(postId: string, content: string) {
+        const createdAt = new Date().toISOString()
+        const newComment = await this.postRepo.createCommetByPostId(postId, content, createdAt)
+        /*{
+            id: mongoId
+            content: content
+            commentatorInfo: {
+                userId: took in mongoId
+                userLogin: took in mongo
+            }
+            createdAt: new Date().toISOString()
+        }*/
+        return newComment
     }
 }
 
