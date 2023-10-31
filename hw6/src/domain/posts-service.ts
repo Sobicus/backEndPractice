@@ -1,6 +1,8 @@
 import {PostsRepository, postsViewType} from "../repositories/posts-repository";
 import {postBodyRequest} from "../routes/posts-router";
 import {IDefaultPagination, PaginationType, SortPostsByEnum} from "../types/paggination-type";
+import {UsersOutputType} from "../repositories/users-repository";
+import {newCommentType} from "../types/comments-type";
 
 export class PostsService {
     postRepo: PostsRepository
@@ -39,19 +41,18 @@ export class PostsService {
         return resultDeletePost
     }
 
-    async createCommetByPostId(postId: string, content: string) {
-        const createdAt = new Date().toISOString()
-        const newComment = await this.postRepo.createCommetByPostId(postId, content, createdAt)
-        /*{
-            id: mongoId
-            content: content
-            commentatorInfo: {
-                userId: took in mongoId
-                userLogin: took in mongo
-            }
-            createdAt: new Date().toISOString()
-        }*/
-        return newComment
+    async createCommetByPostId(postId: string, content: string, user: UsersOutputType) {
+        const comment: newCommentType = {
+            createdAt: new Date().toISOString(),
+            postId,
+            content,
+            userId: user.id,
+            userLogin: user.login
+        }
+        return await this.postRepo.createCommetByPostId(comment);
+    }
+    async findCommentsById(postId:string){
+        return await this.postRepo.findCommentsByPostId(postId)
     }
 }
 

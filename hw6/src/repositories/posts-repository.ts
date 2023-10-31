@@ -3,10 +3,19 @@ import {blogsRepositoryType} from "./blogs-repository";
 import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 import {IPostPagination, PaginationType} from "../types/paggination-type";
-import {CommentsRepositoryType} from "./comments-repository";
+import {CommentsRepositoryType, CommentsViewType, newCommentType} from "../types/comments-type";
 
 export type postsViewType = {
     id: string
+    title: string
+    shortDescription: string
+    content: string
+    blogId: string
+    blogName: string
+    createdAt: string
+}
+export type postsDbType = {
+    _id: ObjectId
     title: string
     shortDescription: string
     content: string
@@ -85,31 +94,53 @@ export class PostsRepository {
 
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
         const resultUpdateModel = await client.db(dataBaseName)
-            .collection<postsViewType>('posts')
+            .collection<postsDbType>('posts')
             .updateOne({_id: new ObjectId(postId)}, {$set: updateModel})
         return resultUpdateModel.matchedCount === 1
     }
 
     async deletePost(postId: string): Promise<boolean> {
         const resultDeletePost = await client.db(dataBaseName)
-            .collection<postsViewType>('posts')
+            .collection<postsDbType>('posts')
             .deleteOne({_id: new ObjectId(postId)})
         return resultDeletePost.deletedCount === 1
     }
 
     async findCommentsByPostId(postId: string) {
-        const allCommetsByPostId = await client.db(dataBaseName)
-            .collection<commentsViewType>('comments').find({_id: new ObjectId(postId)})
-        return allCommetsByPostId
+        const commets = await client.db(dataBaseName)
+            .collection<CommentsRepositoryType>('comments').find({postId: postId}).toArray()
+        /*return allCommetsByPostId*/
+        const comments = commets.map(el => (
+            {
+                id: el._id.toString(),
+                content: el.content,
+                commentatorInfo: {
+                    userId: el.userId,
+                    userLogin: el.userLogin
+                },
+                createdAt: el.createdAt
+            })
+        )
+        return {
+            pagesCount: 0,
+            page: 0,
+            pageSize: 0,
+            totalCount: 0,
+            items: comments
+        }
     }
 
-    async createCommetByPostId(postId: string, content: string, createdAt: string) {
-        const post = await client.db(dataBaseName)
-            .collection<postsViewType>('posts')
-            .findOne({_id: new ObjectId(postId)})
-        if (!post) return null
+    async createCommetByPostId(comment: newCommentType): Promise<CommentsViewType> {
         const newComment = await client.db(dataBaseName)
-            .collection<CommentsRepositoryType>('comments').insertOne(newCommentData)
-        return newComment
+            .collection('comments').insertOne({...comment})//<CommentsRepositoryType> can not
+        return {
+            id: newComment.insertedId.toString(),
+            content: comment.content,
+            commentatorInfo: {
+                userLogin: comment.userLogin,
+                userId: comment.userId
+            },
+            createdAt: comment.createdAt
+        }
     }
 }

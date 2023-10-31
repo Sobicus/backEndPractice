@@ -2,12 +2,16 @@ import {Response, Request, Router} from "express";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
 import {validationPostsMidleware} from "../midlewares/input-posts-validation-middleware";
 import {postService} from "../domain/posts-service";
-import {getDefaultPagination, getPostsPagination} from "../helpers/pagination-helpers";
+import {getPostsPagination} from "../helpers/pagination-helpers";
 import {IQuery, SortPostsByEnum} from "../types/paggination-type";
+import {authMiddleware} from "../midlewares/auth-middleware";
+import {body} from "express-validator";
+import {inputVal} from "../midlewares/errorValidator";
+import {UsersOutputType} from "../repositories/users-repository";
 
 export const postsRouter = Router()
 
-postsRouter.get('/', async (req: Request<{},{},{},IQuery<SortPostsByEnum>>, res: Response) => {
+postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery<SortPostsByEnum>>, res: Response) => {
     const postsPagination = getPostsPagination(req.query)
     const posts = await postService.findAllPosts(postsPagination)
     res.status(200).send(posts)
@@ -45,6 +49,29 @@ postsRouter.delete('/:id', checkAuthorization, async (req: RequestWithParams<{ i
     }
     res.sendStatus(204)
 })
+postsRouter.post('/:id/comments',
+    authMiddleware,
+    body('content').isString().trim().isLength({
+        min: 20,
+        max: 300
+    }).withMessage('Comment cannot be less than 20 and more than 300 characters'), inputVal,
+    async (req: postRequestComment<{ id: string }, { content: string }, UsersOutputType>, res: Response) => {
+        const post = await postService.findPostById(req.params.id)
+        if (!post) {
+            return res.sendStatus(404)
+        }
+        const newPost = await postService.createCommetByPostId(req.params.id, req.body.content, req.user!)
+        return res.status(201).send(newPost)
+    })
+postsRouter.get('/:id/comments', async (req: RequestWithParams<{ id: string }>, res: Response) => {
+    const post = await postService.findPostById(req.params.id)
+    if (!post) {
+        res.sendStatus(404)
+        return
+    }
+    const comments = await postService.findCommentsById(req.params.id)
+    return res.status(200).send(comments)
+})
 
 type RequestWithParams<P> = Request<P, {}, {}, {}>
 type postRequestWithBody<B> = Request<{}, {}, B, {}>
@@ -54,4 +81,5 @@ export type postBodyRequest = {
     content: string
     blogId: string
 }
+type postRequestComment<P, B, U extends UsersOutputType> = Request<P, {}, B, {}, U>
 type putRequesrChangePost<P, B> = Request<P, {}, B, {}>
