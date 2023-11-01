@@ -4,6 +4,7 @@ import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 import {IPostPagination, PaginationType} from "../types/paggination-type";
 import {CommentsRepositoryType, CommentsViewType, newCommentType} from "../types/comments-type";
+import {queryCommentsType} from "../helpers/pagination-comments";
 
 export type postsViewType = {
     id: string
@@ -106,7 +107,7 @@ export class PostsRepository {
         return resultDeletePost.deletedCount === 1
     }
 
-    async findCommentsByPostId(postId: string) {
+    async findCommentsByPostId(postId: string, query: queryCommentsType) {
         const commets = await client.db(dataBaseName)
             .collection<CommentsRepositoryType>('comments').find({postId: postId}).toArray()
         /*return allCommetsByPostId*/

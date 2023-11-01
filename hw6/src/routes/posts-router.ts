@@ -8,6 +8,7 @@ import {authMiddleware} from "../midlewares/auth-middleware";
 import {body} from "express-validator";
 import {inputVal} from "../midlewares/errorValidator";
 import {UsersOutputType} from "../repositories/users-repository";
+import {queryCommentsType} from "../helpers/pagination-comments";
 
 export const postsRouter = Router()
 
@@ -30,7 +31,7 @@ postsRouter.post('/', checkAuthorization, ...validationPostsMidleware, async (re
     if (!newPost) return res.sendStatus(404);
     return res.status(201).send(newPost);
 })
-postsRouter.put('/:id', checkAuthorization, ...validationPostsMidleware, async (req: putRequesrChangePost<{
+postsRouter.put('/:id', checkAuthorization, ...validationPostsMidleware, async (req: putRequestChangePost<{
     id: string
 }, postBodyRequest>, res: Response) => {
     let {title, shortDescription, content, blogId} = req.body
@@ -63,13 +64,16 @@ postsRouter.post('/:id/comments',
         const newPost = await postService.createCommetByPostId(req.params.id, req.body.content, req.user!)
         return res.status(201).send(newPost)
     })
-postsRouter.get('/:id/comments', async (req: RequestWithParams<{ id: string }>, res: Response) => {
+postsRouter.get('/:id/comments', async (req: RequestWithParamsAndQuery<{
+    id: string
+}, queryCommentsType>, res: Response) => {
     const post = await postService.findPostById(req.params.id)
+    const query = req.query
     if (!post) {
         res.sendStatus(404)
         return
     }
-    const comments = await postService.findCommentsById(req.params.id)
+    const comments = await postService.findCommentsById(req.params.id, query)
     return res.status(200).send(comments)
 })
 
@@ -82,4 +86,5 @@ export type postBodyRequest = {
     blogId: string
 }
 type postRequestComment<P, B, U extends UsersOutputType> = Request<P, {}, B, {}, U>
-type putRequesrChangePost<P, B> = Request<P, {}, B, {}>
+type putRequestChangePost<P, B> = Request<P, {}, B, {}>
+type RequestWithParamsAndQuery<P, Q> = Request<P, {}, {}, Q>

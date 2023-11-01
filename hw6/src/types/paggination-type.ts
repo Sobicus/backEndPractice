@@ -6,22 +6,24 @@ export enum SortBlogsByEnum {
     createdAt = 'createdAt',
     isMembership = 'isMembership'
 }
-export enum SortPostsByEnum{
-    id= 'id',
-    title= 'title',
-    shortDescription= 'shortDescription',
-    content= 'content',
-    blogId= 'blogId',
-    blogName= 'blogName',
-    createdAt= 'createdAt'
+
+export enum SortPostsByEnum {
+    id = 'id',
+    title = 'title',
+    shortDescription = 'shortDescription',
+    content = 'content',
+    blogId = 'blogId',
+    blogName = 'blogName',
+    createdAt = 'createdAt'
 }
+
 export enum Description {
     asc = 1,
     desc = -1
 }
 
-export enum InputDescription{
-    asc= 'asc',
+export enum InputDescription {
+    asc = 'asc',
     desc = 'desc'
 }
 
@@ -45,7 +47,7 @@ export interface IBlockPagination extends IDefaultPagination<SortBlogsByEnum> {
     searchNameTerm: string// +sortBy, +pageSize,...
 }
 
-export interface IPostPagination extends IDefaultPagination<SortPostsByEnum>{
+export interface IPostPagination extends IDefaultPagination<SortPostsByEnum> {
 
 }
 
