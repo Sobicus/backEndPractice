@@ -4,7 +4,7 @@ import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 import {IPostPagination, PaginationType} from "../types/paggination-type";
 import {CommentsRepositoryType, CommentsViewType, newCommentType} from "../types/comments-type";
-import {queryCommentsType} from "../helpers/pagination-comments";
+import {getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
 
 export type postsViewType = {
     id: string
@@ -108,9 +108,11 @@ export class PostsRepository {
     }
 
     async findCommentsByPostId(postId: string, query: queryCommentsType) {
+        const paggination = getCommentsPagination(query)
         const commets = await client.db(dataBaseName)
-            .collection<CommentsRepositoryType>('comments').find({postId: postId}).toArray()
-        /*return allCommetsByPostId*/
+            .collection<CommentsRepositoryType>('comments')
+            .find({postId: postId})
+            .toArray()
         const comments = commets.map(el => (
             {
                 id: el._id.toString(),
