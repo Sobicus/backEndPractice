@@ -8,7 +8,7 @@ import {authMiddleware} from "../midlewares/auth-middleware";
 import {body} from "express-validator";
 import {inputVal} from "../midlewares/errorValidator";
 import {UsersOutputType} from "../repositories/users-repository";
-import {queryCommentsType} from "../helpers/pagination-comments";
+import {getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
 
 export const postsRouter = Router()
 
@@ -61,19 +61,22 @@ postsRouter.post('/:id/comments',
         if (!post) {
             return res.sendStatus(404)
         }
-        const newPost = await postService.createCommetByPostId(req.params.id, req.body.content, req.user!)
-        return res.status(201).send(newPost)
+        const newComment = await postService.createCommetByPostId(req.params.id, req.body.content, req.user!)
+        return res.status(201).send(newComment)
     })
 postsRouter.get('/:id/comments', async (req: RequestWithParamsAndQuery<{
     id: string
 }, queryCommentsType>, res: Response) => {
+    console.log(req.query)
+    const paggination = getCommentsPagination(req.query)
+    console.log(paggination)
     const post = await postService.findPostById(req.params.id)
     const query = req.query
     if (!post) {
         res.sendStatus(404)
         return
     }
-    const comments = await postService.findCommentsById(req.params.id, query)
+    const comments = await postService.findCommentsById(req.params.id, paggination)
     return res.status(200).send(comments)
 })
 

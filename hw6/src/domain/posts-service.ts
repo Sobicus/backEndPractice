@@ -3,7 +3,7 @@ import {postBodyRequest} from "../routes/posts-router";
 import {IDefaultPagination, PaginationType, SortPostsByEnum} from "../types/paggination-type";
 import {UsersOutputType} from "../repositories/users-repository";
 import {newCommentType} from "../types/comments-type";
-import {queryCommentsType} from "../helpers/pagination-comments";
+import {DefaultCommentsPaginationType, queryCommentsType} from "../helpers/pagination-comments";
 
 export class PostsService {
     postRepo: PostsRepository
@@ -53,8 +53,8 @@ export class PostsService {
         return await this.postRepo.createCommetByPostId(comment);
     }
 
-    async findCommentsById(postId: string, query: queryCommentsType) {
-        return await this.postRepo.findCommentsByPostId(postId, query)
+    async findCommentsById(postId: string, paggination: DefaultCommentsPaginationType) {
+        return await this.postRepo.findCommentsByPostId(postId, paggination)
     }
 }
 

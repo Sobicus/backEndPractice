@@ -4,7 +4,7 @@ import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 import {IPostPagination, PaginationType} from "../types/paggination-type";
 import {CommentsRepositoryType, CommentsViewType, newCommentType} from "../types/comments-type";
-import {getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
+import {DefaultCommentsPaginationType, getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
 
 export type postsViewType = {
     id: string
@@ -107,11 +107,14 @@ export class PostsRepository {
         return resultDeletePost.deletedCount === 1
     }
 
-    async findCommentsByPostId(postId: string, query: queryCommentsType) {
-        const paggination = getCommentsPagination(query)
+    async findCommentsByPostId(postId: string, paggination: DefaultCommentsPaginationType) {
+        // const paggination = getCommentsPagination(query)
         const commets = await client.db(dataBaseName)
             .collection<CommentsRepositoryType>('comments')
             .find({postId: postId})
+            .sort({[paggination.sortBy]: paggination.sortDirection})
+            .limit(paggination.pageSize)
+            .skip(paggination.skip)
             .toArray()
         const comments = commets.map(el => (
             {
@@ -124,11 +127,13 @@ export class PostsRepository {
                 createdAt: el.createdAt
             })
         )
+        const totalCount = await client.db(dataBaseName).collection<CommentsRepositoryType>('comments').countDocuments({postId: postId})
+        const pageCount = Math.ceil(totalCount / paggination.pageSize)
         return {
-            pagesCount: 0,
-            page: 0,
-            pageSize: 0,
-            totalCount: 0,
+            pagesCount: pageCount,
+            page: paggination.pageNumber,
+            pageSize: paggination.pageSize,
+            totalCount: totalCount,
             items: comments
         }
     }
