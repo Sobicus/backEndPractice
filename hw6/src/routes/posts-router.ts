@@ -1,14 +1,13 @@
 import {Response, Request, Router} from "express";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
-import {validationPostsMidleware} from "../midlewares/input-posts-validation-middleware";
+import {validationPostsMiddleware} from "../midlewares/input-posts-validation-middleware";
 import {postService} from "../domain/posts-service";
 import {getPostsPagination} from "../helpers/pagination-helpers";
 import {IQuery, SortPostsByEnum} from "../types/paggination-type";
 import {authMiddleware} from "../midlewares/auth-middleware";
-import {body} from "express-validator";
-import {inputVal} from "../midlewares/errorValidator";
 import {UsersOutputType} from "../repositories/users-repository";
 import {getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
+import {validationCommentsContentMiddleware} from "../midlewares/input-comments-content-middleware";
 
 export const postsRouter = Router()
 
@@ -25,13 +24,13 @@ postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res: Resp
     }
     return res.status(200).send(post);
 })
-postsRouter.post('/', checkAuthorization, ...validationPostsMidleware, async (req: postRequestWithBody<postBodyRequest>, res: Response) => {
+postsRouter.post('/', checkAuthorization, ...validationPostsMiddleware, async (req: postRequestWithBody<postBodyRequest>, res: Response) => {
     let {title, shortDescription, content, blogId} = req.body
     const newPost = await postService.createPost(title, shortDescription, content, blogId)
     if (!newPost) return res.sendStatus(404);
     return res.status(201).send(newPost);
 })
-postsRouter.put('/:id', checkAuthorization, ...validationPostsMidleware, async (req: putRequestChangePost<{
+postsRouter.put('/:id', checkAuthorization, ...validationPostsMiddleware, async (req: putRequestChangePost<{
     id: string
 }, postBodyRequest>, res: Response) => {
     let {title, shortDescription, content, blogId} = req.body
@@ -52,10 +51,7 @@ postsRouter.delete('/:id', checkAuthorization, async (req: RequestWithParams<{ i
 })
 postsRouter.post('/:id/comments',
     authMiddleware,
-    body('content').isString().trim().isLength({
-        min: 20,
-        max: 300
-    }).withMessage('Comment cannot be less than 20 and more than 300 characters'), inputVal,
+    validationCommentsContentMiddleware,
     async (req: postRequestComment<{ id: string }, { content: string }, UsersOutputType>, res: Response) => {
         const post = await postService.findPostById(req.params.id)
         if (!post) {

@@ -114,8 +114,7 @@ export class PostsRepository {
             .find({postId: postId})
             .sort({[paggination.sortBy]: paggination.sortDirection})
             .limit(paggination.pageSize)
-            .skip(paggination.skip)
-            .toArray()
+            .skip(paggination.skip).toArray()
         const comments = commets.map(el => (
             {
                 id: el._id.toString(),
@@ -127,7 +126,9 @@ export class PostsRepository {
                 createdAt: el.createdAt
             })
         )
-        const totalCount = await client.db(dataBaseName).collection<CommentsRepositoryType>('comments').countDocuments({postId: postId})
+        const totalCount = await client.db(dataBaseName)
+            .collection<CommentsRepositoryType>('comments')
+            .countDocuments({postId: postId})
         const pageCount = Math.ceil(totalCount / paggination.pageSize)
         return {
             pagesCount: pageCount,

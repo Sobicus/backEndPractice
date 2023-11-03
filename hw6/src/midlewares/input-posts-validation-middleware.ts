@@ -3,7 +3,7 @@ import {inputVal} from "./errorValidator";
 import {blogsService} from "../domain/blogs-service";
 
 
-export const validationPostsMidleware = [
+export const validationPostsMiddleware = [
     body('title')
         .isString().withMessage('Title not a string')
         .trim().notEmpty().withMessage('Title can`t be empty and cannot consist of only spaces')

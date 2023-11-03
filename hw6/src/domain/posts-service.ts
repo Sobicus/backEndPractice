@@ -5,7 +5,7 @@ import {UsersOutputType} from "../repositories/users-repository";
 import {newCommentType} from "../types/comments-type";
 import {DefaultCommentsPaginationType, queryCommentsType} from "../helpers/pagination-comments";
 
-export class PostsService {
+class PostsService {
     postRepo: PostsRepository
 
     constructor() {

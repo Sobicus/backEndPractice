@@ -3,11 +3,11 @@ import {ObjectId} from "mongodb";
 export type CommentsViewType = {
     id: string
     content: string
-    createdAt: string
     commentatorInfo: {
         userId: string
         userLogin: string
     }
+    createdAt: string
 }
 export type CommentsRepositoryType = {
     _id: ObjectId
