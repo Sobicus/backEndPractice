@@ -23,7 +23,10 @@ commentsRouter.put('/:id', authMiddleware, validationCommentsContentMiddleware, 
         res.sendStatus(404)
         return
     }
-    if (comment.commentatorInfo.userId !== req.userId) {
+    if (comment.commentatorInfo.userId !== req.user!.id) {
+        console.log(comment.commentatorInfo.userId)
+        console.log(req.user!.id)
+        console.log(comment.commentatorInfo.userId === req.user!.id)
         res.sendStatus(403)
         return
     }
@@ -34,13 +37,15 @@ commentsRouter.put('/:id', authMiddleware, validationCommentsContentMiddleware, 
     }
     res.sendStatus(204)
 })
-commentsRouter.delete('/:id',authMiddleware, async (req:commentsRequestParams<{ id:string }>, res:Response)=>{
+commentsRouter.delete('/:id', authMiddleware, async (req: commentsRequestParamsAndUser<{
+    id: string
+}, UsersOutputType>, res: Response) => {
     const comment = await commentService.getCommentById(req.params.id)
-    if(!comment){
+    if (!comment) {
         res.sendStatus(404)
         return
     }
-    if(comment.commentatorInfo.userId!==req.userId){
+    if (comment.commentatorInfo.userId !== req.user!.id) {
         res.sendStatus(403)
         return
     }
@@ -53,4 +58,5 @@ commentsRouter.delete('/:id',authMiddleware, async (req:commentsRequestParams<{ 
 })
 
 type commentsRequestParams<P> = Request<P, {}, {}, {}>
+type commentsRequestParamsAndUser<P, U extends UsersOutputType> = Request<P, {}, {}, {}, U>
 type commentsRequestParamsAndBodyUser<P, B, U extends UsersOutputType> = Request<P, {}, B, {}, U>

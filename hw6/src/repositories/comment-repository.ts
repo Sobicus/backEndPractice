@@ -20,7 +20,7 @@ export class CommentRepository {
     }
 
     async updateComment(commentId: string, content: string): Promise<boolean> {
-        const resultUpdateCommentModel = await client.db(dataBaseName).collection<CommentsRepositoryType>('comments').updateOne({_id: new ObjectId(commentId)}, {content: content})
+        const resultUpdateCommentModel = await client.db(dataBaseName).collection<CommentsRepositoryType>('comments').updateOne({_id: new ObjectId(commentId)}, {$set:{content: content}})
         return resultUpdateCommentModel.matchedCount === 1
     }
 
