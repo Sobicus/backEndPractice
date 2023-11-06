@@ -40,7 +40,9 @@ authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
         userId: userData.id
     })
 })
-
+authRouter.post('/registration',async ()=>{})
+authRouter.post('/registration-confirmation',async ()=>{})
+authRouter.post('/registration-email-resending',async ()=>{})
 
 type PostRequestType<B> = Request<{}, {}, B, {}>
 type BodyType = {
