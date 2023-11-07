@@ -24,9 +24,6 @@ commentsRouter.put('/:id', authMiddleware, validationCommentsContentMiddleware, 
         return
     }
     if (comment.commentatorInfo.userId !== req.user!.id) {
-        console.log(comment.commentatorInfo.userId)
-        console.log(req.user!.id)
-        console.log(comment.commentatorInfo.userId === req.user!.id)
         res.sendStatus(403)
         return
     }

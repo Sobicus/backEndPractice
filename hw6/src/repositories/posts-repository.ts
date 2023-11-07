@@ -141,7 +141,7 @@ export class PostsRepository {
 
     async createCommetByPostId(comment: newCommentType): Promise<CommentsViewType> {
         const newComment = await client.db(dataBaseName)
-            .collection('comments').insertOne({...comment})//<CommentsRepositoryType> can not
+            .collection<CommentsRepositoryType>('comments').insertOne({...comment, _id: new ObjectId()})//<CommentsRepositoryType> can not
         return {
             id: newComment.insertedId.toString(),
             content: comment.content,
