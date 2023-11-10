@@ -15,6 +15,7 @@ export type postsViewType = {
     blogName: string
     createdAt: string
 }
+
 export type postsDbType = {
     _id: ObjectId
     title: string
@@ -80,17 +81,17 @@ export class PostsRepository {
         }
     }
 
-    async createPost(newPost: createPostType): Promise<{ blogName: string, blogId: string } | null> {
+    async createPost(newPost: createPostType): Promise<{ blogName: string, postId: string } | null> {
         let blog: blogsRepositoryType | null = await client.db(dataBaseName)
             .collection<blogsRepositoryType>('blogs')
             .findOne({_id: new ObjectId(newPost.blogId)})
         if (!blog) return null;
         let newPostByDb = await client.db(dataBaseName)
-            .collection('posts')
-            .insertOne({...newPost, blogName: blog.name})
+            .collection<postsDbType>('posts')
+            .insertOne({...newPost, blogName: blog.name, _id:new ObjectId()})
         const blogName = blog.name
-        const blogId = newPostByDb.insertedId.toString()
-        return {blogName, blogId}
+        const postId = newPostByDb.insertedId.toString()
+        return {blogName, postId}
     }
 
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {

@@ -28,9 +28,10 @@ class PostsService {
             blogId,
             createdAt: new Date().toISOString()
         };
+
         const mongoResponse = await this.postRepo.createPost(newPost)
         if (!mongoResponse) return null
-        return {id: mongoResponse.blogId, blogName: mongoResponse.blogName, ...newPost};
+        return {id: mongoResponse.postId, blogName: mongoResponse.blogName, ...newPost};
     }
 
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {

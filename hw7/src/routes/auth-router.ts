@@ -3,6 +3,7 @@ import {userService} from "../domain/user-service";
 import {jwtService} from "../application/jwt-service";
 import {authMiddleware} from "../midlewares/auth-middleware";
 import nodemailer from 'nodemailer'
+import {emailAdapter} from "../adapters/email-adapter";
 
 export const authRouter = Router()
 
@@ -42,32 +43,8 @@ authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
     })
 })
 authRouter.post('/registration', async (req: PostRequestType<PostRequestRegistrationType>, res: Response) => {
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: 'maksymdeveloper88@gmail.com',
-                pass: 'hvls muyj jswi iark'
-            }
-        });
-
-        async function main() {
-            const info = await transporter.sendMail({
-                from: 'Maksym', // sender address
-                to: req.body.email, // list of receivers
-                subject: req.body.subject, // Subject line
-                html: req.body.message, // html body
-            });
-            console.log(info)
-            console.log("Message sent: %s", info.messageId);
-        }
-
-        main().catch(console.error);
-        res.send({
-            email: req.body.email,
-            message: req.body.message,
-            subject: req.body.subject,
-        })
-
+        await emailAdapter.sendEmail(req.body.email, req.body.subject, req.body.message)
+        res.sendStatus(204)
     }
 )
 authRouter.post('/registration-confirmation', async () => {

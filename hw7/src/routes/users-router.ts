@@ -8,7 +8,7 @@ export const usersRouter = Router()
 
 usersRouter.get('/', checkAuthorization, async (req: Request<{}, {}, {}, IQueryUsers>, res: Response) => {
     const usersPagination = getPaginationUsersHelpers(req.query)
-    const users = await userService.findAllPosts(usersPagination)
+    const users = await userService.findAllUsers(usersPagination)
     res.status(200).send(users)
 })
 usersRouter.post('/', checkAuthorization, validationUsersMiddleware,

@@ -2,14 +2,14 @@ import bcrypt from "bcrypt"
 import {UsersRepository, UsersOutputType, UserServiceType, UsersDbType} from "../repositories/users-repository";
 import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
 
-export class UsersService {
+class UsersService {
     userRepo: UsersRepository
 
     constructor() {
         this.userRepo = new UsersRepository()
     }
 
-    async findAllPosts(pagination: IQueryUsersPagination) {
+    async findAllUsers(pagination: IQueryUsersPagination) {
         return await this.userRepo.findAllUsers(pagination)
     }
 
