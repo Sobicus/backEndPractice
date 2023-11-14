@@ -4,26 +4,12 @@ import {jwtService} from "../application/jwt-service";
 import {authMiddleware} from "../midlewares/auth-middleware";
 import nodemailer from 'nodemailer'
 import {emailAdapter} from "../adapters/email-adapter";
+import {authService} from "../domain/auth-service";
 
 export const authRouter = Router()
 
-/*authRouter.post('/login', validationAuthMiddleware, async (req: PostRequestType<BodyType>, res: Response) => {
-    const checkResult = await userService.checkCredentials(req.body.loginOrEmail, req.body.password)
-    if (!checkResult) return res.sendStatus(401)
-    return res.sendStatus(204)
-})*/
-//----------------------HW 6------------------------------------
 authRouter.post('/login', async (req: PostRequestType<BodyType>, res: Response) => {
     const user = await userService.checkCredentials(req.body.loginOrEmail, req.body.password)
-    /*
-    if (user) {
-        const token = await jwtService.createJWT(user.id!) // Change hardcode
-        res.status(200).send(token)
-        return
-    } else {
-
-    }
-    */
     if (!user) {
         res.sendStatus(401)
         return
@@ -43,7 +29,8 @@ authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
     })
 })
 authRouter.post('/registration', async (req: PostRequestType<PostRequestRegistrationType>, res: Response) => {
-        await emailAdapter.sendEmail(req.body.email, req.body.subject, req.body.message)
+        //await userService.createUser(req.body.login, req.body.password, req.body.email)
+        await authService.createUser(req.body.login, req.body.password, req.body.email)
         res.sendStatus(204)
     }
 )
@@ -58,7 +45,7 @@ type BodyType = {
     password: string
 }
 type PostRequestRegistrationType = {
+    login: string
+    password: string
     email: string
-    message: string
-    subject: string
 }

@@ -2,6 +2,8 @@ import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 import {PaginationType} from "../types/paggination-type";
 import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
+import {randomUUID} from "crypto";
+import add from "date-fns/add";
 
 //response:
 export type UsersOutputType = {
@@ -18,8 +20,13 @@ export type UserServiceType = {
     passwordHash: string
     email: string
     createdAt: string
+    emailConfirmation:EmailConfirmation
 }
-
+export type EmailConfirmation = {
+    confirmationCode: string,
+    expirationDate: Date,
+    isConfirmed: boolean
+}
 // in db:
 export type UsersDbType = {
     _id: ObjectId
@@ -108,7 +115,7 @@ export class UsersRepository {
         } : null)
     }
 
-    async findUserById(userId: string):Promise<UsersOutputType|null> {
+    async findUserById(userId: string): Promise<UsersOutputType | null> {
         const user = await client.db(dataBaseName)
             .collection<UsersDbType>('users').findOne({_id: new ObjectId(userId)})
         if (!user) {
@@ -116,9 +123,9 @@ export class UsersRepository {
         }
         return {
             id: user._id.toString(),
-            login:user.login,
-            email:user.email,
-            createdAt:user.createdAt,
+            login: user.login,
+            email: user.email,
+            createdAt: user.createdAt,
         }
     }
 
