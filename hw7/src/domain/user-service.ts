@@ -15,7 +15,7 @@ class UsersService {
         return await this.userRepo.findAllUsers(pagination)
     }
 
-    async createUser(login: string, password: string, email: string): Promise<UsersOutputType> {
+    async createUser(login: string, password: string, email: string):Promise<string>/*: Promise<UsersOutputType>*/ {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
 
@@ -31,12 +31,14 @@ class UsersService {
                 expirationDate:add(new Date(),{
                     hours:1,
                     minutes:1,
+                    seconds:1
                 }),
                 isConfirmed:false
             }
         }
         const id = await this.userRepo.createUser(createUserModel)
-        return {id, login, email, createdAt}
+        // return {id, login, email, createdAt}
+        return createUserModel.emailConfirmation.confirmationCode
     }
 
     async deleteUser(userId: string): Promise<boolean> {

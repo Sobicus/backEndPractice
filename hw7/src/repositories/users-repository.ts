@@ -20,7 +20,7 @@ export type UserServiceType = {
     passwordHash: string
     email: string
     createdAt: string
-    emailConfirmation:EmailConfirmation
+    emailConfirmation: EmailConfirmation
 }
 export type EmailConfirmation = {
     confirmationCode: string,
@@ -35,6 +35,7 @@ export type UsersDbType = {
     passwordHash: string
     email: string
     createdAt: string
+    emailConfirmation: EmailConfirmation
 }
 
 export class UsersRepository {
@@ -110,8 +111,12 @@ export class UsersRepository {
             email: user.email,
             createdAt: user.createdAt,
             passwordHash: user.passwordHash,
-            passwordSalt: user.passwordSalt
-
+            passwordSalt: user.passwordSalt,
+            emailConfirmation: {
+                confirmationCode: user.emailConfirmation.confirmationCode,
+                expirationDate: user.emailConfirmation.expirationDate,
+                isConfirmed: user.emailConfirmation.isConfirmed
+            }
         } : null)
     }
 
