@@ -3,6 +3,8 @@ import {UsersRepository, UsersOutputType, UserServiceType, UsersDbType} from "..
 import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
 import {randomUUID} from "crypto";
 import add from "date-fns/add";
+import {client, dataBaseName} from "../repositories/db";
+import {ObjectId} from "mongodb";
 
 class UsersService {
     userRepo: UsersRepository
@@ -15,7 +17,7 @@ class UsersService {
         return await this.userRepo.findAllUsers(pagination)
     }
 
-    async createUser(login: string, password: string, email: string):Promise<string>/*: Promise<UsersOutputType>*/ {
+    async createUser(login: string, password: string, email: string): Promise<string>/*: Promise<UsersOutputType>*/ {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
 
@@ -26,14 +28,14 @@ class UsersService {
             passwordHash,
             email,
             createdAt,
-            emailConfirmation:{
+            emailConfirmation: {
                 confirmationCode: randomUUID(),
-                expirationDate:add(new Date(),{
-                    hours:1,
-                    minutes:1,
-                    seconds:1
+                expirationDate: add(new Date(), {
+                    hours: 1,
+                    minutes: 1,
+                    seconds: 1
                 }),
-                isConfirmed:false
+                isConfirmed: false
             }
         }
         const id = await this.userRepo.createUser(createUserModel)
@@ -65,6 +67,13 @@ class UsersService {
         return await this.userRepo.findUserById(userId)
     }
 
+    async findUserByCode(code: string): Promise<UsersDbType | null> {
+        return await this.userRepo.findUserByCode(code)
+    }
+
+    async updateConfirmation(id: ObjectId) {
+        return await this.userRepo.updateConfirmation(id)
+    }
 }
 
 export const userService = new UsersService()

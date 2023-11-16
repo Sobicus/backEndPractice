@@ -16,11 +16,14 @@ class AuthService {
 
     async confirmEmail(code: string) {
         const user = await userService.findUserByCode(code)
-        if(!user){return false}
-        if(user.emailConfirmation.confirmationCode=== code && user.emailConfirmation.expirationDate>new Date()){
-
+        if (!user) {
+            return false
         }
-        return user
+        if (user.emailConfirmation.confirmationCode === code && user.emailConfirmation.expirationDate > new Date()) {
+            let result = await userService.updateConfirmation(user._id)
+            return result
+        }
+        return false
     }
 }
 

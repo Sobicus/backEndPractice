@@ -134,4 +134,16 @@ export class UsersRepository {
         }
     }
 
+    async findUserByCode(code: string): Promise<UsersDbType | null> {
+        const user = await client.db(dataBaseName)
+            .collection<UsersDbType>('users').findOne({'emailConfirmation.confirmationCode': code})
+        if (!user) return null
+        return user
+    }
+
+    async updateConfirmation(id:ObjectId){
+        const result = await client.db(dataBaseName)
+            .collection<UsersDbType>('users')
+            .updateOne({_id:id}, {'emailConfirmation.isConfirmed': true})
+    }
 }
