@@ -2,8 +2,7 @@ import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 import {PaginationType} from "../types/paggination-type";
 import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
-import {randomUUID} from "crypto";
-import add from "date-fns/add";
+
 
 //response:
 export type UsersOutputType = {
@@ -134,16 +133,17 @@ export class UsersRepository {
         }
     }
 
-    async findUserByCode(code: string): Promise<UsersDbType | null> {
+    async findUserByConfirmationCode(confirmationCode: string): Promise<UsersDbType | null> {
         const user = await client.db(dataBaseName)
-            .collection<UsersDbType>('users').findOne({'emailConfirmation.confirmationCode': code})
+            .collection<UsersDbType>('users').findOne({'emailConfirmation.confirmationCode': confirmationCode})
         if (!user) return null
         return user
     }
 
-    async updateConfirmation(id:ObjectId){
+    async updateConfirmation(id:ObjectId):Promise<boolean>{
         const result = await client.db(dataBaseName)
             .collection<UsersDbType>('users')
-            .updateOne({_id:id}, {'emailConfirmation.isConfirmed': true})
+            .updateOne({_id:id}, {$set:{'emailConfirmation.isConfirmed': true}})
+        return result.matchedCount===1
     }
 }

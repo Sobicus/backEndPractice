@@ -53,7 +53,19 @@ authRouter.post('/registration-confirmation', async (req: PostRequestType<{ code
     }
     return res.sendStatus(204)
 })
-authRouter.post('/registration-email-resending', async () => {
+authRouter.post('/registration-email-resending', async (req: PostRequestType<{ email: string }>, res: Response) => {
+    const result = await authService.resendingRegistrationEmail(req.body.email)
+    if (!result) {
+        return res.status(400).send({
+            "errorsMessages": [
+                {
+                    "message": "If the inputModel has incorrect values or if email is already confirmed",
+                    "field": "email"
+                }
+            ]
+        })
+    }
+    return res.sendStatus(204)
 })
 
 type PostRequestType<B> = Request<{}, {}, B, {}>
