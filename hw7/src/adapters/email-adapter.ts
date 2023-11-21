@@ -12,7 +12,7 @@ export const emailAdapter = {
             service: 'gmail',
             auth: {
                 user: 'maksymdeveloper88@gmail.com',
-                pass: 'vwed nxvk qfag gerv'
+                pass: 'hbtg rieb etwe drxh'
             }
         });
 

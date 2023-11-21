@@ -1,5 +1,11 @@
 import bcrypt from "bcrypt"
-import {UsersRepository, UsersOutputType, UserServiceType, UsersDbType} from "../repositories/users-repository";
+import {
+    UsersRepository,
+    UsersOutputType,
+    UserServiceType,
+    UsersDbType,
+    EmailConfirmation
+} from "../repositories/users-repository";
 import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
 import {randomUUID} from "crypto";
 import add from "date-fns/add";
@@ -55,7 +61,7 @@ class UsersService {
     async checkCredentials(loginOrMail: string, password: string): Promise<null | UserServiceType> {
         const user = await this.userRepo.findByLoginOrEmail(loginOrMail)
         if (!user) return null
-        if (!user.emailConfirmation.isConfirmed) return null
+        //if (!user.emailConfirmation.isConfirmed) return null
         const passwordHash = await this._generateHash(password, user.passwordSalt)
         //return user.passwordHash === passwordHash; // if this true return users
         // return user._id.toString()
@@ -75,9 +81,17 @@ class UsersService {
         return await this.userRepo.updateConfirmation(id)
     }
 
-    async findUserByEmail(email: string): Promise<UserServiceType | null> {
-       return  await this.userRepo.findByLoginOrEmail(email)
+    async updateCodeAfterResend(id: string, newCode: string) {
+        return await this.userRepo.updateCodeAfterResend(id, newCode)
     }
+
+    async findUserByEmailOrLogin(emailOrLogin: string): Promise<UserServiceType | null> {
+        return await this.userRepo.findByLoginOrEmail(emailOrLogin)
+    }
+
+    /*async findUserByLoginOrEmail(login:string,email:string):Promise<UsersDbType | null>{
+        return await this.userRepo.findUserByLoginOrEmail(login,email)
+    }*/
 }
 
 export const userService = new UsersService()
