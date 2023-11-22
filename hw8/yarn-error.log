@@ -30,7 +30,7 @@ npm manifest:
   {
     "name": "hw2",
     "version": "1.0.0",
-    "main": "src/settings.ts",
+    "main": "src/app.ts",
     "license": "MIT",
     "dependencies": {
       "@types/bcrypt": "^5.0.0",

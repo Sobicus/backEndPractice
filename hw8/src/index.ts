@@ -1,4 +1,4 @@
-import { app } from './settings'
+import { app } from './app'
 import {runDb} from "./repositories/db";
 /*
 process.on('uncaughtException',(error)=>{

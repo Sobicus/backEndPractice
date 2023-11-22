@@ -16,8 +16,11 @@ authRouter.post('/login', validationAuthLoginMiddleware, async (req: PostRequest
         res.sendStatus(401)
         return
     }
-    const token = await jwtService.createJWT(user.id!) // Change hardcode
-    res.status(200).send(token)
+    const accessToken = await jwtService.createAccessJWT(user.id!) // Change hardcode
+    const refreshToken = await jwtService.createRefreshJWT(user.id!) // Change hardcode
+    console.log('accessToken', accessToken)
+    console.log('refreshToken', refreshToken)
+    res.status(200).cookie('refreshToken', refreshToken, {httpOnly: true, secure: true}).send(accessToken)
     return
 })
 authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {

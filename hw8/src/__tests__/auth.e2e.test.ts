@@ -1,5 +1,5 @@
 import request from "supertest";
-import {app} from "../settings";
+import {app} from "../app";
 import {userService} from "../domain/user-service";
 
 describe('auth', () => {
@@ -41,3 +41,21 @@ describe('auth', () => {
         expect(cod1).not.toEqual(cod2)
     })
 })
+
+/*describe('tests for /users', () => {
+    beforeAll(async () => {
+        connection = await MongoClient.connect (process.env.mongoUrl!,
+            {// @ts-ignore
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            });
+        db = await connection.db();
+        await getRequest()
+            .delete('/testing/all-data')
+            .set('Authorization', 'Basic YWRtaW46cXdlcnR5')
+
+    })
+
+    afterAll(async () => {
+        await connection.close()
+    })*/

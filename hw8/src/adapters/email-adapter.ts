@@ -1,7 +1,9 @@
 import nodemailer from "nodemailer";
+import {config} from 'dotenv'
 
+config()
 export const emailAdapter = {
-    async sendEmail(email: string, /*subject: string, message: string*/confirmationCode:string) {
+    async sendEmail(email: string, /*subject: string, message: string*/confirmationCode: string) {
 
         const subject = '<h1>Thank for your registration</h1>'
         const message = `<p>To finish registration please follow the link below:
@@ -12,7 +14,7 @@ export const emailAdapter = {
             service: 'gmail',
             auth: {
                 user: 'maksymdeveloper88@gmail.com',
-                pass: 'hbtg rieb etwe drxh'
+                pass: process.env.EMAIL_PASS
             }
         });
 
@@ -27,6 +29,7 @@ export const emailAdapter = {
             console.log("Message sent: %s", info.messageId);
             return info
         }
+
         main().catch(console.error);
     }
 }

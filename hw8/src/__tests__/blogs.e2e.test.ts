@@ -1,5 +1,5 @@
 import request from "supertest";
-import {app} from '../settings'
+import {app} from '../app'
 /*
 app.use('/blogs', blogsRouter)
 app.use('/posts', postsRouter)

@@ -15,6 +15,8 @@ usersRouter.post('/', checkAuthorization, validationUsersMiddleware,
     async (req: postRequestWithBody<UsersInputRequest>, res: Response) => {
         const {login, password, email} = req.body
         const newUser = await userService.createUser(login, password, email)
+
+
         res.status(201).send(newUser)
     })
 usersRouter.delete('/:id', checkAuthorization, async (req: RequestWithParams<{ id: string }>, res: Response) => {
