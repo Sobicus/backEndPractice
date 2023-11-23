@@ -7,6 +7,7 @@ import {validationAuthLoginMiddleware} from "../midlewares/input-auth-validation
 import {validationUsersMiddleware} from "../midlewares/input-user-validation-middleware";
 import {body} from "express-validator";
 import {inputVal} from "../midlewares/errorValidator";
+import { jwtTokensService } from "../domain/jwt-tokens-service";
 
 export const authRouter = Router()
 
@@ -20,7 +21,9 @@ authRouter.post('/login', validationAuthLoginMiddleware, async (req: PostRequest
     const refreshToken = await jwtService.createRefreshJWT(user.id!) // Change hardcode
     console.log('accessToken', accessToken)
     console.log('refreshToken', refreshToken)
-    res.status(200).cookie('refreshToken', refreshToken, {httpOnly: true, secure: true}).send(accessToken)
+    res.status(200)
+        .cookie('refreshToken', refreshToken, {httpOnly: true, secure: true})
+        .send(accessToken)
     return
 })
 authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
@@ -74,19 +77,43 @@ authRouter.post('/registration-email-resending', body('email')
         return true
     }), inputVal, async (req: PostRequestType<{ email: string }>, res: Response) => {
     const result = await authService.resendingRegistrationEmail(req.body.email)
-    /*if (!result) {
-        return res.status(400).send({
-            "errorsMessages": [
-                {
-                    "message": "If the inputModel has incorrect values or if email is already confirmed",
-                    "field": "email"
-                }
-            ]
-        })
-    }*/
     return res.sendStatus(204)
 })
+authRouter.post('/refresh-token', async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken
+    if (!refreshToken) return res.sendStatus(401)
+    const isExpiredToken = await jwtTokensService.isExpiredToken(refreshToken)
+    console.log(isExpiredToken)
+    if(isExpiredToken) return res.sendStatus(401)// check need i this verification or this redundant
+    const userId = await jwtService.getUserIdByToken(refreshToken.refreshToken)
+    console.log(userId)
+    if(!userId) return res.sendStatus(401)
+    const newAccessToken = await jwtService.createAccessJWT(userId)
+    const newRefreshToken = await jwtService.createRefreshJWT(userId)
+    await jwtTokensService.expiredTokens(refreshToken)//do need something check?
+    console.log('refresh-token newAccessToken', newAccessToken)
+    console.log('refresh-token newRefreshToken', newRefreshToken)
+    res.status(200)
+        .cookie('refreshToken', newRefreshToken, {httpOnly: true, secure: true})
+        .send(newAccessToken)
+    return
+})
+authRouter.post('/logout', async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken
+    if (!refreshToken) return res.sendStatus(401)
+    console.log('logout refreshToken', refreshToken)
 
+    const expiredOrNot=await jwtService.getUserIdByToken(refreshToken.refreshToken)
+    console.log('logout expiredOrNot', expiredOrNot)
+    if(!expiredOrNot)return res.sendStatus(401)
+
+    const isExpiredToken = await jwtTokensService.isExpiredToken(refreshToken.refreshToken)
+    console.log('logout isExpiredToken', isExpiredToken)
+    if(isExpiredToken) return res.sendStatus(401)// check need i this verification or this redundant
+
+    await jwtTokensService.expiredTokens(refreshToken.refreshToken)
+    return res.sendStatus(204)
+})
 type PostRequestType<B> = Request<{}, {}, B, {}>
 type BodyTypeRegistration = {
     loginOrEmail: string

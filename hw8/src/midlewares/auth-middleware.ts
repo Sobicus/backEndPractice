@@ -10,7 +10,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const token = req.headers.authorization.split(' ')[1]
 
     const userId = await jwtService.getUserIdByToken(token)
-    console.log('userId authMiddleware 1 '+userId)
+    console.log('userId authMiddleware 1 ' + userId)
     if (userId) {
         req.user = await userService.findUserById(userId)
         console.log('user authMiddleware ')

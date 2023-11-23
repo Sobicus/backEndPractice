@@ -14,10 +14,14 @@ export const jwtService = {
 
     async getUserIdByToken(token: string) {
         try {
-            const result: any = jwt.verify(token, process.env.JWT_Secret || '333')
+            console.log('token', token)
+            const result: any = jwt.verify(token, process.env.JWT_SECRET || '123')
+            console.log('result', result)
             return result.userId
         } catch (error) {
             return null
         }
     }
 }
+
+

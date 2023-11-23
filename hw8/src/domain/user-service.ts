@@ -22,7 +22,7 @@ class UsersService {
         return await this.userRepo.findAllUsers(pagination)
     }
 
-    async createUser(login: string, password: string, email: string): Promise<string>/*: Promise<UsersOutputType>*/ {
+    async createUser(login: string, password: string, email: string): Promise<UsersOutputType>/*: Promise<UsersOutputType>*/ {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
 
@@ -44,8 +44,8 @@ class UsersService {
             }
         }
         const id = await this.userRepo.createUser(createUserModel)
-        // return {id, login, email, createdAt}
-        return createUserModel.emailConfirmation.confirmationCode
+        return {id, login, email, createdAt}
+        // return createUserModel.emailConfirmation.confirmationCode
     }
 
     async deleteUser(userId: string): Promise<boolean> {

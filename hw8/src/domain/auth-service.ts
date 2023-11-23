@@ -7,9 +7,10 @@ class AuthService {
     async createUser(login: string, password: string, email: string): Promise<boolean | null> {
         /*const checkUser = await userService.findUserByLoginOrEmail(login, email)
         if(checkUser)return null*/
-        const confirmationCode = await userService.createUser(login, password, email)
+        await userService.createUser(login, password, email)
+        const confirmationCode= await userService.findUserByEmailOrLogin(email)
         try {
-            await emailAdapter.sendEmail(email, confirmationCode)
+            await emailAdapter.sendEmail(email, confirmationCode!.emailConfirmation.confirmationCode)
         } catch (error) {
             console.log(error)
             //await userService.deleteUser(newUser.id)
