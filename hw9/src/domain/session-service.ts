@@ -1,17 +1,20 @@
 import {randomUUID} from "crypto";
+import {SessionRepository} from "../repositories/session-repository";
 
-class SessionService{
+class SessionService {
+    sessionsRepo: SessionRepository
 
-    createSession( ){
-       console.log('accessToken', accessToken)
-        console.log('refreshToken', refreshToken)
-        console.log('atob jwt', atob(accessToken.accessToken.split('.')[1]))
-        console.log('deviceId',randomUUID())
-        console.log('encode',Buffer.from(refreshToken.refreshToken.split('.')[1], 'base64').toString('utf-8'))
+    constructor() {
+        this.sessionsRepo = new SessionRepository()
+    }
 
-        console.log('ip', req.socket.remoteAddress)
-        console.log('deviceName', req.headers['user-agent'])
-        console.log('userId', user.id)
+    createSession(refreshToken: string, ip: string, deviceName: string, userId: string) {
+
+        const deviceId = randomUUID()
+        const issuedAt = Buffer.from(refreshToken.split('.')[1], 'base64').toString('utf-8')
+
+        console.log('userId', userId)
     }
 }
+
 export const sessionService = new SessionService()
