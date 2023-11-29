@@ -20,9 +20,11 @@ export class SessionRepository {
 
 type allActiveSessinDbType = {
     _id: ObjectId
-    issuedAt: string
+    issuedAt: string // = iat
     deviceId: string
     ip: string
     deviceName: string
     userId: string
 }
+
+// refreshTokenPayload = { deviceId, userId, iat, exp}

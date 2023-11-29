@@ -10,6 +10,7 @@ import {inputVal} from "../midlewares/errorValidator";
 import {jwtTokensService} from "../domain/jwt-tokens-service";
 import bcrypt from "bcrypt";
 import {randomUUID} from "crypto";
+import jwt from 'jsonwebtoken'
 
 export const authRouter = Router()
 
@@ -26,10 +27,18 @@ authRouter.post('/login', validationAuthLoginMiddleware, async (req: PostRequest
     console.log('atob jwt', atob(accessToken.accessToken.split('.')[1]))
     console.log('atob jwt', atob(refreshToken.refreshToken.split('.')[1]))
     console.log('encode', Buffer.from(refreshToken.refreshToken.split('.')[1], 'base64').toString('utf-8'))
-    const {userId, iat, exp} = Buffer.from(refreshToken.refreshToken.split('.')[1], 'base64').toString('utf-8')
-    console.log('test1', userId)
-    console.log('test2', iat)
-    console.log('test3', exp)
+    console.log('encode', Buffer.from(refreshToken.refreshToken.split('.')[0], 'base64').toString('utf-8'))
+    // const {userId, iat, exp} = Buffer.from(refreshToken.refreshToken.split('.')[1], 'base64').toString('utf-8')
+    // console.log('test1', userId)
+    // console.log('test2', iat)
+    // console.log('test3', exp)
+    console.log('jwt', jwt.decode(accessToken.accessToken))
+    const decodeJwt = jwt.decode(accessToken.accessToken)
+    //@ts-ignore
+    console.log(decodeJwt.iat)
+    //@ts-ignore
+    const {userId,iat} = jwt.decode(accessToken.accessToken)
+    console.log('userId iat', userId, iat)
     console.log('deviceId', randomUUID())
     console.log('ip', req.socket.remoteAddress)
     console.log('deviceName', req.headers['user-agent'])
