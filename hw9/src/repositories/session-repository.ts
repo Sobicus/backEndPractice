@@ -2,10 +2,19 @@ import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 
 export class SessionRepository {
-    async getAllActiveSessions() {
+    async createDeviceSession(issuedAt: string, deviceId: string, ip: string, deviceName: string, userId: string): Promise<boolean> {
+        const newSession = {issuedAt, deviceId, ip, deviceName, userId}
+        const result = await client.db(dataBaseName)
+            .collection<allActiveSessinDbType>('sessions').insertOne({_id: new ObjectId(), ...newSession})
+        console.log('result.acknowledged', result.acknowledged)
+        console.log('newSession', newSession)
+        return result.acknowledged
+    }
+
+    async getAllActiveSessions(): Promise<allActiveSessionViewType[]> {
         const sessins = await client.db(dataBaseName)
             .collection<allActiveSessinDbType>('sessions').find({}).toArray()
-        const allActiveSessinDb = sessins.map(s => {
+        const allActiveSessInDb = sessins.map(s => {
             return {
                 ip: s.ip,
                 title: s.deviceName,
@@ -13,7 +22,7 @@ export class SessionRepository {
                 deviceId: s.deviceId,
             }
         })
-        return allActiveSessinDb
+        return allActiveSessInDb
     }
 
 }
@@ -26,5 +35,11 @@ type allActiveSessinDbType = {
     deviceName: string
     userId: string
 }
+export type allActiveSessionViewType = {
+    ip: string
+    title: string// = deviceName
+    lastActiveDate: string // = iat
+    deviceId: string
+    }
 
 // refreshTokenPayload = { deviceId, userId, iat, exp}

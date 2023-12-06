@@ -1,5 +1,6 @@
 import {randomUUID} from "crypto";
-import {SessionRepository} from "../repositories/session-repository";
+import {allActiveSessionViewType, SessionRepository} from "../repositories/session-repository";
+import jwt from "jsonwebtoken";
 
 class SessionService {
     sessionsRepo: SessionRepository
@@ -8,12 +9,16 @@ class SessionService {
         this.sessionsRepo = new SessionRepository()
     }
 
-    createSession(refreshToken: string, ip: string, deviceName: string, userId: string) {
-
+    createDeviceSession(refreshToken: string, ip: string, deviceName: string): Promise<boolean> {
+        const decodeJwtRefreshToken = jwt.decode(refreshToken)
+        const userId = decodeJwtRefreshToken['userId']
+        const iat = decodeJwtRefreshToken['iat']
         const deviceId = randomUUID()
-        const issuedAt = Buffer.from(refreshToken.split('.')[1], 'base64').toString('utf-8')
+        return this.sessionsRepo.createDeviceSession(iat, deviceId, ip, deviceName, userId)
+    }
 
-        console.log('userId', userId)
+    getAllDeviceSessions(): Promise<allActiveSessionViewType[]> {
+        return this.sessionsRepo.getAllActiveSessions()
     }
 }
 

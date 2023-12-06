@@ -8,9 +8,9 @@ import {validationUsersMiddleware} from "../midlewares/input-user-validation-mid
 import {body} from "express-validator";
 import {inputVal} from "../midlewares/errorValidator";
 import {jwtTokensService} from "../domain/jwt-tokens-service";
-import bcrypt from "bcrypt";
 import {randomUUID} from "crypto";
 import jwt from 'jsonwebtoken'
+import {sessionService} from "../domain/session-service";
 
 export const authRouter = Router()
 
@@ -22,6 +22,8 @@ authRouter.post('/login', validationAuthLoginMiddleware, async (req: PostRequest
     }
     const accessToken = await jwtService.createAccessJWT(user.id!) // Change hardcode
     const refreshToken = await jwtService.createRefreshJWT(user.id!) // Change hardcode
+
+    //------------------test------------------
     console.log('accessToken', accessToken)
     console.log('refreshToken', refreshToken)
     console.log('atob jwt', atob(accessToken.accessToken.split('.')[1]))
@@ -33,16 +35,30 @@ authRouter.post('/login', validationAuthLoginMiddleware, async (req: PostRequest
     // console.log('test2', iat)
     // console.log('test3', exp)
     console.log('jwt', jwt.decode(accessToken.accessToken))
+    const decodeJwtAccessToken = jwt.decode(accessToken.accessToken)
+    console.log('decodeJwtAccessToken', decodeJwtAccessToken)
+    console.log('decodeJwtAccessToken', decodeJwtAccessToken['userId'])
+    console.log('decodeJwtAccessToken', decodeJwtAccessToken['iat'])
+    console.log('req.baseUrl', req.baseUrl)
+    console.log('req.originalUrl', req.originalUrl)
     const decodeJwt = jwt.decode(accessToken.accessToken)
     //@ts-ignore
-    console.log(decodeJwt.iat)
+    console.log('jwt.decode(accessToken.accessToken)', decodeJwt.iat)
     //@ts-ignore
-    const {userId,iat} = jwt.decode(accessToken.accessToken)
+    const {userId, iat} = jwt.decode(accessToken.accessToken)
+    console.log('userId iat', userId, iat)
     console.log('userId iat', userId, iat)
     console.log('deviceId', randomUUID())
     console.log('ip', req.socket.remoteAddress)
     console.log('deviceName', req.headers['user-agent'])
     console.log('userId', user.id)
+
+    //-----------------------------------------
+    const ip = req.socket.remoteAddress//what we do with ip becouse ts think that ip can be undefined
+    const deviceName = req.headers['user-agent']//what we do with deviceName becouse ts think that deviceName can be undefined
+    const addDeviceSession = await sessionService.createDeviceSession(refreshToken.refreshToken, ip!, deviceName!)
+    if (!addDeviceSession) return res.sendStatus(401)
+    //------------above new logic------------------
     res.status(200)
         .cookie('refreshToken', refreshToken.refreshToken, {httpOnly: true, secure: true})
         .send(accessToken)
@@ -105,17 +121,12 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
     const refreshToken: string = req.cookies.refreshToken
     if (!refreshToken) return res.sendStatus(401)
     const userId = await jwtService.getUserIdByToken(refreshToken)
-    console.log("userId in token", userId)
     if (!userId) return res.sendStatus(401)
     const isExpiredToken = await jwtTokensService.isExpiredToken(refreshToken)
-    console.log(isExpiredToken)
     if (isExpiredToken) return res.sendStatus(401)// check need i this verification or this redundant
-
     const newAccessToken = await jwtService.createAccessJWT(userId)
     const newRefreshToken = await jwtService.createRefreshJWT(userId)
     await jwtTokensService.expiredTokens(refreshToken)//do need something check?
-    console.log('refresh-token newAccessToken', newAccessToken)
-    console.log('refresh-token newRefreshToken', newRefreshToken)
     res.status(200)
         .cookie('refreshToken', newRefreshToken.refreshToken, {httpOnly: true, secure: true})
         .send(newAccessToken)
@@ -124,14 +135,11 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 authRouter.post('/logout', async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken
     if (!refreshToken) return res.sendStatus(401)
-    console.log('logout refreshToken', refreshToken)
 
     const expiredOrNot = await jwtService.getUserIdByToken(refreshToken)
-    console.log('logout expiredOrNot', expiredOrNot)
     if (!expiredOrNot) return res.sendStatus(401)
 
     const isExpiredToken = await jwtTokensService.isExpiredToken(refreshToken)
-    console.log('logout isExpiredToken', isExpiredToken)
     if (isExpiredToken) return res.sendStatus(401)// check need i this verification or this redundant
 
     await jwtTokensService.expiredTokens(refreshToken)
