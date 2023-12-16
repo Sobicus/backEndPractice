@@ -48,9 +48,9 @@ authRouter.post('/login', rateLimitMiddleware, validationAuthLoginMiddleware, as
     console.log('userId iat', userId, iat)
     console.log('deviceId', randomUUID())
     console.log('ip', req.socket.remoteAddress)
+    console.log('ip', req.ip)
     console.log('deviceName', req.headers['user-agent'])
     console.log('userId', user.id)
-
     //-----------------------------------------
     const ip = req.socket.remoteAddress//what we do with ip becouse ts think that ip can be undefined
     const deviceName = req.headers['user-agent']//what we do with deviceName becouse ts think that deviceName can be undefined
