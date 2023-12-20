@@ -1,4 +1,3 @@
-import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 
 export class JwtTokensRepository {

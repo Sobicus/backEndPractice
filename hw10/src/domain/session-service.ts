@@ -1,11 +1,11 @@
-import {allActiveSessionDbType, allActiveSessionViewType, SessionRepository} from "../repositories/session-repository";
+import {allActiveSessionDbType, allActiveSessionViewType, SessionsRepository} from "../repositories/sessions-repository";
 import jwt from "jsonwebtoken";
 
 class SessionService {
-    sessionsRepo: SessionRepository
+    sessionsRepo: SessionsRepository
 
     constructor() {
-        this.sessionsRepo = new SessionRepository()
+        this.sessionsRepo = new SessionsRepository()
     }
 
     async createDeviceSession(refreshToken: string, ip: string, deviceName: string): Promise<boolean> {

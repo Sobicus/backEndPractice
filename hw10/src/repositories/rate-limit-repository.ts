@@ -1,4 +1,3 @@
-import {client, dataBaseName} from "./db";
 import {ObjectId, WithId} from "mongodb";
 
 export class RateLimitRepository {

@@ -1,11 +1,11 @@
-import {CommentRepository} from "../repositories/comment-repository";
+import {CommentsRepository} from "../repositories/comments-repository";
 import {CommentsViewType} from "../types/comments-type";
 
 class CommentService {
-    commentRepo: CommentRepository
+    commentRepo: CommentsRepository
 
     constructor() {
-        this.commentRepo = new CommentRepository()
+        this.commentRepo = new CommentsRepository()
     }
 
     async getCommentById(commentId: string): Promise<CommentsViewType | null> {

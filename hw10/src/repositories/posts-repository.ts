@@ -1,6 +1,5 @@
 import {postBodyRequest} from "../routes/posts-router";
 import {blogsRepositoryType} from "./blogs-repository";
-import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 import {IPostPagination, PaginationType} from "../types/paggination-type";
 import {CommentsRepositoryType, CommentsViewType, newCommentType} from "../types/comments-type";

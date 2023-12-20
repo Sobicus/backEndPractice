@@ -1,8 +1,7 @@
-import {client, dataBaseName} from "./db";
 import {CommentsRepositoryType, CommentsViewType} from "../types/comments-type";
 import {ObjectId} from "mongodb";
 
-export class CommentRepository {
+export class CommentsRepository {
     async getCommentById(commentId: string): Promise<CommentsViewType | null> {
         const comment = await client.db(dataBaseName).collection<CommentsRepositoryType>('comments').findOne({_id: new ObjectId(commentId)})
         if (!comment) {

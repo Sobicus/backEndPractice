@@ -1,8 +1,6 @@
-import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 import {PaginationType} from "../types/paggination-type";
 import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
-import {randomUUID} from "crypto";
 
 
 //response:
@@ -44,20 +42,6 @@ export class UsersRepository {
             $or: [{login: {$regex: pagination.searchLoginTerm ?? '', $options: 'i'}},
                 {email: {$regex: pagination.searchEmailTerm ?? '', $options: 'i'}}]
         }
-        /* const createFilter = (searchLoginTerm?: string, searchEmailTerm?: string) => {
-             if (searchLoginTerm && searchEmailTerm) {
-                 return {
-                     $or: [{login: {$regex: pagination.searchLoginTerm ?? '', $options: 'i'}},
-                         {email: {$regex: pagination.searchEmailTerm ?? '', $options: 'i'}}]
-                 }
-             }
-             if (searchLoginTerm) return {login: {$regex: searchLoginTerm}}
-             if (searchEmailTerm) return {email: {$regex: searchEmailTerm}}
-             return {}
-
-         }
-
-         const filter = createFilter()*/
 
         const users = await client.db(dataBaseName)
             .collection<UsersDbType>('users')
@@ -147,16 +131,6 @@ export class UsersRepository {
             .updateOne({_id: id}, {$set: {'emailConfirmation.isConfirmed': true}})
         return result.matchedCount === 1
     }
-
-    /*async findUserByLoginOrEmail(login: string, email: string): Promise<UsersDbType | null> {
-        const user = client.db(dataBaseName)
-            .collection<UsersDbType>('users')
-            .findOne({
-                $or: [{login: login}, {email: email}]
-            })
-        if (!user) return null
-        return user
-    }*/
     async updateCodeAfterResend(id: string, newCode: string) {
         const result = await client.db(dataBaseName)
             .collection<UsersDbType>('users')

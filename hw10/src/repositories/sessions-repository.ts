@@ -1,7 +1,6 @@
-import {client, dataBaseName} from "./db";
 import {ObjectId} from "mongodb";
 
-export class SessionRepository {
+export class SessionsRepository {
     async createDeviceSession(issuedAt: string, deviceId: string, ip: string, deviceName: string, userId: string): Promise<boolean> {
         const newSession = {issuedAt, deviceId, ip, deviceName, userId}
         const result = await client.db(dataBaseName)
