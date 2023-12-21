@@ -1,6 +1,7 @@
 import {ObjectId} from "mongodb";
 import {PaginationType} from "../types/paggination-type";
 import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
+import {UsersModel} from "./db";
 
 
 //response:
@@ -43,21 +44,19 @@ export class UsersRepository {
                 {email: {$regex: pagination.searchEmailTerm ?? '', $options: 'i'}}]
         }
 
-        const users = await client.db(dataBaseName)
-            .collection<UsersDbType>('users')
+        const users = await UsersModel
             .find(filter)
             .sort({[pagination.sortBy]: pagination.sortDirection})
             .limit(pagination.pageSize)
             .skip(pagination.skip)
-            .toArray()
+            .lean()
         const allUsers = users.map(u => ({
             id: u._id.toString(),
             login: u.login,
             email: u.email,
             createdAt: u.createdAt
         }))
-        const totalCount = await client.db(dataBaseName)
-            .collection<UsersDbType>('users')
+        const totalCount = await UsersModel
             .countDocuments(filter)
         const pageCount = Math.ceil(totalCount / pagination.pageSize)
         return {
@@ -69,24 +68,21 @@ export class UsersRepository {
         }
     }
 
-    async createUser(createUserModel: UserServiceType):
-        Promise<string> {
-        const resultCreatedUser = await client.db(dataBaseName)
-            .collection<UsersDbType>('users')
-            .insertOne({_id: new ObjectId(), ...createUserModel})
-        return resultCreatedUser.insertedId.toString()
+    async createUser(createUserModel: UserServiceType): Promise<string> {
+        const resultCreatedUser = await UsersModel
+            .create({_id: new ObjectId(), ...createUserModel})
+        return resultCreatedUser._id.toString()
     }
 
     async deleteUser(userId: string): Promise<boolean> {
-        const resultDeleteUser = await client.db(dataBaseName)
-            .collection<UsersDbType>('users')
+        const resultDeleteUser = await UsersModel
             .deleteOne({_id: new ObjectId(userId)})
         return resultDeleteUser.deletedCount === 1
     }
 
     async findByLoginOrEmail(loginOrMail: string): Promise<UserServiceType | null> {
-        const user = await client.db(dataBaseName)
-            .collection<UsersDbType>('users').findOne({
+        const user = await UsersModel
+            .findOne({
                 $or: [{login: loginOrMail}, {email: loginOrMail}]
             })
         return (user ? {
@@ -105,8 +101,8 @@ export class UsersRepository {
     }
 
     async findUserById(userId: string): Promise<UsersOutputType | null> {
-        const user = await client.db(dataBaseName)
-            .collection<UsersDbType>('users').findOne({_id: new ObjectId(userId)})
+        const user = await UsersModel
+            .findOne({_id: new ObjectId(userId)})
         if (!user) {
             return null
         }
@@ -119,21 +115,20 @@ export class UsersRepository {
     }
 
     async findUserByConfirmationCode(confirmationCode: string): Promise<UsersDbType | null> {
-        const user = await client.db(dataBaseName)
-            .collection<UsersDbType>('users').findOne({'emailConfirmation.confirmationCode': confirmationCode})
+        const user = await UsersModel
+            .findOne({'emailConfirmation.confirmationCode': confirmationCode})
         if (!user) return null
         return user
     }
 
     async updateConfirmation(id: ObjectId): Promise<boolean> {
-        const result = await client.db(dataBaseName)
-            .collection<UsersDbType>('users')
+        const result = await UsersModel
             .updateOne({_id: id}, {$set: {'emailConfirmation.isConfirmed': true}})
         return result.matchedCount === 1
     }
+
     async updateCodeAfterResend(id: string, newCode: string) {
-        const result = await client.db(dataBaseName)
-            .collection<UsersDbType>('users')
+        const result = await UsersModel
             .updateOne({_id: new ObjectId(id)}, {$set: {'emailConfirmation.confirmationCode': newCode}})
         return result.matchedCount === 1
     }

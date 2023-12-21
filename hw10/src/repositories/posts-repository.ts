@@ -4,6 +4,8 @@ import {ObjectId} from "mongodb";
 import {IPostPagination, PaginationType} from "../types/paggination-type";
 import {CommentsRepositoryType, CommentsViewType, newCommentType} from "../types/comments-type";
 import {DefaultCommentsPaginationType, getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
+import {BlogsModel, CommentsModel, PostsModel} from "./db";
+import {create} from "node:domain";
 
 export type postsViewType = {
     id: string
@@ -34,15 +36,13 @@ export type createPostType = {
 
 export class PostsRepository {
     async findAllPosts(postsPagination: IPostPagination): Promise<PaginationType<postsViewType>> {
-        const posts = await client.db(dataBaseName)
-            .collection<postsViewType>('posts')
+        const posts = await PostsModel
             .find({})
             .sort({[postsPagination.sortBy]: postsPagination.sortDirection})
             .limit(postsPagination.pageSize)
             .skip(postsPagination.skip)
-            .toArray()
-        const totalCount = await client.db(dataBaseName)
-            .collection<postsViewType>('posts')
+            .lean()
+        const totalCount = await PostsModel
             .countDocuments()
         const pagesCount = Math.ceil(totalCount / postsPagination.pageSize)
         const allPosts = posts.map(p => (
@@ -65,7 +65,8 @@ export class PostsRepository {
     }
 
     async findPostById(postId: string): Promise<postsViewType | null> {
-        let post = await client.db(dataBaseName).collection<postsViewType>('posts').findOne({_id: new ObjectId(postId)})
+        let post = await PostsModel
+            .findOne({_id: new ObjectId(postId)})
         if (!post) {
             return null
         }
@@ -81,40 +82,35 @@ export class PostsRepository {
     }
 
     async createPost(newPost: createPostType): Promise<{ blogName: string, postId: string } | null> {
-        let blog: blogsRepositoryType | null = await client.db(dataBaseName)
-            .collection<blogsRepositoryType>('blogs')
+        let blog: blogsRepositoryType | null = await BlogsModel
             .findOne({_id: new ObjectId(newPost.blogId)})
         if (!blog) return null;
-        let newPostByDb = await client.db(dataBaseName)
-            .collection<postsDbType>('posts')
-            .insertOne({...newPost, blogName: blog.name, _id:new ObjectId()})
+        let newPostByDb = await PostsModel
+            .create({...newPost, blogName: blog.name, _id: new ObjectId()})
         const blogName = blog.name
-        const postId = newPostByDb.insertedId.toString()
+        const postId = newPostByDb._id.toString()
         return {blogName, postId}
     }
 
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
-        const resultUpdateModel = await client.db(dataBaseName)
-            .collection<postsDbType>('posts')
+        const resultUpdateModel = await PostsModel
             .updateOne({_id: new ObjectId(postId)}, {$set: updateModel})
         return resultUpdateModel.matchedCount === 1
     }
 
     async deletePost(postId: string): Promise<boolean> {
-        const resultDeletePost = await client.db(dataBaseName)
-            .collection<postsDbType>('posts')
+        const resultDeletePost = await PostsModel
             .deleteOne({_id: new ObjectId(postId)})
         return resultDeletePost.deletedCount === 1
     }
 
     async findCommentsByPostId(postId: string, paggination: DefaultCommentsPaginationType) {
         // const paggination = getCommentsPagination(query)
-        const commets = await client.db(dataBaseName)
-            .collection<CommentsRepositoryType>('comments')
+        const commets = await CommentsModel
             .find({postId: postId})
             .sort({[paggination.sortBy]: paggination.sortDirection})
             .limit(paggination.pageSize)
-            .skip(paggination.skip).toArray()
+            .skip(paggination.skip).lean()
         const comments = commets.map(el => (
             {
                 id: el._id.toString(),
@@ -126,8 +122,7 @@ export class PostsRepository {
                 createdAt: el.createdAt
             })
         )
-        const totalCount = await client.db(dataBaseName)
-            .collection<CommentsRepositoryType>('comments')
+        const totalCount = await CommentsModel
             .countDocuments({postId: postId})
         const pageCount = Math.ceil(totalCount / paggination.pageSize)
         return {
@@ -140,10 +135,10 @@ export class PostsRepository {
     }
 
     async createCommetByPostId(comment: newCommentType): Promise<CommentsViewType> {
-        const newComment = await client.db(dataBaseName)
-            .collection('comments').insertOne({...comment})//<CommentsRepositoryType> can not
+        const newComment = await CommentsModel
+            .create({...comment})//<CommentsRepositoryType> can not
         return {
-            id: newComment.insertedId.toString(),
+            id: newComment._id.toString(),
             content: comment.content,
             commentatorInfo: {
                 userLogin: comment.userLogin,

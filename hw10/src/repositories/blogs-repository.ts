@@ -1,10 +1,10 @@
 import {blogBodyRequest} from "../routes/blogs-router";
-import {Filter, ObjectId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {IBlockPagination, IQuery, PaginationType, SortBlogsByEnum} from "../types/paggination-type";
 import {postService} from "../domain/posts-service";
 import {postsViewType} from "./posts-repository";
 import {getBlogsPagination} from "../helpers/pagination-helpers";
-import {BlogsModel} from "./db";
+import {BlogsModel, PostsModel} from "./db";
 
 export type blogsRepositoryType = {
     name: string
@@ -78,12 +78,11 @@ export class BlogsRepository {
         }
         /*const blogId = blog._id.toString()*/
         const pagination = getBlogsPagination(query)
-        const posts = await client.db(dataBaseName)
-            .collection<postsViewType>('posts')
+        const posts = await PostsModel
             .find({blogId: blogId})
             .sort({[pagination.sortBy]: pagination.sortDirection})
             .skip(pagination.skip).limit(pagination.pageSize)
-            .toArray();
+            .lean();
         const allPosts = posts.map(p => ({
             id: p._id.toString(),
             title: p.title,
@@ -93,8 +92,7 @@ export class BlogsRepository {
             blogName: p.blogName,
             createdAt: p.createdAt
         }))
-        const totalCount = await client.db(dataBaseName)
-            .collection<postsViewType>('posts')
+        const totalCount = await PostsModel
             .countDocuments({blogId: blogId})
         const pagesCount = Math.ceil(totalCount / pagination.pageSize)
         return {
@@ -110,12 +108,11 @@ export class BlogsRepository {
         const resultNewBlog = await BlogsModel
             .create(createModel)
         return resultNewBlog._id.toString()
-            //.insertedId.toString()
+        //.insertedId.toString()
     }
 
     async createPostByBlogId(title: string, shortDescription: string, content: string, blogId: string): Promise<postsViewType | null> {
-        const createdPostByBlogId = await postService.
-        createPost(title, shortDescription, content, blogId)
+        const createdPostByBlogId = await postService.createPost(title, shortDescription, content, blogId)
         if (!createdPostByBlogId) return null
         return createdPostByBlogId
     }

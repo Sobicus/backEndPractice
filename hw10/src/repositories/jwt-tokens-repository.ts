@@ -1,14 +1,15 @@
 import {ObjectId} from "mongodb";
+import {JwtTokenModel} from "./db";
 
 export class JwtTokensRepository {
     async expiredTokens(_id: ObjectId, refreshToken: string):Promise<string> {
-        const result = await client.db(dataBaseName)
-            .collection<refreshTokenType>('jwtTokens').insertOne({_id, refreshToken})
-        return result.insertedId.toString()
+        const result = await JwtTokenModel
+            .create({_id, refreshToken})
+        return result._id.toString()
     }
     async isExpiredToken(refreshToken: string):Promise<boolean>{
-        const result = await client.db(dataBaseName)
-            .collection<refreshTokenType>('jwtTokens').findOne({refreshToken})
+        const result = await JwtTokenModel
+            .findOne({refreshToken})
         if (!result) return false
         return true
     }
