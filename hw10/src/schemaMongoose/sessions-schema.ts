@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import {ObjectId} from "mongodb";
 
 export const sessionsSchema = new mongoose.Schema({
     _id: {type: Schema.Types.ObjectId, required: true},

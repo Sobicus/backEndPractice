@@ -1,6 +1,5 @@
 import {userService} from "./user-service";
 import {emailAdapter} from "../adapters/email-adapter";
-import {UserServiceType} from "../repositories/users-repository";
 import {randomUUID} from "crypto";
 
 class AuthService {

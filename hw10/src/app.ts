@@ -8,7 +8,15 @@ import {authRouter} from "./routes/auth-router";
 import { commentsRouter } from './routes/comments-router';
 import cookieParser from "cookie-parser";
 import {securityDevicesRouter} from "./routes/securityDevices-router";
-import {BlogsModel} from "./repositories/db";
+import {
+    BlogsModel,
+    CommentsModel,
+    JwtTokenModel,
+    PostsModel,
+    RateLimitModel,
+    SessionsModel,
+    UsersModel
+} from "./repositories/db";
 
 export const app = express()
 app.use(express.json())
@@ -28,10 +36,15 @@ app.get('/', (req: Request, res: Response) => {
     res.send('This first page if we connect to localhost:3000')
 })
 app.delete('/testing/all-data', async (req: Request, res: Response) => {
-
-   await client.db(dataBaseName).collection<postsViewType>('posts').deleteMany({})
-   await BlogsModel.deleteMany({})
-   await client.db(dataBaseName).collection<blogsRepositoryType>('users').deleteMany({})
-   await client.db(dataBaseName).collection<blogsRepositoryType>('sessions').deleteMany({})
+await BlogsModel.deleteMany({})
+await PostsModel.deleteMany({})
+await CommentsModel.deleteMany({})
+await JwtTokenModel.deleteMany({})
+await RateLimitModel.deleteMany({})
+await SessionsModel.deleteMany({})
+await UsersModel.deleteMany({})
+   // await client.db(dataBaseName).collection<postsViewType>('posts').deleteMany({})
+   // await client.db(dataBaseName).collection<blogsRepositoryType>('users').deleteMany({})
+   // await client.db(dataBaseName).collection<blogsRepositoryType>('sessions').deleteMany({})
     res.sendStatus(204)
 })

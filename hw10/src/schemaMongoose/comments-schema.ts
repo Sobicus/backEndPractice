@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+import mongoose, {Schema} from "mongoose";
 import {ObjectId} from "mongodb";
 
 export const commentsSchema = new mongoose.Schema({
-    _id: {type:ObjectId, required:true},
+    _id: {type:Schema.Types.ObjectId, required:true},
     createdAt: {type:String, required:true},
     postId: {type:String, required:true},
     content: {type:String, required:true},

@@ -9,7 +9,6 @@ import {IQuery, SortBlogsByEnum} from "../types/paggination-type";
 export const blogsRouter = Router()
 blogsRouter.get('/', async (req: Request<{}, {}, {}, IQuery<SortBlogsByEnum>>, res: Response) => {
     const pagination = getBlogsPagination(req.query)
-
     const blogs = await blogsService.findAllBlogs(pagination)
     res.status(200).send(blogs)
 })

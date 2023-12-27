@@ -11,6 +11,9 @@ import {randomUUID} from "crypto";
 import jwt from 'jsonwebtoken'
 import {sessionService} from "../domain/session-service";
 import {rateLimitMiddleware} from "../domain/rate-limit-middleware";
+import {
+    validationEmailPasswordRecoveryMiddleware
+} from "../midlewares/input-emailPasswordRecovery-validation-middleware";
 
 export const authRouter = Router()
 
@@ -72,7 +75,7 @@ authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
         userId: userData.id
     })
 })
-authRouter.post('/registration',rateLimitMiddleware, validationUsersMiddleware, async (req: PostRequestType<PostRequestRegistrationType>, res: Response) => {
+authRouter.post('/registration', rateLimitMiddleware, validationUsersMiddleware, async (req: PostRequestType<PostRequestRegistrationType>, res: Response) => {
         //await userService.createUser(req.body.login, req.body.password, req.body.email)
         const newUser = await authService.createUser(req.body.login, req.body.password, req.body.email)
         if (!newUser) {
@@ -81,7 +84,7 @@ authRouter.post('/registration',rateLimitMiddleware, validationUsersMiddleware, 
         return res.sendStatus(204)
     }
 )
-authRouter.post('/registration-confirmation',rateLimitMiddleware, body('code')
+authRouter.post('/registration-confirmation', rateLimitMiddleware, body('code')
     .custom(async (code) => {
         const checkUser = await userService.findUserByConfirmationCode(code)
         if (checkUser?.emailConfirmation.isConfirmed === true) throw new Error(' already exist by email')
@@ -102,7 +105,7 @@ authRouter.post('/registration-confirmation',rateLimitMiddleware, body('code')
     }
     return res.sendStatus(204)
 })
-authRouter.post('/registration-email-resending',rateLimitMiddleware, body('email')
+authRouter.post('/registration-email-resending', rateLimitMiddleware, body('email')
     .isString().withMessage('Email not a string')
     .trim().notEmpty().withMessage('Email can`t be empty and cannot consist of only spaces')
     .matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$').withMessage('Email must be include type like forexample@gmail.com')
@@ -123,7 +126,7 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
     const {userId, deviceId} = payload;
     const getSessionByUserIdAndDeviceId = await sessionService.getSessionByUserIdAndDeviceId(userId, deviceId)
     if (!getSessionByUserIdAndDeviceId) return res.sendStatus(401)
-    if (payload.iat*1000 !== new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime()) return res.sendStatus(401)
+    if (payload.iat * 1000 !== new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime()) return res.sendStatus(401)
 
     // const isExpiredToken = await jwtTokensService.isExpiredToken(refreshToken)
     // if (isExpiredToken) return res.sendStatus(401)// check need i this verification or this redundant
@@ -146,31 +149,34 @@ authRouter.post('/logout', async (req: Request, res: Response) => {
     const {userId, deviceId} = expiredOrNot;
     const getSessionByUserIdAndDeviceId = await sessionService.getSessionByUserIdAndDeviceId(userId, deviceId)
     if (!getSessionByUserIdAndDeviceId) return res.sendStatus(401)
-   //  console.log('expiredOrNot logout',expiredOrNot.iat)
-   //  console.log('getSessionByUserIdAndDeviceId.issuedAt logout',getSessionByUserIdAndDeviceId.issuedAt)
-   //  const date=new Date(expiredOrNot.iat * 1000).toISOString()
-   //  console.log('date logout',date)
-   //  console.log('date logout',new Date(date)!==new Date(getSessionByUserIdAndDeviceId.issuedAt))
-   //  console.log('new Date(expiredOrNot.iat) == new Date(getSessionByUserIdAndDeviceId.issuedAt)',  expiredOrNot.iat*1000 !== new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime(), expiredOrNot.iat*1000, new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime())
-   // console.log('getSessionByUserIdAndDeviceId.issuedAt',getSessionByUserIdAndDeviceId.issuedAt)
-
-
+    //  console.log('expiredOrNot logout',expiredOrNot.iat)
+    //  console.log('getSessionByUserIdAndDeviceId.issuedAt logout',getSessionByUserIdAndDeviceId.issuedAt)
+    //  const date=new Date(expiredOrNot.iat * 1000).toISOString()
+    //  console.log('date logout',date)
+    //  console.log('date logout',new Date(date)!==new Date(getSessionByUserIdAndDeviceId.issuedAt))
+    //  console.log('new Date(expiredOrNot.iat) == new Date(getSessionByUserIdAndDeviceId.issuedAt)',  expiredOrNot.iat*1000 !== new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime(), expiredOrNot.iat*1000, new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime())
+    // console.log('getSessionByUserIdAndDeviceId.issuedAt',getSessionByUserIdAndDeviceId.issuedAt)
     // if (expiredOrNot.iat*1000 !== new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime()) return res.sendStatus(401)
-    console.log('new Date(expiredOrNot.iat*1000).toISOString()',new Date(expiredOrNot.iat*1000).toISOString())
-    console.log('getSessionByUserIdAndDeviceId.issuedAt',getSessionByUserIdAndDeviceId.issuedAt)
-    console.log('new Date(expiredOrNot.iat*1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt',new Date(expiredOrNot.iat*1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt)
-
-    if (new Date(expiredOrNot.iat*1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt) return res.sendStatus(401)
-
-
+    console.log('new Date(expiredOrNot.iat*1000).toISOString()', new Date(expiredOrNot.iat * 1000).toISOString())
+    console.log('getSessionByUserIdAndDeviceId.issuedAt', getSessionByUserIdAndDeviceId.issuedAt)
+    console.log('new Date(expiredOrNot.iat*1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt', new Date(expiredOrNot.iat * 1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt)
+    if (new Date(expiredOrNot.iat * 1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt) return res.sendStatus(401)
     //const isExpiredToken = await jwtTokensService.isExpiredToken(refreshToken)
     //if (isExpiredToken) return res.sendStatus(401)// check need i this verification or this redundant
-
     //await jwtTokensService.expiredTokens(refreshToken)
     const result = await sessionService.deleteSessionDevice(userId, deviceId)
     if (!result) return res.sendStatus(401)
     return res.clearCookie('refreshToken').sendStatus(204)
 })
+authRouter.post('/password-recovery',
+    rateLimitMiddleware,
+    validationEmailPasswordRecoveryMiddleware,
+    async (req: PostRequestType<BodyPasswordRecoveryType>, res: Response) => {
+        const email = req.body.email
+        const user = await userService.findUserByEmailOrLogin(email)
+        if (!user) return res.sendStatus(204)
+        
+    })
 type PostRequestType<B> = Request<{}, {}, B, {}>
 type BodyTypeRegistration = {
     loginOrEmail: string
@@ -179,5 +185,8 @@ type BodyTypeRegistration = {
 type PostRequestRegistrationType = {
     login: string
     password: string
+    email: string
+}
+type BodyPasswordRecoveryType = {
     email: string
 }

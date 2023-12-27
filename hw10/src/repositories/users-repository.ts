@@ -117,7 +117,9 @@ export class UsersRepository {
     async findUserByConfirmationCode(confirmationCode: string): Promise<UsersDbType | null> {
         const user = await UsersModel
             .findOne({'emailConfirmation.confirmationCode': confirmationCode})
+
         if (!user) return null
+
         return user
     }
 

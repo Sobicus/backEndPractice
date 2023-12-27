@@ -8,7 +8,7 @@ import {commentsSchema} from "../schemaMongoose/comments-schema";
 import {jwtTokensSchema} from '../schemaMongoose/jwt-tokens-schema';
 import {rateLimitSchema} from "../schemaMongoose/rate-limit-schema";
 import {sessionsSchema} from "../schemaMongoose/sessions-schema";
-import { usersSchema } from '../schemaMongoose/users-schema';
+import {IUser, usersSchema} from '../schemaMongoose/users-schema';
 
 export const BlogsModel = mongoose.model('Blogs', blogSchema);
 export const PostsModel = mongoose.model('Posts', postsSchema)
@@ -16,7 +16,7 @@ export const CommentsModel = mongoose.model('Comments', commentsSchema)
 export const JwtTokenModel = mongoose.model('JwtTokens', jwtTokensSchema)
 export const RateLimitModel = mongoose.model('RateSessions', rateLimitSchema)
 export const SessionsModel = mongoose.model('Sessions', sessionsSchema)
-export const UsersModel = mongoose.model('Users', usersSchema)
+export const UsersModel = mongoose.model/*<IUser>*/('Users', usersSchema)
 
 
 const mongoUri = process.env.MONGO_URL || 'mongodb://0.0.0.0:27017'
