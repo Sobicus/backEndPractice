@@ -2,7 +2,6 @@ import {Request, Response, Router} from "express";
 import {userService} from "../domain/user-service";
 import {jwtService} from "../application/jwt-service";
 import {authMiddleware} from "../midlewares/auth-middleware";
-import {authService} from "../domain/auth-service";
 import {validationAuthLoginMiddleware} from "../midlewares/input-auth-validation-middleware";
 import {validationUsersMiddleware} from "../midlewares/input-user-validation-middleware";
 import {body} from "express-validator";
@@ -14,6 +13,7 @@ import {rateLimitMiddleware} from "../domain/rate-limit-middleware";
 import {
     validationEmailPasswordRecoveryMiddleware
 } from "../midlewares/input-emailPasswordRecovery-validation-middleware";
+import { authService } from "../domain/auth-service";
 
 export const authRouter = Router()
 
@@ -175,8 +175,14 @@ authRouter.post('/password-recovery',
         const email = req.body.email
         const user = await userService.findUserByEmailOrLogin(email)
         if (!user) return res.sendStatus(204)
-        
+        const result=await authService.passwordRecovery(user)
+        if (!result) return res.sendStatus(404)//need or not?
+        return res.sendStatus(204)//need or not?
     })
+authRouter.post('/new-password', rateLimitMiddleware, async (req: PostRequestType<BodyNewPasswordType>, res: Response) => {
+
+    res.sendStatus(204)
+})
 type PostRequestType<B> = Request<{}, {}, B, {}>
 type BodyTypeRegistration = {
     loginOrEmail: string
@@ -189,4 +195,8 @@ type PostRequestRegistrationType = {
 }
 type BodyPasswordRecoveryType = {
     email: string
+}
+type BodyNewPasswordType = {
+    newPassword: string
+    recoveryCode: string
 }
