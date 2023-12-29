@@ -5,6 +5,7 @@ import {UserServiceType} from "../repositories/users-repository";
 import {ObjectId} from "mongodb";
 import {emailPasswordRecoveryAdapter} from "../adapters/email-passwordRecoveryAdapter";
 import {PasswordRecoveryRepository, PasswordRecoveryType} from "../repositories/passwordRecovery-repository";
+import bcrypt from "bcrypt";
 
 class AuthService {
     passwordRecoveryRepo: PasswordRecoveryRepository

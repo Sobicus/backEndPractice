@@ -90,7 +90,9 @@ class UsersService {
     }
 
     async changePassword(userId: string, newPassword: string): Promise<boolean> {
-        return await this.userRepo.changePassword(userId, newPassword)
+        const passwordSalt = await bcrypt.genSalt(10)
+        const passwordHash = await this._generateHash(newPassword, passwordSalt)
+        return await this.userRepo.changePassword(userId, passwordSalt, passwordHash)
     }
 
     /*async findUserByLoginOrEmail(login:string,email:string):Promise<UsersDbType | null>{
