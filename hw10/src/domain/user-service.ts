@@ -89,6 +89,10 @@ class UsersService {
         return await this.userRepo.findByLoginOrEmail(emailOrLogin)
     }
 
+    async changePassword(userId: string, newPassword: string): Promise<boolean> {
+        return await this.userRepo.changePassword(userId, newPassword)
+    }
+
     /*async findUserByLoginOrEmail(login:string,email:string):Promise<UsersDbType | null>{
         return await this.userRepo.findUserByLoginOrEmail(login,email)
     }*/

@@ -7,6 +7,7 @@ import {jwtTokensSchema} from '../schemaMongoose/jwt-tokens-schema';
 import {rateLimitSchema} from "../schemaMongoose/rate-limit-schema";
 import {sessionsSchema} from "../schemaMongoose/sessions-schema";
 import {usersSchema} from '../schemaMongoose/users-schema';
+import {passwordRecoverySchema} from "../schemaMongoose/passwordRecovery-schema";
 dotenv.config()
 
 export const BlogsModel = mongoose.model('Blogs', blogSchema);
@@ -16,7 +17,7 @@ export const JwtTokenModel = mongoose.model('JwtTokens', jwtTokensSchema)
 export const RateLimitModel = mongoose.model('RateSessions', rateLimitSchema)
 export const SessionsModel = mongoose.model('Sessions', sessionsSchema)
 export const UsersModel = mongoose.model/*<IUser>*/('Users', usersSchema)
-export const PasswordRecoveryModel = mongoose.model('PasswordRecovery', usersSchema)
+export const PasswordRecoveryModel = mongoose.model('PasswordRecovery', passwordRecoverySchema)
 
 
 const mongoUri = process.env.MONGO_URL || 'mongodb://0.0.0.0:27017'

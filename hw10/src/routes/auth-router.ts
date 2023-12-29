@@ -13,7 +13,8 @@ import {rateLimitMiddleware} from "../domain/rate-limit-middleware";
 import {
     validationEmailPasswordRecoveryMiddleware
 } from "../midlewares/input-emailPasswordRecovery-validation-middleware";
-import { authService } from "../domain/auth-service";
+import {authService} from "../domain/auth-service";
+import {validationNewPasswordMiddleware} from "../midlewares/newPassword-recoveryCode-middleware";
 
 export const authRouter = Router()
 
@@ -175,12 +176,12 @@ authRouter.post('/password-recovery',
         const email = req.body.email
         const user = await userService.findUserByEmailOrLogin(email)
         if (!user) return res.sendStatus(204)
-        const result=await authService.passwordRecovery(user)
-        if (!result) return res.sendStatus(404)//need or not?
-        return res.sendStatus(204)//need or not?
+        await authService.passwordRecovery(user)
+        return res.sendStatus(204)
     })
-authRouter.post('/new-password', rateLimitMiddleware, async (req: PostRequestType<BodyNewPasswordType>, res: Response) => {
-
+authRouter.post('/new-password', rateLimitMiddleware, validationNewPasswordMiddleware, async (req: PostRequestType<BodyNewPasswordType>, res: Response) => {
+    const {newPassword, recoveryCode} = req.body
+    await authService.newPassword(newPassword, recoveryCode)
     res.sendStatus(204)
 })
 type PostRequestType<B> = Request<{}, {}, B, {}>

@@ -1,6 +1,5 @@
 import {body} from "express-validator";
 import {inputVal} from "./errorValidator";
-import {userService} from "../domain/user-service";
 
 export const validationEmailPasswordRecoveryMiddleware = [
     body('email')

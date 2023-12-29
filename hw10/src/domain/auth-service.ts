@@ -4,7 +4,7 @@ import {randomUUID} from "crypto";
 import {UserServiceType} from "../repositories/users-repository";
 import {ObjectId} from "mongodb";
 import {emailPasswordRecoveryAdapter} from "../adapters/email-passwordRecoveryAdapter";
-import {PasswordRecoveryRepository} from "../repositories/passwordRecovery-repository";
+import {PasswordRecoveryRepository, PasswordRecoveryType} from "../repositories/passwordRecovery-repository";
 
 class AuthService {
     passwordRecoveryRepo: PasswordRecoveryRepository
@@ -55,28 +55,39 @@ class AuthService {
         return true
     }
 
-    async passwordRecovery(user: UserServiceType):Promise<true|null> {
+    async passwordRecovery(user: UserServiceType) {
         const idPasswordRecovery = new ObjectId()
         const passwordRecoveryCode = randomUUID()
-        const codeExpirationDate = Date.now() + 1000 * 60 * 10 // 10 min
-        const email = user.email
+        const codeExpirationDate = Date.now() + 1000 * 60 * 60 // 60 min
+        const userId = user.id!
         const alreadyChangePassword = false
         try {
-            await emailPasswordRecoveryAdapter.sendEmail(email, passwordRecoveryCode)
+            await this.passwordRecoveryRepo.createPasswordRecovery({
+                _id: idPasswordRecovery,
+                passwordRecoveryCode,
+                codeExpirationDate,
+                userId,
+                alreadyChangePassword
+            })
+            await emailPasswordRecoveryAdapter.sendEmail(user.email, passwordRecoveryCode)
         } catch (error) {
             console.log(error)
             //await userService.deleteUser(newUser.id)
             return null
         }
-        const result = await this.passwordRecoveryRepo.createPasswordRecovery({
-            _id:idPasswordRecovery,
-            passwordRecoveryCode,
-            codeExpirationDate,
-            email,
-            alreadyChangePassword
-        })//need or not?
-        if(!result) return null//need or not?
-        return true//need or not?
+        return
+    }
+
+    async findPasswordRecoveryCodeByCode(recoveryCode: string): Promise<PasswordRecoveryType | null> {
+        const result = await this.passwordRecoveryRepo.findPasswordRecoveryByCode(recoveryCode)
+        return result
+    }
+
+    async newPassword(newPassword: string, recoveryCode: string): Promise<boolean | null> {
+        const result = await this.passwordRecoveryRepo.findPasswordRecoveryByCode(recoveryCode)
+        const changePassword = await userService.changePassword(result!.userId, newPassword)
+        if (!changePassword) return null
+        return await this.passwordRecoveryRepo.changePasswordRecoveryStatus(recoveryCode)
     }
 }
 

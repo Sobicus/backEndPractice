@@ -132,4 +132,9 @@ export class UsersRepository {
             .updateOne({_id: new ObjectId(id)}, {$set: {'emailConfirmation.confirmationCode': newCode}})
         return result.matchedCount === 1
     }
+    async changePassword(userId:string, newPassword:string):Promise<boolean>{
+        const result = await UsersModel
+            .updateOne({_id: new ObjectId(userId)}, {$set: {passwordHash: newPassword}})
+        return result.matchedCount === 1
+    }
 }
