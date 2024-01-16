@@ -5,6 +5,7 @@ import {blogsService} from "../domain/blogs-service";
 import {getBlogsPagination} from "../helpers/pagination-helpers";
 import {validationPostsByBlogIdMidleware} from "../midlewares/input-postsByBlogId-validation-middleware";
 import {IQuery, SortBlogsByEnum} from "../types/paggination-type";
+import {postService} from "../domain/posts-service";
 
 export const blogsRouter = Router()
 blogsRouter.get('/', async (req: Request<{}, {}, {}, IQuery<SortBlogsByEnum>>, res: Response) => {
@@ -38,7 +39,7 @@ blogsRouter.post('/:id/posts', checkAuthorization, ...validationPostsByBlogIdMid
 }, postByBlogIdBodyRequest>, res: Response) => {
     const blogId = req.params.id
     const {title, shortDescription, content} = req.body
-    const post = await blogsService.createPostByBlogId(title, shortDescription, content, blogId)
+    const post =  await postService.createPost(title, shortDescription, content, blogId)
     //const createdPostByBlogId = await postService.createPost(title, shortDescription, content, blogId)
     if (!post) return res.sendStatus(404)
     return res.status(201).send(post)

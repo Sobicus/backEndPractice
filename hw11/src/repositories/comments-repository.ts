@@ -3,21 +3,10 @@ import {ObjectId} from "mongodb";
 import {CommentsModel} from "./db";
 
 export class CommentsRepository {
-    async getCommentById(commentId: string): Promise<CommentsViewType | null> {
-        const comment = await CommentsModel
+    async getCommentById(commentId: string): Promise<CommentsRepositoryType | null> {
+       return CommentsModel
             .findOne({_id: new ObjectId(commentId)})
-        if (!comment) {
-            return null
-        }
-        return {
-            id: comment._id.toString(),
-            content: comment.content,
-            commentatorInfo: {
-                userId: comment.userId,
-                userLogin: comment.userLogin
-            },
-            createdAt: comment.createdAt
-        }
+
     }
 
     async updateComment(commentId: string, content: string): Promise<boolean> {

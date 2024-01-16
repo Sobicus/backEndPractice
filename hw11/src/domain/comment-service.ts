@@ -1,5 +1,5 @@
 import {CommentsRepository} from "../repositories/comments-repository";
-import {CommentsViewType} from "../types/comments-type";
+import {CommentsRepositoryType, CommentsViewType} from "../types/comments-type";
 
 class CommentService {
     commentRepo: CommentsRepository
@@ -18,6 +18,9 @@ class CommentService {
     async deleteComment(commentId:string):Promise<boolean>{
         return await this.commentRepo.deleteComment(commentId)
     }
+    async getDbCommentById(commentId: string): Promise<CommentsRepositoryType|null> {
+    return await this.commentRepo.getCommentById(commentId)
+}
 }
 
 export const commentService = new CommentService()

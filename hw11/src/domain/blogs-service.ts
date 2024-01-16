@@ -31,9 +31,9 @@ class BlogsService {
         return {id: mongoResponse, ...createModel, createdAt, isMembership}
     }
 
-    async createPostByBlogId(title: string, shortDescription: string, content: string, blogId: string): Promise<postsViewType | null> {
-        return this.blogRepo.createPostByBlogId(title, shortDescription, content, blogId)
-    }
+    // async createPostByBlogId(title: string, shortDescription: string, content: string, blogId: string): Promise<postsViewType | null> {
+    //     return this.blogRepo.createPostByBlogId(title, shortDescription, content, blogId)
+    // }
 
     async updateBlog(blogId: string, updateModel: blogBodyRequest): Promise<boolean> {
         return await this.blogRepo.updateBlog(blogId, updateModel)

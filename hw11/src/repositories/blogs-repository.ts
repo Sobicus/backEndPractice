@@ -111,11 +111,11 @@ export class BlogsRepository {
         //.insertedId.toString()
     }
 
-    async createPostByBlogId(title: string, shortDescription: string, content: string, blogId: string): Promise<postsViewType | null> {
-        const createdPostByBlogId = await postService.createPost(title, shortDescription, content, blogId)
-        if (!createdPostByBlogId) return null
-        return createdPostByBlogId
-    }
+    // async createPostByBlogId(title: string, shortDescription: string, content: string, blogId: string): Promise<postsViewType | null> {
+    //     const createdPostByBlogId = await postService.createPost(title, shortDescription, content, blogId)
+    //     if (!createdPostByBlogId) return null
+    //     return createdPostByBlogId
+    // }
 
     async updateBlog(blogId: string, updateModel: blogBodyRequest): Promise<boolean> {
         const resultUpdateModel = await BlogsModel

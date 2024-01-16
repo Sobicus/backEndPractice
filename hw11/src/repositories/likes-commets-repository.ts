@@ -1,16 +1,19 @@
 import {ObjectId} from "mongodb";
+import {LikesCommentsModel} from "./db";
 
-export class LikesCommentsRepo {
+export class LikesCommentsRepository {
     async createCommentLike(commentModel: LikesCommentsRepoInputType) {
+
+        const newReaction = await LikesCommentsModel.create({_id: new ObjectId(), ...commentModel})
 
     }
 }
 
-type LikesCommentsRepoDbType = {
+export type LikesCommentsRepoDbType = {
     _id: ObjectId
     userId: string
     commentId: string
-    myStatus: /*'Like' | 'Dislike' | 'None'*/likesStatus
+    myStatus: /*'Like' | 'Dislike' | 'None'*/LikesStatus
     createdAt: string
 }
 type LikesCommentsRepoInputType = {
@@ -20,8 +23,8 @@ type LikesCommentsRepoInputType = {
     createdAt: string
 }
 
-export enum likesStatus {
-    'none',
-    'like',
-    'dislike'
+export enum LikesStatus {
+    None = 'None',
+    Like = 'Like',
+    Dislike = 'Dislike'
 }

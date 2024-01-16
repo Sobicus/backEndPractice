@@ -13,7 +13,7 @@ export interface IUser{
         isConfirmed: boolean,
     }
 }
-export const usersSchema = new mongoose.Schema/*<IUser>*/({
+export const usersSchema = new mongoose.Schema<IUser>({
     _id: {type: Schema.Types.ObjectId, required: true},
     login: {type: String, required: true},
     passwordSalt: {type: String, required: true},

@@ -6,6 +6,7 @@ import {CommentsRepositoryType, CommentsViewType, newCommentType} from "../types
 import {DefaultCommentsPaginationType, getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
 import {BlogsModel, CommentsModel, PostsModel} from "./db";
 import {create} from "node:domain";
+import {LikesStatus} from "./likes-commets-repository";
 
 export type postsViewType = {
     id: string
@@ -144,7 +145,12 @@ export class PostsRepository {
                 userLogin: comment.userLogin,
                 userId: comment.userId
             },
-            createdAt: comment.createdAt
+            createdAt: comment.createdAt,
+            likesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: LikesStatus.None
+            }
         }
     }
 }
