@@ -64,11 +64,8 @@ postsRouter.post('/:id/comments',
 postsRouter.get('/:id/comments', async (req: RequestWithParamsAndQuery<{
     id: string
 }, queryCommentsType>, res: Response) => {
-    console.log(req.query)
     const paggination = getCommentsPagination(req.query)
-    console.log(paggination)
     const post = await postService.findPostById(req.params.id)
-    const query = req.query
     if (!post) {
         res.sendStatus(404)
         return
@@ -77,7 +74,7 @@ postsRouter.get('/:id/comments', async (req: RequestWithParamsAndQuery<{
     return res.status(200).send(comments)
 })
 
-type RequestWithParams<P> = Request<P, {}, {}, {}>
+type RequestWithParams<P> = Request<P, {}, {}, {}>  
 type postRequestWithBody<B> = Request<{}, {}, B, {}>
 export type postBodyRequest = {
     title: string
@@ -88,3 +85,4 @@ export type postBodyRequest = {
 type postRequestComment<P, B, U extends UsersOutputType> = Request<P, {}, B, {}, U>
 type putRequestChangePost<P, B> = Request<P, {}, B, {}>
 type RequestWithParamsAndQuery<P, Q> = Request<P, {}, {}, Q>
+

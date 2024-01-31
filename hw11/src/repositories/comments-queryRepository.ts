@@ -1,9 +1,9 @@
-import {CommentsRepositoryType, CommentsViewType} from "../types/comments-type";
+import { CommentsViewType} from "../types/comments-type";
 import {ObjectId} from "mongodb";
 import {CommentsModel, LikesCommentsModel} from "./db";
 import {LikesStatus} from "./likes-commets-repository";
 
-export class CommentsRepository {
+export class CommentsQueryRepository {
     async getCommentById(commentId: string, userId?: string): Promise<CommentsViewType | null> {
         const comment = await CommentsModel
             .findOne({_id: new ObjectId(commentId)})
@@ -14,7 +14,8 @@ export class CommentsRepository {
         let myStatus = LikesStatus.None
 
         if (userId) {
-            const reaction = await LikesCommentsModel.findOne({userId, commentId: comment._id.toString()}).exec()
+            const reaction = await LikesCommentsModel
+                .findOne({userId, commentId: comment._id.toString()}).exec()
             myStatus = reaction ? reaction.myStatus : LikesStatus.None
         }
 
@@ -38,7 +39,6 @@ export class CommentsRepository {
                 myStatus
             }
         }
-
         return result
     }
 

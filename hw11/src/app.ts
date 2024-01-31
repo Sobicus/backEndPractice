@@ -45,8 +45,5 @@ app.delete('/testing/all-data', async (req: Request, res: Response) => {
     await UsersModel.deleteMany({})
     await PasswordRecoveryModel.deleteMany({})
     await LikesCommentsModel.deleteMany({})
-    // await client.db(dataBaseName).collection<postsViewType>('posts').deleteMany({})
-    // await client.db(dataBaseName).collection<blogsRepositoryType>('users').deleteMany({})
-    // await client.db(dataBaseName).collection<blogsRepositoryType>('sessions').deleteMany({})
     res.sendStatus(204)
 })

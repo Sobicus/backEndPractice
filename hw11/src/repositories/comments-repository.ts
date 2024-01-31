@@ -6,7 +6,6 @@ export class CommentsRepository {
     async getCommentById(commentId: string): Promise<CommentsRepositoryType | null> {
        return CommentsModel
             .findOne({_id: new ObjectId(commentId)})
-
     }
 
     async updateComment(commentId: string, content: string): Promise<boolean> {
