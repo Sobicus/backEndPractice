@@ -8,7 +8,8 @@ export class LikesCommentsRepository {
         return newReaction
     }
     async updateCommentLike(){}
-    
+    async findCommentLikeById(){}
+
 }
 
 export type LikesCommentsRepoDbType = {
