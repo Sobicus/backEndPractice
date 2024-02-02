@@ -1,10 +1,10 @@
-import { CommentsViewType} from "../types/comments-type";
+import { CommentViewType} from "../types/comments-type";
 import {ObjectId} from "mongodb";
 import {CommentsModel, LikesCommentsModel} from "./db";
 import {LikesStatus} from "./likes-commets-repository";
 
 export class CommentsQueryRepository {
-    async getCommentById(commentId: string, userId?: string): Promise<CommentsViewType | null> {
+    async getCommentById(commentId: string, userId?: string): Promise<CommentViewType | null> {
         const comment = await CommentsModel
             .findOne({_id: new ObjectId(commentId)})
         if (!comment) {

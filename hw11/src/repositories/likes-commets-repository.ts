@@ -5,8 +5,10 @@ export class LikesCommentsRepository {
     async createCommentLike(commentModel: LikesCommentsRepoInputType) {
 
         const newReaction = await LikesCommentsModel.create({_id: new ObjectId(), ...commentModel})
-
+        return newReaction
     }
+    async updateCommentLike(){}
+    
 }
 
 export type LikesCommentsRepoDbType = {
@@ -19,7 +21,7 @@ export type LikesCommentsRepoDbType = {
 type LikesCommentsRepoInputType = {
     userId: string
     commentId: string
-    myStatus: 'Like' | 'Dislike' | 'None'
+    myStatus: /*'Like' | 'Dislike' | 'None'*/LikesStatus
     createdAt: string
 }
 

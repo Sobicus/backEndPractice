@@ -1,4 +1,4 @@
-import {LikesCommentsRepository} from "../repositories/likes-commets-repository";
+import {LikesCommentsRepository, LikesStatus} from "../repositories/likes-commets-repository";
 
 class LikeCommentsService {
     likesCommentsRepo: LikesCommentsRepository
@@ -7,7 +7,7 @@ class LikeCommentsService {
         this.likesCommentsRepo = new LikesCommentsRepository()
     }
 
-    likeCommentUpdate(commentId:string, userId:string){
+    likeCommentUpdate(commentId:string, userId:string, likeStatus:LikesStatus){
 
     }
 }

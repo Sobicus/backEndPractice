@@ -74,7 +74,7 @@ postsRouter.get('/:id/comments', async (req: RequestWithParamsAndQuery<{
     return res.status(200).send(comments)
 })
 
-type RequestWithParams<P> = Request<P, {}, {}, {}>  
+type RequestWithParams<P> = Request<P, {}, {}, {}>
 type postRequestWithBody<B> = Request<{}, {}, B, {}>
 export type postBodyRequest = {
     title: string

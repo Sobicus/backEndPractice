@@ -1,5 +1,5 @@
 import {CommentsRepository} from "../repositories/comments-repository";
-import {CommentsRepositoryType, CommentsViewType} from "../types/comments-type";
+import {CommentsRepositoryType, CommentViewType} from "../types/comments-type";
 import {CommentsQueryRepository} from "../repositories/comments-queryRepository";
 
 class CommentService {
@@ -11,7 +11,7 @@ class CommentService {
         this.commentQueryRepo = new CommentsQueryRepository()
     }
 
-    async getCommentById(commentId: string): Promise<CommentsViewType | null> {
+    async getCommentById(commentId: string): Promise<CommentViewType | null> {
         return await this.commentQueryRepo.getCommentById(commentId)
     }
 
