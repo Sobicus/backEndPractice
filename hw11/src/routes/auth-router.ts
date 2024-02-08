@@ -9,7 +9,7 @@ import {inputVal} from "../midlewares/errorValidator";
 import {randomUUID} from "crypto";
 import jwt from 'jsonwebtoken'
 import {sessionService} from "../domain/session-service";
-import {rateLimitMiddleware} from "../domain/rate-limit-middleware";
+import {rateLimitMiddleware} from "../midlewares/rate-limit-middleware";
 import {
     validationEmailPasswordRecoveryMiddleware
 } from "../midlewares/input-emailPasswordRecovery-validation-middleware";
