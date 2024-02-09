@@ -6,7 +6,7 @@ dotenv.config()
 
 export const jwtService = {
     async createAccessJWT(userId: string) {
-        const token = jwt.sign({userId}, process.env.JWT_SECRET || '333', {expiresIn: '10s'})
+        const token = jwt.sign({userId}, process.env.JWT_SECRET || '333', {expiresIn: '10m'})
         return {accessToken: token}
     },
     async createRefreshJWT(userId: string, deviceId: string) {

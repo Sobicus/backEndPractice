@@ -54,8 +54,8 @@ class PostsService {
         return await this.postRepo.createCommetByPostId(comment);
     }
 
-    async findCommentsById(postId: string, paggination: DefaultCommentsPaginationType) {
-        return await this.postRepo.findCommentsByPostId(postId, paggination)
+    async findCommentsByPostId(postId: string, paggination: DefaultCommentsPaginationType,userId?: string) {
+        return await this.postRepo.findCommentsByPostId(postId, paggination,userId)
     }
 }
 

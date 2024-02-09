@@ -8,6 +8,7 @@ import {authMiddleware} from "../midlewares/auth-middleware";
 import {UsersOutputType} from "../repositories/users-repository";
 import {getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
 import {validationCommentsContentMiddleware} from "../midlewares/input-comments-content-middleware";
+import {softAuthMiddleware} from "../midlewares/soft-auth-middleware";
 
 export const postsRouter = Router()
 
@@ -61,16 +62,17 @@ postsRouter.post('/:id/comments',
         const newComment = await postService.createCommetByPostId(req.params.id, req.body.content, req.user!)
         return res.status(201).send(newComment)
     })
-postsRouter.get('/:id/comments', async (req: RequestWithParamsAndQuery<{
+postsRouter.get('/:id/comments', softAuthMiddleware, async (req: RequestWithParamsAndQuery<{
     id: string
 }, queryCommentsType>, res: Response) => {
+    const userId = req.user?.id
     const paggination = getCommentsPagination(req.query)
     const post = await postService.findPostById(req.params.id)
     if (!post) {
         res.sendStatus(404)
         return
     }
-    const comments = await postService.findCommentsById(req.params.id, paggination)
+    const comments = await postService.findCommentsByPostId(req.params.id, paggination, userId)
     return res.status(200).send(comments)
 })
 
@@ -84,5 +86,5 @@ export type postBodyRequest = {
 }
 type postRequestComment<P, B, U extends UsersOutputType> = Request<P, {}, B, {}, U>
 type putRequestChangePost<P, B> = Request<P, {}, B, {}>
-type RequestWithParamsAndQuery<P, Q> = Request<P, {}, {}, Q>
+export type RequestWithParamsAndQuery<P, Q> = Request<P, {}, {}, Q>
 

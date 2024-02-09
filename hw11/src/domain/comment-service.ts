@@ -11,8 +11,8 @@ class CommentService {
         this.commentQueryRepo = new CommentsQueryRepository()
     }
 
-    async getCommentById(commentId: string): Promise<CommentViewType | null> {
-        return await this.commentQueryRepo.getCommentById(commentId)
+    async getCommentById(commentId: string,userId?:string): Promise<CommentViewType | null> {
+        return await this.commentQueryRepo.getCommentById(commentId,userId)
     }
 
     async updatePost(commentId: string, content: string): Promise<boolean> {

@@ -7,13 +7,16 @@ export class LikesCommentsRepository {
         return newReaction
     }
 
-    async updateCommentLike(commentId: string, myStatus: string): Promise<boolean> {
-        const result = await LikesCommentsModel.updateOne({commentId}, {$set: {myStatus}})
+    async updateCommentLike(commentId: string, userId: string, myStatus: LikesStatus): Promise<boolean> {
+        const result = await LikesCommentsModel.updateOne({commentId, userId}, {$set: {myStatus}})
         return result.modifiedCount === 1
     }
 
-    async findCommentLikeById(commentId: string): Promise<LikesCommentsRepoDbType | null> {
-        return (await LikesCommentsModel.findOne({_id: new ObjectId(commentId)}))
+    async findCommentLikeCommentIdUserId(commentId: string, userId: string): Promise<LikesCommentsRepoDbType | null> {
+        return LikesCommentsModel.findOne({
+            commentId,
+            userId
+        })
     }
 
 }

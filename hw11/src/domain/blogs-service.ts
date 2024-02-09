@@ -12,7 +12,7 @@ class BlogsService {
     }
 
     async findAllBlogs(pagination: IBlockPagination): Promise<PaginationType<BlogViewType>> {
-        return this.blogRepo.findAllBlogs(pagination)
+        return await this.blogRepo.findAllBlogs(pagination)
     }
 
     async findBlogById(blogId: string): Promise<BlogViewType | null> {

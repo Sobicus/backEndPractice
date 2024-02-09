@@ -7,8 +7,22 @@ class LikeCommentsService {
         this.likesCommentsRepo = new LikesCommentsRepository()
     }
 
-    likeCommentUpdate(commentId:string, userId:string, likeStatus:LikesStatus){
-
+    async likeCommentUpdate(commentId: string, userId: string, likeStatus: LikesStatus) {
+        const existingReaction = await this.likesCommentsRepo.findCommentLikeCommentIdUserId(commentId, userId)
+        if (!existingReaction) {
+            const commentStatusModel = {
+                userId,
+                commentId,
+                myStatus: likeStatus,
+                createdAt: new Date().toISOString()
+            }
+            return this.likesCommentsRepo.createCommentLike(commentStatusModel)
+        }
+        if (likeStatus === existingReaction.myStatus) {
+            return
+        } else {
+            return this.likesCommentsRepo.updateCommentLike(commentId, userId, likeStatus)
+        }
     }
 }
 

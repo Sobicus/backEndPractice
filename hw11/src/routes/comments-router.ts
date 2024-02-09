@@ -5,13 +5,15 @@ import {UsersOutputType} from "../repositories/users-repository";
 import {authMiddleware} from "../midlewares/auth-middleware";
 import {postService} from "../domain/posts-service";
 import {LikesStatus} from "../repositories/likes-commets-repository";
-import {validationAuthLoginMiddleware} from "../midlewares/like-status-middleware";
+import {validationComentLikeStatusMiddleware} from "../midlewares/like-status-middleware";
 import {likeCommentsService} from "../domain/like-comments-service";
+import {softAuthMiddleware} from "../midlewares/soft-auth-middleware";
 
 export const commentsRouter = Router()
 
-commentsRouter.get('/:id', async (req: commentsRequestParams<{ id: string }>, res: Response) => {
-    const comment = await commentService.getCommentById(req.params.id)
+commentsRouter.get('/:id', softAuthMiddleware, async (req: commentsRequestParams<{ id: string }>, res: Response) => {
+    const userId = req.user?.id
+    const comment = await commentService.getCommentById(req.params.id, userId)
     if (!comment) {
         res.sendStatus(404)
         return
@@ -40,20 +42,21 @@ commentsRouter.put('/:id', authMiddleware, validationCommentsContentMiddleware, 
     }
     res.sendStatus(204)
 })
-commentsRouter.put(':id/like-status', authMiddleware, validationAuthLoginMiddleware, async (req: commentsRequestParamsBody<{
+commentsRouter.put('/:id/like-status', authMiddleware, validationComentLikeStatusMiddleware, async (req: commentsRequestParamsBody<{
     id: string
 }, {
     likeStatus: LikesStatus
 }>, res: Response) => {
     const commentId = req.params.id
     const comentsLikeStatus = req.body.likeStatus
-    const userId= req.user!.id
+    const userId = req.user!.id
     const comment = await commentService.getCommentById(commentId)
     if (!comment) {
         res.sendStatus(404)
         return
     }
     await likeCommentsService.likeCommentUpdate(commentId, userId, comentsLikeStatus)
+    return res.sendStatus(204)
 
 })
 commentsRouter.delete('/:id', authMiddleware, async (req: commentsRequestParamsAndUser<{
