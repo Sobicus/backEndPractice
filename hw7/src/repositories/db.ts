@@ -8,6 +8,7 @@ console.log(process.env.MONGO_URL)
 export const client = new MongoClient(mongoUri)
 export const dataBaseName = 'dataBaseHW4'
 export async function runDb() {
+    console.log('123123123')
     try {
         // Connect the client to the server
         await client.connect()
