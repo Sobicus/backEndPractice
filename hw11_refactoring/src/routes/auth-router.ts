@@ -28,34 +28,10 @@ authRouter.post('/login', rateLimitMiddleware, validationAuthLoginMiddleware, as
     const accessToken = await jwtService.createAccessJWT(user.id!) // Change hardcode
     const refreshToken = await jwtService.createRefreshJWT(user.id!, deviceId) // Change hardcode
 
-    //------------------test------------------
-    console.log('accessToken', accessToken)
-    console.log('refreshToken', refreshToken)
-    console.log('atob jwt', atob(accessToken.accessToken.split('.')[1]))
-    console.log('atob jwt', atob(refreshToken.refreshToken.split('.')[1]))
-    console.log('encode', Buffer.from(refreshToken.refreshToken.split('.')[1], 'base64').toString('utf-8'))
-    console.log('encode', Buffer.from(refreshToken.refreshToken.split('.')[0], 'base64').toString('utf-8'))
-    // const {userId, iat, exp} = Buffer.from(refreshToken.refreshToken.split('.')[1], 'base64').toString('utf-8')
-    // console.log('test1', userId)
-    // console.log('test2', iat)
-    // console.log('test3', exp)
-    console.log('jwt', jwt.decode(accessToken.accessToken))
     const decodeJwtAccessToken = jwt.decode(accessToken.accessToken)
-    console.log('decodeJwtAccessToken', decodeJwtAccessToken)
 
-    console.log('req.baseUrl', req.baseUrl)
-    console.log('req.originalUrl', req.originalUrl)
     const decodeJwt = jwt.decode(accessToken.accessToken)
 
-    const {userId, iat}: any = jwt.decode(accessToken.accessToken)
-    console.log('userId iat', userId, iat)
-    console.log('userId iat', userId, iat)
-    console.log('deviceId', randomUUID())
-    console.log('ip', req.socket.remoteAddress)
-    console.log('ip', req.ip)
-    console.log('deviceName', req.headers['user-agent'])
-    console.log('userId', user.id)
-    //-----------------------------------------
     const ip = req.socket.remoteAddress//what we do with ip becouse ts think that ip can be undefined
     const deviceName = req.headers['user-agent']//what we do with deviceName becouse ts think that deviceName can be undefined
     const addDeviceSession = await sessionService.createDeviceSession(refreshToken.refreshToken, ip!, deviceName!)

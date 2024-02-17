@@ -1,12 +1,7 @@
 import bcrypt from "bcrypt"
 import {
-    UsersRepository,
-    UsersOutputType,
-    UserServiceType,
-    UsersDbType,
-    EmailConfirmation
+    UsersRepository
 } from "../repositories/users-repository";
-import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
 import {randomUUID} from "crypto";
 import add from "date-fns/add";
 import {ObjectId} from "mongodb";
@@ -17,11 +12,6 @@ class UsersService {
     constructor() {
         this.userRepo = new UsersRepository()
     }
-
-    /*async findAllUsers(pagination: IQueryUsersPagination) {
-        return await this.userRepo.findAllUsers(pagination)
-    }*/
-
     async createUser(login: string, password: string, email: string): Promise<UsersOutputType>/*: Promise<UsersOutputType>*/ {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
