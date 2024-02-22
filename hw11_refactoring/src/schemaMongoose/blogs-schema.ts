@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import {blogsRepositoryType} from "../repositories/blogs-repository";
+import mongoose, {Schema} from "mongoose";
+import { blogsRepositoryType } from "../types/blogs-type";
 
 export const blogSchema = new mongoose.Schema<blogsRepositoryType>({
     name: {type: String, required: true},

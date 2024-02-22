@@ -1,7 +1,7 @@
 //response:
 import {ObjectId} from "mongodb";
 
-export type UsersOutputType = {
+export type UsersViewType = {
     id: string
     login: string
     email: string

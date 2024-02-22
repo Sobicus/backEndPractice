@@ -1,11 +1,9 @@
 import {postBodyRequest} from "../routes/posts-router";
-import {blogsRepositoryType} from "./blogs-repository";
 import {ObjectId} from "mongodb";
 import {IPostPagination, PaginationType} from "../types/paggination-type";
-import {CommentsRepositoryType, CommentsViewType, CommentViewType, newCommentType} from "../types/comments-type";
+import { CommentsViewType, CommentViewType, newCommentType} from "../types/comments-type";
 import {DefaultCommentsPaginationType, getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
 import {BlogsModel, CommentsModel, LikesCommentsModel, PostsModel} from "./db";
-import {create} from "node:domain";
 import {LikesStatus} from "./likes-commets-repository";
 
 export type postsViewType = {

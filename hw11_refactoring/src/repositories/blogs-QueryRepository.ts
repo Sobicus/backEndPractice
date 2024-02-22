@@ -4,12 +4,10 @@ import {IBlockPagination, IQuery, PaginationType, SortBlogsByEnum} from "../type
 import {postsViewType} from "./posts-repository";
 import {getBlogsPagination} from "../helpers/pagination-helpers";
 import {BlogsModel, PostsModel} from "./db";
-import { BlogViewType, blogsRepositoryType } from "../types/blogs-type";
+import {BlogViewType} from "../types/blogs-type";
 
 
-
-
-export class BlogsRepository {
+export class BlogsQueryRepository {
     async findAllBlogs(pagination: IBlockPagination): Promise<PaginationType<BlogViewType>> {
         const filter = {name: {$regex: pagination.searchNameTerm, $options: 'i'}}
         const blogs = await BlogsModel
@@ -88,29 +86,5 @@ export class BlogsRepository {
             "items": allPosts
         }
     }
-
-    async createBlog(createModel: blogsRepositoryType): Promise<string>/*Promise<InsertOneResult>*/ /*Promise<BlogViewType>*/ {
-        const resultNewBlog = await BlogsModel
-            .create(createModel)
-        return resultNewBlog._id.toString()
-        //.insertedId.toString()
-    }
-
-    // async createPostByBlogId(title: string, shortDescription: string, content: string, blogId: string): Promise<postsViewType | null> {
-    //     const createdPostByBlogId = await postService.createPost(title, shortDescription, content, blogId)
-    //     if (!createdPostByBlogId) return null
-    //     return createdPostByBlogId
-    // }
-
-    async updateBlog(blogId: string, updateModel: blogBodyRequest): Promise<boolean> {
-        const resultUpdateModel = await BlogsModel
-            .updateOne({_id: new ObjectId(blogId)}, {$set: updateModel})
-        return resultUpdateModel.matchedCount === 1
-    }
-
-    async deleteBlog(blogId: string): Promise<boolean> {
-        const resultDeleteBlog = await BlogsModel
-            .deleteOne({_id: new ObjectId(blogId)})
-        return resultDeleteBlog.deletedCount === 1
-    }
 }
+export const blogsQueryRepository = new BlogsQueryRepository()

@@ -2,13 +2,7 @@ import {app} from '../app'
 import request from 'supertest'
 import mongoose from 'mongoose'
 import {runDb} from "../repositories/db";
-/*
-app.use('/blogs', blogsRouter)
-app.use('/posts', postsRouter)
-app.use('/users', usersRouter)
-app.use('/auth', authRouter)
-app.use('/comments', commentsRouter)
-*/
+
 describe('blogs', () => {
     beforeAll(async () => {
         await request(app).delete('/testing/all-data')

@@ -1,8 +1,6 @@
 import {ObjectId} from "mongodb";
-import {PaginationType} from "../types/paggination-type";
-import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
 import {UsersModel} from "./db";
-import {UserServiceType, UsersDbType, UsersOutputType } from "../types/user-types";
+import {UserServiceType, UsersDbType, UsersViewType } from "../types/user-types";
 
 
 
@@ -40,6 +38,7 @@ export class UsersRepository {
         } : null)
     }
 
+    /*
     async findUserById(userId: string): Promise<UsersOutputType | null> {
         const user = await UsersModel
             .findOne({_id: new ObjectId(userId)})
@@ -53,6 +52,7 @@ export class UsersRepository {
             createdAt: user.createdAt,
         }
     }
+    */
 
     async findUserByConfirmationCode(confirmationCode: string): Promise<UsersDbType | null> {
         const user = await UsersModel

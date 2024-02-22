@@ -4,7 +4,6 @@ import {randomUUID} from "crypto";
 import {ObjectId} from "mongodb";
 import {emailPasswordRecoveryAdapter} from "../adapters/email-passwordRecoveryAdapter";
 import {PasswordRecoveryRepository, PasswordRecoveryType} from "../repositories/passwordRecovery-repository";
-import bcrypt from "bcrypt";
 import {UserServiceType} from "../types/user-types";
 
 class AuthService {
