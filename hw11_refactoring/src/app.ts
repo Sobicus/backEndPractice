@@ -2,7 +2,7 @@ import express, {Request, Response} from 'express'
 import {blogsRouter} from './routes/blogs-router'
 import {postsRouter} from './routes/posts-router'
 import {postsViewType} from "./repositories/posts-repository";
-import {blogsRepositoryType} from "./repositories/blogs-repository";
+import {blogsDbType} from "./repositories/blogs-repository";
 import {usersRouter} from './routes/users-router';
 import {authRouter} from "./routes/auth-router";
 import {commentsRouter} from './routes/comments-router';

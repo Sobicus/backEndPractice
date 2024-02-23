@@ -6,15 +6,16 @@ import {getBlogsPagination} from "../helpers/pagination-helpers";
 import {validationPostsByBlogIdMidleware} from "../midlewares/input-postsByBlogId-validation-middleware";
 import {IQuery, SortBlogsByEnum} from "../types/paggination-type";
 import {postService} from "../domain/posts-service";
+import {blogsQueryRepository} from "../repositories/blogs-queryRepository";
 
 export const blogsRouter = Router()
 blogsRouter.get('/', async (req: Request<{}, {}, {}, IQuery<SortBlogsByEnum>>, res: Response) => {
     const pagination = getBlogsPagination(req.query)
-    const blogs = await blogsService.findAllBlogs(pagination)
+    const blogs = await blogsQueryRepository.findAllBlogs(pagination)
     res.status(200).send(blogs)
 })
 blogsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res: Response) => {
-    const blog = await blogsService.findBlogById(req.params.id)
+    const blog = await blogsQueryRepository.findBlogById(req.params.id)
 
     if (!blog) {
         res.sendStatus(404)
@@ -27,7 +28,7 @@ blogsRouter.get('/:id/posts', async (req: RequestWithParamsAmdQuery<{
 }, IQuery<SortBlogsByEnum>>, res: Response) => {
     const blogId = req.params.id
     const queryParam = req.query
-    const posts = await blogsService.findPostByBlogId(blogId, queryParam)
+    const posts = await blogsQueryRepository.findPostByBlogId(blogId, queryParam)
     if (!posts) {
         res.sendStatus(404)
         return
@@ -39,7 +40,7 @@ blogsRouter.post('/:id/posts', checkAuthorization, ...validationPostsByBlogIdMid
 }, postByBlogIdBodyRequest>, res: Response) => {
     const blogId = req.params.id
     const {title, shortDescription, content} = req.body
-    const post =  await postService.createPost(title, shortDescription, content, blogId)
+    const post = await postService.createPost(title, shortDescription, content, blogId)
     //const createdPostByBlogId = await postService.createPost(title, shortDescription, content, blogId)
     if (!post) return res.sendStatus(404)
     return res.status(201).send(post)

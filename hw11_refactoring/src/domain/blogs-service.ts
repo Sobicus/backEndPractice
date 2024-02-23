@@ -2,7 +2,7 @@ import {BlogsRepository} from "../repositories/blogs-repository";
 import {blogBodyRequest} from "../routes/blogs-router";
 import {IBlockPagination, IQuery, PaginationType, SortBlogsByEnum} from "../types/paggination-type";
 import {postsViewType} from "../repositories/posts-repository";
-import {BlogViewType} from "../types/blogs-type";
+import {BlogViewType} from "../types/blog-types";
 
 
 class BlogsService {
@@ -11,19 +11,21 @@ class BlogsService {
     constructor() {
         this.blogRepo = new BlogsRepository()
     }
-
+/*
     async findAllBlogs(pagination: IBlockPagination): Promise<PaginationType<BlogViewType>> {
         return await this.blogRepo.findAllBlogs(pagination)
     }
-
+*/
+    /*
     async findBlogById(blogId: string): Promise<BlogViewType | null> {
         return await this.blogRepo.findBlogById(blogId)
     }
-
+*/
+    /*
     async findPostByBlogId(blogId: string, query: IQuery<SortBlogsByEnum>): Promise<PaginationType<postsViewType> | null> {
         return await this.blogRepo.findPostByBlogId(blogId, query)
     }
-
+*/
     async createBlog(createModel: blogBodyRequest): Promise<BlogViewType> {
         const createdAt = new Date().toISOString()
         const isMembership = false

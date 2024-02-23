@@ -1,24 +1,25 @@
-import {Response, Request, Router, NextFunction} from "express";
+import {Response, Request, Router} from "express";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
 import {validationPostsMiddleware} from "../midlewares/input-posts-validation-middleware";
 import {postService} from "../domain/posts-service";
 import {getPostsPagination} from "../helpers/pagination-helpers";
 import {IQuery, SortPostsByEnum} from "../types/paggination-type";
 import {authMiddleware} from "../midlewares/auth-middleware";
-import {UsersOutputType} from "../repositories/users-repository";
 import {getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
 import {validationCommentsContentMiddleware} from "../midlewares/input-comments-content-middleware";
 import {softAuthMiddleware} from "../midlewares/soft-auth-middleware";
+import {UsersViewType} from "../types/user-types";
+import {postsQueryRepository} from "../repositories/posts-queryRepository";
 
 export const postsRouter = Router()
 
 postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery<SortPostsByEnum>>, res: Response) => {
     const postsPagination = getPostsPagination(req.query)
-    const posts = await postService.findAllPosts(postsPagination)
+    const posts = await postsQueryRepository.findAllPosts(postsPagination)
     res.status(200).send(posts)
 })
 postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res: Response) => {
-    const post = await postService.findPostById(req.params.id)
+    const post = await postsQueryRepository.findPostById(req.params.id)
     if (!post) {
         res.sendStatus(404)
         return;
@@ -54,7 +55,7 @@ postsRouter.delete('/:id', checkAuthorization, async (req: RequestWithParams<{ i
 postsRouter.post('/:id/comments',
     authMiddleware,
     validationCommentsContentMiddleware,
-    async (req: postRequestComment<{ id: string }, { content: string }, UsersOutputType>, res: Response) => {
+    async (req: postRequestComment<{ id: string }, { content: string }, UsersViewType>, res: Response) => {
         const post = await postService.findPostById(req.params.id)
         if (!post) {
             return res.sendStatus(404)
@@ -72,7 +73,7 @@ postsRouter.get('/:id/comments', softAuthMiddleware, async (req: RequestWithPara
         res.sendStatus(404)
         return
     }
-    const comments = await postService.findCommentsByPostId(req.params.id, paggination, userId)
+    const comments = await postsQueryRepository.findCommentsByPostId(req.params.id, paggination, userId)
     return res.status(200).send(comments)
 })
 
@@ -84,7 +85,7 @@ export type postBodyRequest = {
     content: string
     blogId: string
 }
-type postRequestComment<P, B, U extends UsersOutputType> = Request<P, {}, B, {}, U>
+type postRequestComment<P, B, U extends UsersViewType> = Request<P, {}, B, {}, U>
 type putRequestChangePost<P, B> = Request<P, {}, B, {}>
 export type RequestWithParamsAndQuery<P, Q> = Request<P, {}, {}, Q>
 

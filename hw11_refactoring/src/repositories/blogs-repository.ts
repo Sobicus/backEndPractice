@@ -4,9 +4,7 @@ import {IBlockPagination, IQuery, PaginationType, SortBlogsByEnum} from "../type
 import {postsViewType} from "./posts-repository";
 import {getBlogsPagination} from "../helpers/pagination-helpers";
 import {BlogsModel, PostsModel} from "./db";
-import { BlogViewType, blogsRepositoryType } from "../types/blogs-type";
-
-
+import {BlogViewType, blogsDbType} from "../types/blog-types";
 
 
 export class BlogsRepository {
@@ -89,7 +87,7 @@ export class BlogsRepository {
         }
     }
 
-    async createBlog(createModel: blogsRepositoryType): Promise<string>/*Promise<InsertOneResult>*/ /*Promise<BlogViewType>*/ {
+    async createBlog(createModel: blogsDbType): Promise<string>/*Promise<InsertOneResult>*/ /*Promise<BlogViewType>*/ {
         const resultNewBlog = await BlogsModel
             .create(createModel)
         return resultNewBlog._id.toString()

@@ -1,40 +1,13 @@
-import {postBodyRequest} from "../routes/posts-router";
 import {ObjectId} from "mongodb";
 import {IPostPagination, PaginationType} from "../types/paggination-type";
-import { CommentsViewType, CommentViewType, newCommentType} from "../types/comments-type";
-import {DefaultCommentsPaginationType, getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
-import {BlogsModel, CommentsModel, LikesCommentsModel, PostsModel} from "./db";
+import {CommentsViewType} from "../types/comment-types";
+import {DefaultCommentsPaginationType} from "../helpers/pagination-comments";
+import { CommentsModel, LikesCommentsModel, PostsModel} from "./db";
 import {LikesStatus} from "./likes-commets-repository";
+import { PostsViewType } from "../types/post-types";
 
-export type postsViewType = {
-    id: string
-    title: string
-    shortDescription: string
-    content: string
-    blogId: string
-    blogName: string
-    createdAt: string
-}
-
-export type postsDbType = {
-    _id: ObjectId
-    title: string
-    shortDescription: string
-    content: string
-    blogId: string
-    blogName: string
-    createdAt: string
-}
-export type createPostType = {
-    title: string
-    shortDescription: string
-    content: string
-    blogId: string
-    createdAt: string
-}
-
-export class PostsRepository {
-    async findAllPosts(postsPagination: IPostPagination): Promise<PaginationType<postsViewType>> {
+export class PostsQueryRepository {
+    async findAllPosts(postsPagination: IPostPagination): Promise<PaginationType<PostsViewType>> {
         const posts = await PostsModel
             .find({})
             .sort({[postsPagination.sortBy]: postsPagination.sortDirection})
@@ -63,7 +36,7 @@ export class PostsRepository {
         }
     }
 
-    async findPostById(postId: string): Promise<postsViewType | null> {
+    async findPostById(postId: string): Promise<PostsViewType | null> {
         let post = await PostsModel
             .findOne({_id: new ObjectId(postId)})
         if (!post) {
@@ -79,30 +52,6 @@ export class PostsRepository {
             createdAt: post.createdAt
         }
     }
-
-    async createPost(newPost: createPostType): Promise<{ blogName: string, postId: string } | null> {
-        let blog: blogsRepositoryType | null = await BlogsModel
-            .findOne({_id: new ObjectId(newPost.blogId)})
-        if (!blog) return null;
-        let newPostByDb = await PostsModel
-            .create({...newPost, blogName: blog.name, _id: new ObjectId()})
-        const blogName = blog.name
-        const postId = newPostByDb._id.toString()
-        return {blogName, postId}
-    }
-
-    async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
-        const resultUpdateModel = await PostsModel
-            .updateOne({_id: new ObjectId(postId)}, {$set: updateModel})
-        return resultUpdateModel.matchedCount === 1
-    }
-
-    async deletePost(postId: string): Promise<boolean> {
-        const resultDeletePost = await PostsModel
-            .deleteOne({_id: new ObjectId(postId)})
-        return resultDeletePost.deletedCount === 1
-    }
-
     async findCommentsByPostId(postId: string, paggination: DefaultCommentsPaginationType, userId?: string): Promise<CommentsViewType> {
         // const paggination = getCommentsPagination(query)
         const commets = await CommentsModel
@@ -152,22 +101,6 @@ export class PostsRepository {
         }
     }
 
-    async createCommetByPostId(comment: newCommentType): Promise<CommentViewType> {
-        const newComment = await CommentsModel
-            .create({...comment})//<CommentsRepositoryType> can not
-        return {
-            id: newComment._id.toString(),
-            content: comment.content,
-            commentatorInfo: {
-                userLogin: comment.userLogin,
-                userId: comment.userId
-            },
-            createdAt: comment.createdAt,
-            likesInfo: {
-                likesCount: 0,
-                dislikesCount: 0,
-                myStatus: LikesStatus.None
-            }
-        }
-    }
 }
+
+export const postsQueryRepository = new PostsQueryRepository()

@@ -1,4 +1,4 @@
-import {CommentsRepositoryType, CommentViewType} from "../types/comments-type";
+import {CommentsRepositoryType, CommentViewType} from "../types/comment-types";
 import {ObjectId} from "mongodb";
 import {CommentsModel} from "./db";
 

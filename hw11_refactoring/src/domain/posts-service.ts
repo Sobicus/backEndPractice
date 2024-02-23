@@ -1,9 +1,9 @@
-import {PostsRepository, postsViewType} from "../repositories/posts-repository";
+import {PostsRepository} from "../repositories/posts-repository";
 import {postBodyRequest} from "../routes/posts-router";
 import {IDefaultPagination, PaginationType, SortPostsByEnum} from "../types/paggination-type";
-import {UsersOutputType} from "../repositories/users-repository";
-import {newCommentType} from "../types/comments-type";
-import {DefaultCommentsPaginationType, queryCommentsType} from "../helpers/pagination-comments";
+import {newCommentType} from "../types/comment-types";
+import {UsersViewType} from "../types/user-types";
+import {PostsDbType, PostsViewType} from "../types/post-types";
 
 class PostsService {
     postRepo: PostsRepository
@@ -12,15 +12,15 @@ class PostsService {
         this.postRepo = new PostsRepository()
     }
 
-    async findAllPosts(postsPagination: IDefaultPagination<SortPostsByEnum>): Promise<PaginationType<postsViewType>> {
-        return await this.postRepo.findAllPosts(postsPagination)
-    }
-
-    async findPostById(postId: string): Promise<postsViewType | null> {
+    /* async findAllPosts(postsPagination: IDefaultPagination<SortPostsByEnum>): Promise<PaginationType<postsViewType>> {
+         return await this.postRepo.findAllPosts(postsPagination)
+     }
+ */
+    async findPostById(postId: string): Promise<PostsDbType | null> {
         return await this.postRepo.findPostById(postId)
     }
 
-    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postsViewType | null> {
+    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<PostsViewType | null> {
         const newPost = {
             title,
             shortDescription,
@@ -43,7 +43,7 @@ class PostsService {
         return resultDeletePost
     }
 
-    async createCommetByPostId(postId: string, content: string, user: UsersOutputType) {
+    async createCommetByPostId(postId: string, content: string, user: UsersViewType) {
         const comment: newCommentType = {
             createdAt: new Date().toISOString(),
             postId,
@@ -54,9 +54,9 @@ class PostsService {
         return await this.postRepo.createCommetByPostId(comment);
     }
 
-    async findCommentsByPostId(postId: string, paggination: DefaultCommentsPaginationType,userId?: string) {
-        return await this.postRepo.findCommentsByPostId(postId, paggination,userId)
-    }
+    /*  async findCommentsByPostId(postId: string, paggination: DefaultCommentsPaginationType,userId?: string) {
+          return await this.postRepo.findCommentsByPostId(postId, paggination,userId)
+      }*/
 }
 
 export const postService = new PostsService()

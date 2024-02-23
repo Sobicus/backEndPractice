@@ -1,4 +1,4 @@
-export type blogsRepositoryType = {
+export type blogsDbType = {
     name: string
     description: string
     websiteUrl: string

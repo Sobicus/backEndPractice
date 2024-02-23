@@ -3,7 +3,7 @@ import {userService} from "../domain/user-service";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
 import {validationUsersMiddleware} from "../midlewares/input-user-validation-middleware";
 import {IQueryUsers, getPaginationUsersHelpers} from "../helpers/pagination-users-helpers";
-import {usersQueryRepository} from "../repositories/users-QueryRepository";
+import {usersQueryRepository} from "../repositories/users-queryRepository";
 
 export const usersRouter = Router()
 
