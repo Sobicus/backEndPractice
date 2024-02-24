@@ -1,7 +1,5 @@
 import {BlogsRepository} from "../repositories/blogs-repository";
 import {blogBodyRequest} from "../routes/blogs-router";
-import {IBlockPagination, IQuery, PaginationType, SortBlogsByEnum} from "../types/paggination-type";
-import {postsViewType} from "../repositories/posts-repository";
 import {BlogViewType} from "../types/blog-types";
 
 

@@ -1,21 +1,29 @@
 import {CommentsRepository} from "../repositories/comments-repository";
-import {CommentsRepositoryType, CommentViewType} from "../types/comment-types";
-import {CommentsQueryRepository} from "../repositories/comments-queryRepository";
+import {CommentsDbType, CommentViewType} from "../types/comment-types";
 
 class CommentService {
     commentRepo: CommentsRepository
-    commentQueryRepo:CommentsQueryRepository
+
+    //commentQueryRepo:CommentsQueryRepository
 
     constructor() {
         this.commentRepo = new CommentsRepository()
-        this.commentQueryRepo = new CommentsQueryRepository()
+        //this.commentQueryRepo = new CommentsQueryRepository()
     }
 
-    async getCommentById(commentId: string,userId?:string): Promise<CommentViewType | null> {
-        return await this.commentQueryRepo.getCommentById(commentId,userId)
-    }
-
-    async updatePost(commentId: string, content: string): Promise<boolean> {
+    /*
+        async getCommentById(commentId: string,userId?:string): Promise<CommentViewType | null> {
+            return await this.commentQueryRepo.getCommentById(commentId,userId)
+        }
+    */
+    async updatePost(commentId: string, content: string, userId: string): Promise<boolean | string> {
+        const resault = await this.commentRepo.findCommentsById(commentId)
+        if (!resault) {
+            return false
+        }
+        if (resault.userId !== userId) {
+            return '403'
+        }
         return await this.commentRepo.updateComment(commentId, content)
     }
 
@@ -24,7 +32,7 @@ class CommentService {
     }
 
     //check below
-    async getDbCommentById(commentId: string): Promise<CommentsRepositoryType | null> {
+    async getDbCommentById(commentId: string): Promise<CommentsDbType | null> {
         return await this.commentRepo.getCommentById(commentId)
     }
 }

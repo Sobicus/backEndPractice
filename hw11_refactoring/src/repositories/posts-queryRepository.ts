@@ -7,6 +7,7 @@ import {LikesStatus} from "./likes-commets-repository";
 import { PostsViewType } from "../types/post-types";
 
 export class PostsQueryRepository {
+
     async findAllPosts(postsPagination: IPostPagination): Promise<PaginationType<PostsViewType>> {
         const posts = await PostsModel
             .find({})
@@ -100,7 +101,12 @@ export class PostsQueryRepository {
             items: comments
         }
     }
+    async doesPostExist(postId: string): Promise<boolean> {
+        let post = await PostsModel
+            .findOne({_id: new ObjectId(postId)})
+       return !!post
 
+    }
 }
 
 export const postsQueryRepository = new PostsQueryRepository()

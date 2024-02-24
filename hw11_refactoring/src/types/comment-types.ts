@@ -11,7 +11,7 @@ export type CommentViewType = {
     createdAt: string
     likesInfo: LikesInfoType
 }
-export type CommentsRepositoryType = {
+export type CommentsDbType = {
     _id: ObjectId
     createdAt: string
     postId: string

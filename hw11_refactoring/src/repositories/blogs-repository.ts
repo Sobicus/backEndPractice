@@ -1,10 +1,10 @@
 import {blogBodyRequest} from "../routes/blogs-router";
 import {ObjectId} from "mongodb";
 import {IBlockPagination, IQuery, PaginationType, SortBlogsByEnum} from "../types/paggination-type";
-import {postsViewType} from "./posts-repository";
 import {getBlogsPagination} from "../helpers/pagination-helpers";
 import {BlogsModel, PostsModel} from "./db";
 import {BlogViewType, blogsDbType} from "../types/blog-types";
+import {PostsViewType} from "../types/post-types";
 
 
 export class BlogsRepository {
@@ -53,7 +53,7 @@ export class BlogsRepository {
         }
     }
 
-    async findPostByBlogId(blogId: string, query: IQuery<SortBlogsByEnum>): Promise<PaginationType<postsViewType> | null> {
+    async findPostByBlogId(blogId: string, query: IQuery<SortBlogsByEnum>): Promise<PaginationType<PostsViewType> | null> {
         let blog = await BlogsModel
             .findOne({_id: new ObjectId(blogId)})
         if (!blog) {

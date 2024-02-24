@@ -1,16 +1,21 @@
-import {CommentsRepositoryType, CommentViewType} from "../types/comment-types";
+import {CommentsDbType, CommentViewType} from "../types/comment-types";
 import {ObjectId} from "mongodb";
 import {CommentsModel} from "./db";
 
 export class CommentsRepository {
-    async getCommentById(commentId: string): Promise<CommentsRepositoryType | null> {
-       return CommentsModel
+    async findCommentsById(commentId: string): Promise<CommentsDbType | null> {
+        return CommentsModel
+            .findOne({_id: commentId})
+    }
+
+    async getCommentById(commentId: string): Promise<CommentsDbType | null> {
+        return CommentsModel
             .findOne({_id: new ObjectId(commentId)})
     }
 
     async updateComment(commentId: string, content: string): Promise<boolean> {
         const resultUpdateCommentModel = await CommentsModel
-            .updateOne({_id: new ObjectId(commentId)}, {$set:{content: content}})
+            .updateOne({_id: new ObjectId(commentId)}, {$set: {content: content}})
         return resultUpdateCommentModel.matchedCount === 1
     }
 

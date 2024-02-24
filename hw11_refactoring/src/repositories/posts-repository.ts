@@ -1,8 +1,7 @@
 import {postBodyRequest} from "../routes/posts-router";
 import {ObjectId} from "mongodb";
-import {CommentsViewType, CommentViewType, newCommentType} from "../types/comment-types";
-import {DefaultCommentsPaginationType} from "../helpers/pagination-comments";
-import {BlogsModel, CommentsModel, LikesCommentsModel, PostsModel} from "./db";
+import {CommentViewType, newCommentType} from "../types/comment-types";
+import {BlogsModel, CommentsModel, PostsModel} from "./db";
 import {LikesStatus} from "./likes-commets-repository";
 import {CreatePostType, PostsDbType} from "../types/post-types";
 import {blogsDbType} from "../types/blog-types";
@@ -38,7 +37,7 @@ export class PostsRepository {
     }
 */
     async findPostById(postId: string): Promise<PostsDbType | null> {
-        return await PostsModel.findOne({_id: new ObjectId(postId)})
+        return PostsModel.findOne({_id: new ObjectId(postId)})
     }
 
     async createPost(newPost: CreatePostType): Promise<{ blogName: string, postId: string } | null> {

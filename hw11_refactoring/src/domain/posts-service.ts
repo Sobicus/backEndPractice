@@ -1,9 +1,8 @@
 import {PostsRepository} from "../repositories/posts-repository";
 import {postBodyRequest} from "../routes/posts-router";
-import {IDefaultPagination, PaginationType, SortPostsByEnum} from "../types/paggination-type";
-import {newCommentType} from "../types/comment-types";
+import {CommentViewType, newCommentType} from "../types/comment-types";
 import {UsersViewType} from "../types/user-types";
-import {PostsDbType, PostsViewType} from "../types/post-types";
+import {PostsViewType} from "../types/post-types";
 
 class PostsService {
     postRepo: PostsRepository
@@ -16,9 +15,9 @@ class PostsService {
          return await this.postRepo.findAllPosts(postsPagination)
      }
  */
-    async findPostById(postId: string): Promise<PostsDbType | null> {
-        return await this.postRepo.findPostById(postId)
-    }
+    // async findPostById(postId: string): Promise<PostsDbType | null> {
+    //     return await this.postRepo.findPostById(postId)
+    // }
 
     async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<PostsViewType | null> {
         const newPost = {
@@ -35,15 +34,20 @@ class PostsService {
     }
 
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
+        const post = await this.postRepo.findPostById(postId)
+        if (!post) return false
         return await this.postRepo.updatePost(postId, updateModel)
     }
 
     async deletePost(postId: string): Promise<boolean> {
-        const resultDeletePost = await this.postRepo.deletePost(postId)
-        return resultDeletePost
+        const post = await this.postRepo.findPostById(postId)
+        if (!post) return false
+        return await this.postRepo.deletePost(postId)
     }
 
-    async createCommetByPostId(postId: string, content: string, user: UsersViewType) {
+    async createCommetByPostId(postId: string, content: string, user: UsersViewType): Promise<CommentViewType | boolean> {
+        const post = await this.postRepo.findPostById(postId)
+        if (!post) return false
         const comment: newCommentType = {
             createdAt: new Date().toISOString(),
             postId,

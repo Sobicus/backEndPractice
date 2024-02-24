@@ -56,11 +56,10 @@ postsRouter.post('/:id/comments',
     authMiddleware,
     validationCommentsContentMiddleware,
     async (req: postRequestComment<{ id: string }, { content: string }, UsersViewType>, res: Response) => {
-        const post = await postService.findPostById(req.params.id)
-        if (!post) {
+        const newComment = await postService.createCommetByPostId(req.params.id, req.body.content, req.user!)
+        if (!newComment) {
             return res.sendStatus(404)
         }
-        const newComment = await postService.createCommetByPostId(req.params.id, req.body.content, req.user!)
         return res.status(201).send(newComment)
     })
 postsRouter.get('/:id/comments', softAuthMiddleware, async (req: RequestWithParamsAndQuery<{
@@ -68,7 +67,7 @@ postsRouter.get('/:id/comments', softAuthMiddleware, async (req: RequestWithPara
 }, queryCommentsType>, res: Response) => {
     const userId = req.user?.id
     const paggination = getCommentsPagination(req.query)
-    const post = await postService.findPostById(req.params.id)
+    const post = await postsQueryRepository.doesPostExist(req.params.id)
     if (!post) {
         res.sendStatus(404)
         return
