@@ -1,5 +1,5 @@
 import {CommentsRepository} from "../repositories/comments-repository";
-import {CommentsDbType, CommentViewType} from "../types/comment-types";
+import {CommentsDbType} from "../types/comment-types";
 
 class CommentService {
     commentRepo: CommentsRepository
