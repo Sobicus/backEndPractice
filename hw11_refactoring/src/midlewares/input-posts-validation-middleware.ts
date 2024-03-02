@@ -1,6 +1,6 @@
 import {body} from "express-validator";
 import {inputVal} from "./errorValidator";
-import {blogsService} from "../domain/blogs-service";
+import {blogsQueryRepository} from "../repositories/blogs-queryRepository";
 
 
 export const validationPostsMiddleware = [
@@ -17,7 +17,8 @@ export const validationPostsMiddleware = [
         .trim().notEmpty().withMessage('Content can`t be empty and cannot consist of only spaces')
         .isString().trim().isLength({max: 1000}).withMessage('Content cannot be more than 1000 characters'),
     body('blogId').custom(async value => {
-       const blogIsExist = await blogsService.findBlogById(value);
+       //const blogIsExist = await blogsService.findBlogById(value);
+       const blogIsExist = await blogsQueryRepository.findBlogById(value);
         if(!blogIsExist){
             throw new Error("Blog not exist")
         }

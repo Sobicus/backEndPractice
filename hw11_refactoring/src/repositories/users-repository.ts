@@ -38,21 +38,22 @@ export class UsersRepository {
         } : null)
     }
 
-    /*
-    async findUserById(userId: string): Promise<UsersOutputType | null> {
+
+    async findUserById(userId: string): Promise<UsersDbType | null> {
         const user = await UsersModel
             .findOne({_id: new ObjectId(userId)})
         if (!user) {
             return null
         }
-        return {
+        return user
+       /* {
             id: user._id.toString(),
             login: user.login,
             email: user.email,
             createdAt: user.createdAt,
-        }
+        }*/
     }
-    */
+
 
     async findUserByConfirmationCode(confirmationCode: string): Promise<UsersDbType | null> {
         const user = await UsersModel

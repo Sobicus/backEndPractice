@@ -70,18 +70,22 @@ commentsRouter.put('/:id/like-status', authMiddleware, validationComentLikeStatu
 commentsRouter.delete('/:id', authMiddleware, async (req: commentsRequestParamsAndUser<{
     id: string
 }, UsersViewType>, res: Response) => {
-    const comment = await commentService.getCommentById(req.params.id)
-    if (!comment) {
-        res.sendStatus(404)
-        return
-    }
-    if (comment.commentatorInfo.userId !== req.user!.id) {
-        res.sendStatus(403)
-        return
-    }
-    const commentDelete = await commentService.deleteComment(req.params.id)
+    // const comment = await commentService.getCommentById(req.params.id)
+    // if (!comment) {
+    //     res.sendStatus(404)
+    //     return
+    // }
+    // if (comment.commentatorInfo.userId !== req.user!.id) {
+    //     res.sendStatus(403)
+    //     return
+    // }
+    const commentDelete = await commentService.deleteComment(req.params.id, req.user!.id)
     if (!commentDelete) {
         res.sendStatus(404)
+        return
+    }
+    if (commentDelete === '403') {
+        res.sendStatus(403)
         return
     }
     res.sendStatus(204)
