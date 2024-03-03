@@ -1,9 +1,9 @@
 import {BlogsRepository} from "../repositories/blogs-repository";
-import {blogBodyRequest} from "../routes/blogs-router";
 import {BlogViewType} from "../types/blog-types";
+import { blogBodyRequest } from "../types/blogsRouter-types";
 
 
-class BlogsService {
+export class BlogsService {
     blogRepo: BlogsRepository
 
     constructor() {
@@ -45,7 +45,5 @@ class BlogsService {
         return result
     }
 }
-
-export const blogsService = new BlogsService();
 
 

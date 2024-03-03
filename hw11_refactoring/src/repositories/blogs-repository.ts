@@ -1,10 +1,10 @@
-import {blogBodyRequest} from "../routes/blogs-router";
 import {ObjectId} from "mongodb";
 import {IBlockPagination, IQuery, PaginationType, SortBlogsByEnum} from "../types/paggination-type";
 import {getBlogsPagination} from "../helpers/pagination-helpers";
 import {BlogsModel, PostsModel} from "./db";
 import {BlogViewType, blogsDbType} from "../types/blog-types";
 import {PostsViewType} from "../types/post-types";
+import { blogBodyRequest } from "../types/blogsRouter-types";
 
 
 export class BlogsRepository {
