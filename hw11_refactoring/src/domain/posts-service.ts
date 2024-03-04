@@ -1,8 +1,8 @@
 import {PostsRepository} from "../repositories/posts-repository";
-import {postBodyRequest} from "../routes/posts-router";
 import {CommentViewType, newCommentType} from "../types/comment-types";
 import {UsersViewType} from "../types/user-types";
 import {PostsViewType} from "../types/post-types";
+import { postBodyRequest } from "../types/postsRouter-types";
 
 export class PostsService {
     postRepo: PostsRepository

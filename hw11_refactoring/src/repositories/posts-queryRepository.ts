@@ -105,8 +105,5 @@ export class PostsQueryRepository {
         let post = await PostsModel
             .findOne({_id: new ObjectId(postId)})
        return !!post
-
     }
 }
-
-export const postsQueryRepository = new PostsQueryRepository()

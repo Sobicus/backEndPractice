@@ -1,7 +1,6 @@
 import {Response, Request, Router} from "express";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
 import {validationPostsMiddleware} from "../midlewares/input-posts-validation-middleware";
-import {postService} from "../domain/posts-service";
 import {getPostsPagination} from "../helpers/pagination-helpers";
 import {IQuery, SortPostsByEnum} from "../types/paggination-type";
 import {authMiddleware} from "../midlewares/auth-middleware";
@@ -9,82 +8,111 @@ import {getCommentsPagination, queryCommentsType} from "../helpers/pagination-co
 import {validationCommentsContentMiddleware} from "../midlewares/input-comments-content-middleware";
 import {softAuthMiddleware} from "../midlewares/soft-auth-middleware";
 import {UsersViewType} from "../types/user-types";
-import {postsQueryRepository} from "../repositories/posts-queryRepository";
+import {
+    postBodyRequest,
+    postRequestComment,
+    postRequestWithBody,
+    putRequestChangePost,
+    RequestWithParams,
+    RequestWithParamsAndQuery
+} from "../types/postsRouter-types";
+import {PostsQueryRepository} from "../repositories/posts-queryRepository";
+import {PostsService} from "../domain/posts-service";
 
 export const postsRouter = Router()
 
-postsRouter.get('/', async (req: Request<{}, {}, {}, IQuery<SortPostsByEnum>>, res: Response) => {
-    const postsPagination = getPostsPagination(req.query)
-    const posts = await postsQueryRepository.findAllPosts(postsPagination)
-    res.status(200).send(posts)
-})
-postsRouter.get('/:id', async (req: RequestWithParams<{ id: string }>, res: Response) => {
-    const post = await postsQueryRepository.findPostById(req.params.id)
-    if (!post) {
-        res.sendStatus(404)
-        return;
-    }
-    return res.status(200).send(post);
-})
+class PostsController {
+    postsQueryRepository: PostsQueryRepository
+    postService: PostsService
 
-postsRouter.post('/', checkAuthorization, ...validationPostsMiddleware, async (req: postRequestWithBody<postBodyRequest>, res: Response) => {
-    let {title, shortDescription, content, blogId} = req.body
-    const newPost = await postService.createPost(title, shortDescription, content, blogId)
-    if (!newPost) return res.sendStatus(404);
-    return res.status(201).send(newPost);
-})
-postsRouter.put('/:id', checkAuthorization, ...validationPostsMiddleware, async (req: putRequestChangePost<{
-    id: string
-}, postBodyRequest>, res: Response) => {
-    let {title, shortDescription, content, blogId} = req.body
-    const postIsUpdated = await postService.updatePost(req.params.id, {title, shortDescription, content, blogId})
-    if (!postIsUpdated) {
-        res.sendStatus(404)
-        return
+    constructor() {
+        this.postsQueryRepository = new PostsQueryRepository()
+        this.postService = new PostsService()
     }
-    res.sendStatus(204)
-})
-postsRouter.delete('/:id', checkAuthorization, async (req: RequestWithParams<{ id: string }>, res: Response) => {
-    const postIsDelete = await postService.deletePost(req.params.id)
-    if (!postIsDelete) {
-        res.sendStatus(404)
-        return
+
+    async getAllPosts(req: Request<{}, {}, {}, IQuery<SortPostsByEnum>>, res: Response) {
+        const postsPagination = getPostsPagination(req.query)
+        const posts = await this.postsQueryRepository.findAllPosts(postsPagination)
+        res.status(200).send(posts)
     }
-    res.sendStatus(204)
-})
-postsRouter.post('/:id/comments',
-    authMiddleware,
-    validationCommentsContentMiddleware,
-    async (req: postRequestComment<{ id: string }, { content: string }, UsersViewType>, res: Response) => {
-        const newComment = await postService.createCommetByPostId(req.params.id, req.body.content, req.user!)
+
+    async findPostById(req: RequestWithParams<{ id: string }>, res: Response) {
+        const post = await this.postsQueryRepository.findPostById(req.params.id)
+        if (!post) {
+            res.sendStatus(404)
+            return;
+        }
+        return res.status(200).send(post);
+    }
+
+    async createPost(req: postRequestWithBody<postBodyRequest>, res: Response) {
+        let {title, shortDescription, content, blogId} = req.body
+        const newPost = await this.postService.createPost(title, shortDescription, content, blogId)
+        if (!newPost) return res.sendStatus(404);
+        return res.status(201).send(newPost);
+    }
+
+    async updatePost(req: putRequestChangePost<{
+        id: string
+    }, postBodyRequest>, res: Response) {
+        let {title, shortDescription, content, blogId} = req.body
+        const postIsUpdated = await this.postService.updatePost(req.params.id, {
+            title,
+            shortDescription,
+            content,
+            blogId
+        })
+        if (!postIsUpdated) {
+            res.sendStatus(404)
+            return
+        }
+        res.sendStatus(204)
+    }
+
+    async deletePost(req: RequestWithParams<{ id: string }>, res: Response) {
+        const postIsDelete = await this.postService.deletePost(req.params.id)
+        if (!postIsDelete) {
+            res.sendStatus(404)
+            return
+        }
+        res.sendStatus(204)
+    }
+
+    async createCommetByPostId(req: postRequestComment<{ id: string }, {
+        content: string
+    }, UsersViewType>, res: Response) {
+        const newComment = await this.postService.createCommetByPostId(req.params.id, req.body.content, req.user!)
         if (!newComment) {
             return res.sendStatus(404)
         }
         return res.status(201).send(newComment)
-    })
-postsRouter.get('/:id/comments', softAuthMiddleware, async (req: RequestWithParamsAndQuery<{
-    id: string
-}, queryCommentsType>, res: Response) => {
-    const userId = req.user?.id
-    const paggination = getCommentsPagination(req.query)
-    const post = await postsQueryRepository.doesPostExist(req.params.id)
-    if (!post) {
-        res.sendStatus(404)
-        return
     }
-    const comments = await postsQueryRepository.findCommentsByPostId(req.params.id, paggination, userId)
-    return res.status(200).send(comments)
-})
 
-type RequestWithParams<P> = Request<P, {}, {}, {}>
-type postRequestWithBody<B> = Request<{}, {}, B, {}>
-export type postBodyRequest = {
-    title: string
-    shortDescription: string
-    content: string
-    blogId: string
+    async findCommentsByPostId(req: RequestWithParamsAndQuery<{
+        id: string
+    }, queryCommentsType>, res: Response) {
+        const userId = req.user?.id
+        const paggination = getCommentsPagination(req.query)
+        const post = await this.postsQueryRepository.doesPostExist(req.params.id)
+        if (!post) {
+            res.sendStatus(404)
+            return
+        }
+        const comments = await this.postsQueryRepository.findCommentsByPostId(req.params.id, paggination, userId)
+        return res.status(200).send(comments)
+    }
 }
-type postRequestComment<P, B, U extends UsersViewType> = Request<P, {}, B, {}, U>
-type putRequestChangePost<P, B> = Request<P, {}, B, {}>
-export type RequestWithParamsAndQuery<P, Q> = Request<P, {}, {}, Q>
+
+const postsControllerInstance = new PostsController()
+
+postsRouter.get('/', postsControllerInstance.getAllPosts.bind(postsControllerInstance))
+postsRouter.get('/:id', postsControllerInstance.findPostById.bind(postsControllerInstance))
+postsRouter.post('/', checkAuthorization, ...validationPostsMiddleware, postsControllerInstance.createPost.bind(postsControllerInstance))
+postsRouter.put('/:id', checkAuthorization, ...validationPostsMiddleware, postsControllerInstance.updatePost.bind(postsControllerInstance))
+postsRouter.delete('/:id', checkAuthorization, postsControllerInstance.deletePost.bind(postsControllerInstance))
+postsRouter.post('/:id/comments', authMiddleware, validationCommentsContentMiddleware, postsControllerInstance.createCommetByPostId.bind(postsControllerInstance))
+postsRouter.get('/:id/comments', softAuthMiddleware, postsControllerInstance.findCommentsByPostId.bind(postsControllerInstance))
+
+
+
 
