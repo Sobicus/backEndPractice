@@ -4,7 +4,7 @@ import {CommentViewType, newCommentType} from "../types/comment-types";
 import {UsersViewType} from "../types/user-types";
 import {PostsViewType} from "../types/post-types";
 
-class PostsService {
+export class PostsService {
     postRepo: PostsRepository
 
     constructor() {
@@ -63,4 +63,4 @@ class PostsService {
       }*/
 }
 
-export const postService = new PostsService()
+//export const postService = new PostsService()
