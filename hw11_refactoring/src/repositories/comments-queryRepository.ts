@@ -42,4 +42,3 @@ export class CommentsQueryRepository {
         return result
     }
 }
-export const commentsQueryRepository = new CommentsQueryRepository()

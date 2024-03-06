@@ -1,6 +1,6 @@
 import {CommentsRepository} from "../repositories/comments-repository";
 
-class CommentService {
+export class CommentService {
     commentRepo: CommentsRepository
 
     //commentQueryRepo:CommentsQueryRepository
@@ -43,4 +43,4 @@ class CommentService {
     }*/
 }
 
-export const commentService = new CommentService()
+//export const commentService = new CommentService()

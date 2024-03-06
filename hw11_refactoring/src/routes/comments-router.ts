@@ -1,5 +1,4 @@
 import {Request, Response, Router} from "express";
-import {commentService} from "../domain/comment-service";
 import {validationCommentsContentMiddleware} from "../midlewares/input-comments-content-middleware";
 import {authMiddleware} from "../midlewares/auth-middleware";
 import {LikesStatus} from "../repositories/likes-commets-repository";
@@ -23,18 +22,6 @@ commentsRouter.get('/:id', softAuthMiddleware, async (req: commentsRequestParams
 commentsRouter.put('/:id', authMiddleware, validationCommentsContentMiddleware, async (req: commentsRequestParamsAndBodyUser<{
     id: string
 }, { content: string }, UsersViewType>, res: Response) => {
-    /*const comment = await commentService.getCommentById(req.params.id)
-    if (!comment) {
-        res.sendStatus(404)
-        return
-    }*/
-    /*if (comment.commentatorInfo.userId !== req.user!.id) {
-        console.log(comment.commentatorInfo.userId)
-        console.log(req.user!.id)
-        console.log(comment.commentatorInfo.userId === req.user!.id)
-        res.sendStatus(403)
-        return
-    }*/
     const commentIsUpdated = await commentService.updatePost(req.params.id, req.body.content, req.user!.id)
     if (!commentIsUpdated) {
         res.sendStatus(404)
@@ -52,15 +39,10 @@ commentsRouter.put('/:id/like-status', authMiddleware, validationComentLikeStatu
     }, {
         likeStatus: LikesStatus
     }>, res: Response) => {
-        const comentsLikeStatus = req.body.likeStatus
+        const commentsLikeStatus = req.body.likeStatus
         const userId = req.user!.id
         const commentId = req.params.id
-        /*const comment = await commentService.getCommentById(commentId)
-        if (!comment) {
-            res.sendStatus(404)
-            return
-        }*/
-        const result = await likeCommentsService.likeCommentUpdate(commentId, userId, comentsLikeStatus)
+        const result = await likeCommentsService.likeCommentUpdate(commentId, userId, commentsLikeStatus)
         if (result === '404') {
             res.sendStatus(404)
             return
@@ -70,15 +52,6 @@ commentsRouter.put('/:id/like-status', authMiddleware, validationComentLikeStatu
 commentsRouter.delete('/:id', authMiddleware, async (req: commentsRequestParamsAndUser<{
     id: string
 }, UsersViewType>, res: Response) => {
-    // const comment = await commentService.getCommentById(req.params.id)
-    // if (!comment) {
-    //     res.sendStatus(404)
-    //     return
-    // }
-    // if (comment.commentatorInfo.userId !== req.user!.id) {
-    //     res.sendStatus(403)
-    //     return
-    // }
     const commentDelete = await commentService.deleteComment(req.params.id, req.user!.id)
     if (!commentDelete) {
         res.sendStatus(404)

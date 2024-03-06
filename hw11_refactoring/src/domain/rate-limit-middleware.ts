@@ -14,7 +14,7 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
     const requestDate = new Date().getTime()
     const requestDateTenSecBefore = requestDate - 10000
     const checkRateLimit = await rateLimitService.getAllRateSessionsTimeRange(ip, path, requestDateTenSecBefore)
-console.log('count', checkRateLimit)
+    console.log('count', checkRateLimit)
     if (checkRateLimit > 5) return res.sendStatus(429)
     return next()
 }

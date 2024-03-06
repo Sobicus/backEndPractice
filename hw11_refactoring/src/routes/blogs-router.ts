@@ -64,7 +64,6 @@ class BlogsController {
         const blogId = req.params.id
         const {title, shortDescription, content} = req.body
         const post = await this.postService.createPost(title, shortDescription, content, blogId)
-//const createdPostByBlogId = await postService.createPost(title, shortDescription, content, blogId)
         if (!post) return res.sendStatus(404)
         return res.status(201).send(post)
     }
@@ -107,5 +106,3 @@ blogsRouter.post('/:id/posts', checkAuthorization, ...validationPostsByBlogIdMid
 blogsRouter.post('/', checkAuthorization, ...validationBlogsMiddleware, blogsControllerInstance.createBlog.bind(blogsControllerInstance))
 blogsRouter.put('/:id', checkAuthorization, ...validationBlogsMiddleware, blogsControllerInstance.updateBlog.bind(blogsControllerInstance))
 blogsRouter.delete('/:id', checkAuthorization, blogsControllerInstance.deleteBlog.bind(blogsControllerInstance))
-
-
