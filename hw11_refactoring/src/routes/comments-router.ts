@@ -93,8 +93,8 @@ class CommentsController {
 const commentsControllerInstance = new CommentsController(commentQueryRepository, commentService, likesCommentsService)
 
 commentsRouter.get('/:id', softAuthMiddleware, commentsControllerInstance.getCommentById.bind(commentsControllerInstance))
-commentsRouter.put('/:id', authMiddleware, validationCommentsContentMiddleware, commentsControllerInstance.updateComments)
-commentsRouter.put('/:id/like-status', authMiddleware, validationComentLikeStatusMiddleware, commentsControllerInstance.likeCommentUpdate)
-commentsRouter.delete('/:id', authMiddleware, commentsControllerInstance.deleteComment)
+commentsRouter.put('/:id', authMiddleware, validationCommentsContentMiddleware, commentsControllerInstance.updateComments.bind(commentsControllerInstance))
+commentsRouter.put('/:id/like-status', authMiddleware, validationComentLikeStatusMiddleware, commentsControllerInstance.likeCommentUpdate.bind(commentsControllerInstance))
+commentsRouter.delete('/:id', authMiddleware, commentsControllerInstance.deleteComment.bind(commentsControllerInstance))
 
 
