@@ -6,9 +6,9 @@ export class LikeCommentsService {
     commentRepository: CommentsRepository
 
 
-    constructor(likesCommentsRepository: LikesCommentsRepository,commentRepository: CommentsRepository) {
-        this.likesCommentsRepository = new LikesCommentsRepository
-        this.commentRepository=new CommentsRepository
+    constructor(likesCommentsRepository: LikesCommentsRepository, commentRepository: CommentsRepository) {
+        this.likesCommentsRepository = likesCommentsRepository
+        this.commentRepository = commentRepository
     }
 
     async likeCommentUpdate(commentId: string, userId: string, likeStatus: LikesStatus) {

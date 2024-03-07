@@ -25,13 +25,13 @@ export type LikesCommentsRepoDbType = {
     _id: ObjectId
     userId: string
     commentId: string
-    myStatus: /*'Like' | 'Dislike' | 'None'*/LikesStatus
+    myStatus:LikesStatus
     createdAt: string
 }
 type LikesCommentsRepoInputType = {
     userId: string
     commentId: string
-    myStatus: /*'Like' | 'Dislike' | 'None'*/LikesStatus
+    myStatus: LikesStatus
     createdAt: string
 }
 

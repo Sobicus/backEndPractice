@@ -5,7 +5,7 @@ export class CommentsService {
 
     //commentQueryRepo:CommentsQueryRepository
 
-    constructor(commentRepo:CommentsRepository) {
+    constructor(commentRepo: CommentsRepository) {
         this.commentRepo = commentRepo
         //this.commentQueryRepo = new CommentsQueryRepository()
     }
@@ -26,12 +26,12 @@ export class CommentsService {
         return await this.commentRepo.updateComment(commentId, content)
     }
 
-    async deleteComment(commentId: string, userId:string): Promise<boolean | string> {
+    async deleteComment(commentId: string, userId: string): Promise<boolean | string> {
         const resault = await this.commentRepo.findCommentsById(commentId)
         if (!resault) {
             return false
         }
-        if(resault.userId !== userId){
+        if (resault.userId !== userId) {
             return '403'
         }
         return await this.commentRepo.deleteComment(commentId)

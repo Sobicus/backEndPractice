@@ -1,24 +1,26 @@
 import {BlogsRepository} from "../repositories/blogs-repository";
 import {BlogViewType} from "../types/blog-types";
-import { blogBodyRequest } from "../types/blogsRouter-types";
+import {blogBodyRequest} from "../types/blogsRouter-types";
 
 
 export class BlogsService {
     blogRepo: BlogsRepository
 
-    constructor(blogRepo:BlogsRepository) {
+    constructor(blogRepo: BlogsRepository) {
         this.blogRepo = blogRepo
     }
-/*
-    async findAllBlogs(pagination: IBlockPagination): Promise<PaginationType<BlogViewType>> {
-        return await this.blogRepo.findAllBlogs(pagination)
-    }
-*/
+
+    /*
+        async findAllBlogs(pagination: IBlockPagination): Promise<PaginationType<BlogViewType>> {
+            return await this.blogRepo.findAllBlogs(pagination)
+        }
+    */
     /*
     async findBlogById(blogId: string): Promise<BlogViewType | null> {
         return await this.blogRepo.findBlogById(blogId)
     }
 */
+
     /*
     async findPostByBlogId(blogId: string, query: IQuery<SortBlogsByEnum>): Promise<PaginationType<postsViewType> | null> {
         return await this.blogRepo.findPostByBlogId(blogId, query)

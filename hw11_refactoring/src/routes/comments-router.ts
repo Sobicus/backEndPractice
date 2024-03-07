@@ -1,7 +1,7 @@
-import {Request, Response, Router} from "express";
+import { Response, Router} from "express";
 import {validationCommentsContentMiddleware} from "../midlewares/input-comments-content-middleware";
 import {authMiddleware} from "../midlewares/auth-middleware";
-import {LikesCommentsRepository, LikesStatus} from "../repositories/likes-commets-repository";
+import { LikesStatus} from "../repositories/likes-commets-repository";
 import {validationComentLikeStatusMiddleware} from "../midlewares/like-status-middleware";
 import {softAuthMiddleware} from "../midlewares/soft-auth-middleware";
 import {UsersViewType} from "../types/user-types";

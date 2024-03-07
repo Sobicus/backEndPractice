@@ -2,12 +2,12 @@ import {PostsRepository} from "../repositories/posts-repository";
 import {CommentViewType, newCommentType} from "../types/comment-types";
 import {UsersViewType} from "../types/user-types";
 import {PostsViewType} from "../types/post-types";
-import { postBodyRequest } from "../types/postsRouter-types";
+import {postBodyRequest} from "../types/postsRouter-types";
 
 export class PostsService {
     private postRepo: PostsRepository
 
-    constructor(postRepo:PostsRepository) {
+    constructor(postRepo: PostsRepository) {
         this.postRepo = postRepo
     }
 
