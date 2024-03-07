@@ -1,12 +1,12 @@
 import {CommentsRepository} from "../repositories/comments-repository";
 
-export class CommentService {
+export class CommentsService {
     commentRepo: CommentsRepository
 
     //commentQueryRepo:CommentsQueryRepository
 
-    constructor() {
-        this.commentRepo = new CommentsRepository()
+    constructor(commentRepo:CommentsRepository) {
+        this.commentRepo = commentRepo
         //this.commentQueryRepo = new CommentsQueryRepository()
     }
 
@@ -15,7 +15,7 @@ export class CommentService {
             return await this.commentQueryRepo.getCommentById(commentId,userId)
         }
     */
-    async updatePost(commentId: string, content: string, userId: string): Promise<boolean | string> {
+    async updateComments(commentId: string, content: string, userId: string): Promise<boolean | string> {
         const resault = await this.commentRepo.findCommentsById(commentId)
         if (!resault) {
             return false

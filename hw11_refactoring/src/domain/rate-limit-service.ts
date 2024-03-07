@@ -1,4 +1,4 @@
-import {RateLimitRepository, RateSessionsDBType} from "../repositories/rate-limit-repository";
+import {RateLimitRepository} from "../repositories/rate-limit-repository";
 
 class RateLimitService {
     reteLimitRepo: RateLimitRepository

@@ -7,7 +7,7 @@ import add from "date-fns/add";
 import {ObjectId} from "mongodb";
 import {UserServiceType, UsersDbType, UsersViewType} from "../types/user-types";
 
-class UsersService {
+export class UsersService {
     userRepo: UsersRepository
 
     constructor() {

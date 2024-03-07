@@ -15,6 +15,7 @@ import {
 } from "../types/blogsRouter-types";
 import {BlogsQueryRepository} from "../repositories/blogs-queryRepository";
 import {PostsService} from "../domain/posts-service";
+import {blogService, blogsQueryRepository, postService} from "../composition-root";
 
 export const blogsRouter = Router()
 
@@ -23,10 +24,13 @@ class BlogsController {
     blogsQueryRepository: BlogsQueryRepository
     postService: PostsService
 
-    constructor() {
-        this.blogsService = new BlogsService()
-        this.blogsQueryRepository = new BlogsQueryRepository()
-        this.postService = new PostsService()
+    constructor(
+        blogService: BlogsService,
+        blogsQueryRepository: BlogsQueryRepository,
+        postService: PostsService) {
+        this.blogsService = blogService
+        this.blogsQueryRepository = blogsQueryRepository
+        this.postService = postService
     }
 
     async getAllBlogs(req: Request<{}, {}, {}, IQuery<SortBlogsByEnum>>, res: Response) {
@@ -97,7 +101,7 @@ class BlogsController {
     }
 }
 
-const blogsControllerInstance = new BlogsController()
+const blogsControllerInstance = new BlogsController(blogService, blogsQueryRepository, postService)
 
 blogsRouter.get('/', blogsControllerInstance.getAllBlogs.bind(blogsControllerInstance))
 blogsRouter.get(':id', blogsControllerInstance.getBlogById.bind(blogsControllerInstance))

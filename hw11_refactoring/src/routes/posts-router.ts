@@ -18,6 +18,7 @@ import {
 } from "../types/postsRouter-types";
 import {PostsQueryRepository} from "../repositories/posts-queryRepository";
 import {PostsService} from "../domain/posts-service";
+import {postQueryRepository, postService} from "../composition-root";
 
 export const postsRouter = Router()
 
@@ -25,9 +26,9 @@ class PostsController {
     postsQueryRepository: PostsQueryRepository
     postService: PostsService
 
-    constructor() {
-        this.postsQueryRepository = new PostsQueryRepository()
-        this.postService = new PostsService()
+    constructor(postsQueryRepository: PostsQueryRepository, postService: PostsService) {
+        this.postsQueryRepository = postsQueryRepository
+        this.postService = postService
     }
 
     async getAllPosts(req: Request<{}, {}, {}, IQuery<SortPostsByEnum>>, res: Response) {
@@ -103,7 +104,7 @@ class PostsController {
     }
 }
 
-const postsControllerInstance = new PostsController()
+const postsControllerInstance = new PostsController(postQueryRepository, postService)
 
 postsRouter.get('/', postsControllerInstance.getAllPosts.bind(postsControllerInstance))
 postsRouter.get('/:id', postsControllerInstance.findPostById.bind(postsControllerInstance))

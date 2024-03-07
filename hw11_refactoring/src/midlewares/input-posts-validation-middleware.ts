@@ -1,6 +1,5 @@
 import {body} from "express-validator";
 import {inputVal} from "./errorValidator";
-import {blogsQueryRepository} from "../repositories/blogs-queryRepository";
 
 
 export const validationPostsMiddleware = [

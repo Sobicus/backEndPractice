@@ -5,10 +5,10 @@ import {PostsViewType} from "../types/post-types";
 import { postBodyRequest } from "../types/postsRouter-types";
 
 export class PostsService {
-    postRepo: PostsRepository
+    private postRepo: PostsRepository
 
-    constructor() {
-        this.postRepo = new PostsRepository()
+    constructor(postRepo:PostsRepository) {
+        this.postRepo = postRepo
     }
 
     /* async findAllPosts(postsPagination: IDefaultPagination<SortPostsByEnum>): Promise<PaginationType<postsViewType>> {

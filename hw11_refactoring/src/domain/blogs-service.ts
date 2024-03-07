@@ -6,8 +6,8 @@ import { blogBodyRequest } from "../types/blogsRouter-types";
 export class BlogsService {
     blogRepo: BlogsRepository
 
-    constructor() {
-        this.blogRepo = new BlogsRepository()
+    constructor(blogRepo:BlogsRepository) {
+        this.blogRepo = blogRepo
     }
 /*
     async findAllBlogs(pagination: IBlockPagination): Promise<PaginationType<BlogViewType>> {
