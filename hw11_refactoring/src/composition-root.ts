@@ -8,7 +8,10 @@ import {CommentsRepository} from "./repositories/comments-repository";
 import {CommentsQueryRepository} from "./repositories/comments-queryRepository";
 import {CommentsService} from "./domain/comments-service";
 import {LikesCommentsRepository} from "./repositories/likes-commets-repository";
-import { LikeCommentsService } from "./domain/like-comments-service";
+import {LikeCommentsService} from "./domain/like-comments-service";
+import {UsersRepository} from "./repositories/users-repository";
+import {UsersQueryRepository} from "./repositories/users-queryRepository";
+import {UsersService} from "./domain/user-service";
 
 export const blogRepo = new BlogsRepository()
 export const blogsQueryRepository = new BlogsQueryRepository()
@@ -21,3 +24,6 @@ export const commentQueryRepository = new CommentsQueryRepository()
 export const commentService = new CommentsService(commentRepo)
 export const likesCommentsRepository = new LikesCommentsRepository()
 export const likesCommentsService = new LikeCommentsService(likesCommentsRepository, commentRepo)
+export const usersRepository = new UsersRepository()
+export const usersQueryRepository = new UsersQueryRepository()
+export const usersService = new UsersService(usersRepository)

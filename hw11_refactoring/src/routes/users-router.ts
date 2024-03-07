@@ -1,40 +1,47 @@
 import {Request, Response, Router} from "express";
-import {userService} from "../domain/user-service";
 import {checkAuthorization} from "../midlewares/authorization-check-middleware";
 import {validationUsersMiddleware} from "../midlewares/input-user-validation-middleware";
 import {IQueryUsers, getPaginationUsersHelpers} from "../helpers/pagination-users-helpers";
-import {usersQueryRepository} from "../repositories/users-queryRepository";
+import {RequestWithParamsUsers, UsersInputRequestUsers, postRequestWithBodyUsers} from "../types/usersRoter-types";
+import {usersQueryRepository, usersService} from "../composition-root";
+import {UsersQueryRepository} from "../repositories/users-queryRepository";
+import {UsersService} from "../domain/user-service";
 
 export const usersRouter = Router()
 
-usersRouter.get('/', checkAuthorization, async (req: Request<{}, {}, {}, IQueryUsers>, res: Response) => {
-    const usersPagination = getPaginationUsersHelpers(req.query)
-    const users = await usersQueryRepository.findAllUsers(usersPagination)
-    res.status(200).send(users)
-})
-usersRouter.post('/', checkAuthorization, validationUsersMiddleware,
-    async (req: postRequestWithBody<UsersInputRequest>, res: Response) => {
+class UsersController {
+    usersQueryRepository: UsersQueryRepository
+    usersService: UsersService
+
+    constructor(usersQueryRepository: UsersQueryRepository, usersService: UsersService) {
+        this.usersQueryRepository = usersQueryRepository
+        this.usersService = usersService
+    }
+
+    async findAllUsers(req: Request<{}, {}, {}, IQueryUsers>, res: Response) {
+        const usersPagination = getPaginationUsersHelpers(req.query)
+        const users = await this.usersQueryRepository.findAllUsers(usersPagination)
+        res.status(200).send(users)
+    }
+
+    async createUser(req: postRequestWithBodyUsers<UsersInputRequestUsers>, res: Response) {
         const {login, password, email} = req.body
-        const newUser = await userService.createUser(login, password, email)
-
-
+        const newUser = await this.usersService.createUser(login, password, email)
         res.status(201).send(newUser)
-    })
-usersRouter.delete('/:id', checkAuthorization, async (req: RequestWithParams<{ id: string }>, res: Response) => {
-        const deleteUser = await userService.deleteUser(req.params.id)
+    }
+
+    async deleteUser(req: RequestWithParamsUsers<{ id: string }>, res: Response) {
+        const deleteUser = await this.usersService.deleteUser(req.params.id)
         if (!deleteUser) {
             res.sendStatus(404)
             return
         }
         return res.sendStatus(204)
     }
-)
-
-
-type postRequestWithBody<B> = Request<{}, {}, B, {}>
-type RequestWithParams<P> = Request<P, {}, {}, {}>
-export  type UsersInputRequest = {
-    login: string
-    password: string
-    email: string
 }
+
+const usersControllerInstance = new UsersController(usersQueryRepository, usersService)
+
+usersRouter.get('/', checkAuthorization, usersControllerInstance.findAllUsers)
+usersRouter.post('/', checkAuthorization, validationUsersMiddleware, usersControllerInstance.createUser)
+usersRouter.delete('/:id', checkAuthorization, usersControllerInstance.deleteUser)

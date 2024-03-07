@@ -1,4 +1,4 @@
-import e, {Request} from "express";
+import {Request} from "express";
 
 export type RequestWithParamsBlogs<P> = Request<P, {}, {}, {}>
 export type RequestWithParamsAmdQueryBlogs<P, Q> = Request<P, {}, {}, Q>
