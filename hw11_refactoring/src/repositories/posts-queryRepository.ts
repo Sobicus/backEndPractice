@@ -3,8 +3,8 @@ import {IPostPagination, PaginationType} from "../types/paggination-type";
 import {CommentsViewType} from "../types/comment-types";
 import {DefaultCommentsPaginationType} from "../helpers/pagination-comments";
 import { CommentsModel, LikesCommentsModel, PostsModel} from "./db";
-import {LikesStatus} from "./likes-commets-repository";
 import { PostsViewType } from "../types/post-types";
+import { LikesStatus } from "../types/likes-comments-repository-types";
 
 export class PostsQueryRepository {
 

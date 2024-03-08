@@ -1,5 +1,6 @@
 import {ObjectId} from "mongodb";
 import {SessionsModel} from "./db";
+import { allActiveSessionDbType, allActiveSessionViewType } from "../types/sessions-repository-types";
 
 export class SessionsRepository {
     async createDeviceSession(issuedAt: string, deviceId: string, ip: string, deviceName: string, userId: string): Promise<boolean> {
@@ -72,19 +73,6 @@ export class SessionsRepository {
 
 }
 
-export type allActiveSessionDbType = {
-    _id: ObjectId
-    issuedAt: string // = iat
-    deviceId: string
-    ip: string
-    deviceName: string
-    userId: string
-}
-export type allActiveSessionViewType = {
-    ip: string
-    title: string// = deviceName
-    lastActiveDate: string // = iat
-    deviceId: string
-}
+
 
 // refreshTokenPayload = { deviceId, userId, iat, exp}

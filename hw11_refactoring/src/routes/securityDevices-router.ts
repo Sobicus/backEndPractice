@@ -1,6 +1,5 @@
 import {Request, Response, Router} from "express";
 import {jwtService} from "../application/jwt-service";
-import {sessionService} from "../domain/session-service";
 
 export const securityDevicesRouter = Router()
 

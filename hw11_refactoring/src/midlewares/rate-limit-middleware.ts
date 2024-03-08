@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {rateLimitService} from "../domain/rate-limit-service";
+import {rateLimitService} from "../composition-root";
 
 export const rateLimitMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     // console.log('baseUrl', req.baseUrl)

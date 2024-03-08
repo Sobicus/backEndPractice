@@ -1,5 +1,6 @@
-import {LikesCommentsRepository, LikesStatus} from "../repositories/likes-commets-repository";
+import {LikesCommentsRepository} from "../repositories/likes-commets-repository";
 import {CommentsRepository} from "../repositories/comments-repository";
+import {LikesStatus} from "../types/likes-comments-repository-types";
 
 export class LikeCommentsService {
     likesCommentsRepository: LikesCommentsRepository

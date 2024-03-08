@@ -1,7 +1,5 @@
 import bcrypt from "bcrypt"
-import {
-    UsersRepository
-} from "../repositories/users-repository";
+import {UsersRepository} from "../repositories/users-repository";
 import {randomUUID} from "crypto";
 import add from "date-fns/add";
 import {ObjectId} from "mongodb";
@@ -10,9 +8,10 @@ import {UserServiceType, UsersDbType, UsersViewType} from "../types/user-types";
 export class UsersService {
     userRepository: UsersRepository
 
-    constructor(userRepository:UsersRepository) {
+    constructor(userRepository: UsersRepository) {
         this.userRepository = userRepository
     }
+
     async createUser(login: string, password: string, email: string): Promise<UsersViewType>/*: Promise<UsersOutputType>*/ {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
@@ -59,6 +58,7 @@ export class UsersService {
         if (user.passwordHash !== passwordHash) return null
         return user
     }
+
 //
     async findUserById(userId: string): Promise<UsersDbType | null> {
         return await this.userRepository.findUserById(userId)

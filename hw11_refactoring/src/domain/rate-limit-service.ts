@@ -1,20 +1,17 @@
 import {RateLimitRepository} from "../repositories/rate-limit-repository";
 
-class RateLimitService {
-    reteLimitRepo: RateLimitRepository
+export class RateLimitService {
+    rateLimitRepository: RateLimitRepository
 
-    constructor() {
-        this.reteLimitRepo = new RateLimitRepository
+    constructor(rateLimitRepository:RateLimitRepository) {
+        this.rateLimitRepository = rateLimitRepository
     }
 
     async createNewRateSession(ip: string, path: string, date: number): Promise<boolean> {
-        return await this.reteLimitRepo.createNewRateSession(ip, path, date)
+        return await this.rateLimitRepository.createNewRateSession(ip, path, date)
     }
 
     async getAllRateSessionsTimeRange(ip: string, path: string, requestDate: number): Promise<number>  {
-        return await this.reteLimitRepo.getAllRateSessionsTimeRange(ip,path, requestDate)
+        return await this.rateLimitRepository.getAllRateSessionsTimeRange(ip,path, requestDate)
     }
-
 }
-
-export const rateLimitService = new RateLimitService()

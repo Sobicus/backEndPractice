@@ -1,10 +1,10 @@
 import {ObjectId} from "mongodb";
 import {CommentViewType, newCommentType} from "../types/comment-types";
 import {BlogsModel, CommentsModel, PostsModel} from "./db";
-import {LikesStatus} from "./likes-commets-repository";
 import {CreatePostType, PostsDbType} from "../types/post-types";
 import {blogsDbType} from "../types/blog-types";
 import { postBodyRequest } from "../types/postsRouter-types";
+import { LikesStatus } from "../types/likes-comments-repository-types";
 
 export class PostsRepository {
     /*async findAllPosts(postsPagination: IPostPagination): Promise<PaginationType<postsViewType>> {

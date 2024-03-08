@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {jwtService} from "../application/jwt-service";
-import {userService, UsersService} from "../domain/user-service";
+import {usersService} from "../composition-root";
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
@@ -11,7 +11,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const userId = await jwtService.getUserIdByToken(token)
     console.log('userId authMiddleware 1 ' + userId)
     if (userId) {
-        req.user = await userService.findUserById(userId)
+        req.user = await usersService.findUserById(userId)
         console.log('user authMiddleware ')
         console.log(req.user)
         next()

@@ -1,5 +1,4 @@
 import {Request, Response, Router} from "express";
-import {userService} from "../domain/user-service";
 import {jwtService} from "../application/jwt-service";
 import {authMiddleware} from "../midlewares/auth-middleware";
 import {validationAuthLoginMiddleware} from "../midlewares/input-auth-validation-middleware";
@@ -8,17 +7,27 @@ import {body} from "express-validator";
 import {inputVal} from "../midlewares/errorValidator";
 import {randomUUID} from "crypto";
 import jwt from 'jsonwebtoken'
-import {sessionService} from "../domain/session-service";
 import {rateLimitMiddleware} from "../midlewares/rate-limit-middleware";
 import {
     validationEmailPasswordRecoveryMiddleware
 } from "../midlewares/input-emailPasswordRecovery-validation-middleware";
-import {authService} from "../domain/auth-service";
 import {validationNewPasswordMiddleware} from "../midlewares/newPassword-recoveryCode-middleware";
+import {
+    BodyNewPasswordAuthType,
+    BodyPasswordRecoveryAuthType,
+    BodyRegistrationAuthType,
+    PostRequestAuthType,
+    PostRequestRegistrationAuthType
+} from "../types/authRouter-types";
 
 export const authRouter = Router()
 
-authRouter.post('/login', rateLimitMiddleware, validationAuthLoginMiddleware, async (req: PostRequestType<BodyTypeRegistration>, res: Response) => {
+class authController{
+    constructor() {
+    }
+}
+const authControllerInstance
+authRouter.post('/login', rateLimitMiddleware, validationAuthLoginMiddleware, async (req: PostRequestAuthType<BodyRegistrationAuthType>, res: Response) => {
     const user = await userService.checkCredentials(req.body.loginOrEmail, req.body.password)
     if (!user) {
         res.sendStatus(401)
@@ -52,7 +61,7 @@ authRouter.get('/me', authMiddleware, async (req: Request, res: Response) => {
         userId: userData.id
     })
 })
-authRouter.post('/registration', rateLimitMiddleware, validationUsersMiddleware, async (req: PostRequestType<PostRequestRegistrationType>, res: Response) => {
+authRouter.post('/registration', rateLimitMiddleware, validationUsersMiddleware, async (req: PostRequestAuthType<PostRequestRegistrationAuthType>, res: Response) => {
         //await userService.createUser(req.body.login, req.body.password, req.body.email)
         const newUser = await authService.createUser(req.body.login, req.body.password, req.body.email)
         if (!newUser) {
@@ -66,7 +75,7 @@ authRouter.post('/registration-confirmation', rateLimitMiddleware, body('code')
         const checkUser = await userService.findUserByConfirmationCode(code)
         if (checkUser?.emailConfirmation.isConfirmed === true) throw new Error(' already exist by email')
         return true
-    }), inputVal, async (req: PostRequestType<{ code: string }>, res: Response) => {
+    }), inputVal, async (req: PostRequestAuthType<{ code: string }>, res: Response) => {
     const result = await authService.confirmEmail(req.body.code)
     console.log('result registration-confirmation', result)
     console.log('req.body.code', req.body.code)
@@ -91,7 +100,7 @@ authRouter.post('/registration-email-resending', rateLimitMiddleware, body('emai
         if (!checkUser) throw new Error(' user not found')
         if (checkUser.emailConfirmation.isConfirmed) throw new Error(' already exist by email')
         return true
-    }), inputVal, async (req: PostRequestType<{ email: string }>, res: Response) => {
+    }), inputVal, async (req: PostRequestAuthType<{ email: string }>, res: Response) => {
     const result = await authService.resendingRegistrationEmail(req.body.email)
     return res.sendStatus(204)
 })
@@ -148,32 +157,15 @@ authRouter.post('/logout', async (req: Request, res: Response) => {
 authRouter.post('/password-recovery',
     rateLimitMiddleware,
     validationEmailPasswordRecoveryMiddleware,
-    async (req: PostRequestType<BodyPasswordRecoveryType>, res: Response) => {
+    async (req: PostRequestAuthType<BodyPasswordRecoveryAuthType>, res: Response) => {
         const email = req.body.email
         const user = await userService.findUserByEmailOrLogin(email)
         if (!user) return res.sendStatus(204)
         await authService.passwordRecovery(user)
         return res.sendStatus(204)
     })
-authRouter.post('/new-password', rateLimitMiddleware, validationNewPasswordMiddleware, async (req: PostRequestType<BodyNewPasswordType>, res: Response) => {
+authRouter.post('/new-password', rateLimitMiddleware, validationNewPasswordMiddleware, async (req: PostRequestAuthType<BodyNewPasswordAuthType>, res: Response) => {
     const {newPassword, recoveryCode} = req.body
     await authService.newPassword(newPassword, recoveryCode)
     res.sendStatus(204)
 })
-type PostRequestType<B> = Request<{}, {}, B, {}>
-type BodyTypeRegistration = {
-    loginOrEmail: string
-    password: string
-}
-type PostRequestRegistrationType = {
-    login: string
-    password: string
-    email: string
-}
-type BodyPasswordRecoveryType = {
-    email: string
-}
-type BodyNewPasswordType = {
-    newPassword: string
-    recoveryCode: string
-}

@@ -1,11 +1,12 @@
-import {allActiveSessionDbType, allActiveSessionViewType, SessionsRepository} from "../repositories/sessions-repository";
+import {SessionsRepository} from "../repositories/sessions-repository";
 import jwt from "jsonwebtoken";
+import { allActiveSessionDbType, allActiveSessionViewType } from "../types/sessions-repository-types";
 
-class SessionService {
+export class SessionsService {
     sessionsRepo: SessionsRepository
 
-    constructor() {
-        this.sessionsRepo = new SessionsRepository()
+    constructor(sessionsRepository: SessionsRepository) {
+        this.sessionsRepo = sessionsRepository
     }
 
     async createDeviceSession(refreshToken: string, ip: string, deviceName: string): Promise<boolean> {
@@ -16,11 +17,11 @@ class SessionService {
         const iat: number = decodeJwtRefreshToken['iat']
         const issuedAt = new Date(iat * 1000).toISOString()
         // const deviceId = randomUUID()
-        console.log('issuedAt session-service',issuedAt)
+        console.log('issuedAt session-service', issuedAt)
         return this.sessionsRepo.createDeviceSession(issuedAt, deviceId, ip, deviceName, userId)
     }
 
-    async getAllDeviceSessions(userId:string): Promise<allActiveSessionViewType[]> {
+    async getAllDeviceSessions(userId: string): Promise<allActiveSessionViewType[]> {
         return this.sessionsRepo.getAllActiveSessions(userId)
     }
 
@@ -41,12 +42,12 @@ class SessionService {
     async deleteDevicesExceptThis(userId: string, deviceId: string): Promise<boolean> {
         return await this.sessionsRepo.deleteDevicesExceptThis(userId, deviceId)
     }
-    async getDeviceByDeviceId(deviceId:string):Promise<allActiveSessionDbType|null>{
+
+    async getDeviceByDeviceId(deviceId: string): Promise<allActiveSessionDbType | null> {
         return await this.sessionsRepo.getDeviceByDeviceId(deviceId)
     }
-    async getSessionByUserIdAndDeviceId(userId:string,deviceId:string){
-        return await this.sessionsRepo.getSessionByUserIdAndDeviceId(userId,deviceId)
+
+    async getSessionByUserIdAndDeviceId(userId: string, deviceId: string) {
+        return await this.sessionsRepo.getSessionByUserIdAndDeviceId(userId, deviceId)
     }
 }
-
-export const sessionService = new SessionService()

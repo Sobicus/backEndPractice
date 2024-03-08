@@ -1,5 +1,6 @@
 import {ObjectId} from "mongodb";
 import {LikesCommentsModel} from "./db";
+import {LikesCommentsRepoDbType, LikesCommentsRepoInputType, LikesStatus} from "../types/likes-comments-repository-types";
 
 export class LikesCommentsRepository {
     async createCommentLike(commentModel: LikesCommentsRepoInputType) {
@@ -21,22 +22,3 @@ export class LikesCommentsRepository {
 
 }
 
-export type LikesCommentsRepoDbType = {
-    _id: ObjectId
-    userId: string
-    commentId: string
-    myStatus:LikesStatus
-    createdAt: string
-}
-type LikesCommentsRepoInputType = {
-    userId: string
-    commentId: string
-    myStatus: LikesStatus
-    createdAt: string
-}
-
-export enum LikesStatus {
-    None = 'None',
-    Like = 'Like',
-    Dislike = 'Dislike'
-}
