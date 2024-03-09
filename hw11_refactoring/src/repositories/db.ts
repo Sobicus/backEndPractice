@@ -9,7 +9,7 @@ import {sessionsSchema} from "../schemaMongoose/sessions-schema";
 import {IUser, usersSchema} from '../schemaMongoose/users-schema';
 import {passwordRecoverySchema} from "../schemaMongoose/passwordRecovery-schema";
 import {likesCommentsSchema} from "../schemaMongoose/likes-comments-schema";
-import {LikesCommentsRepoDbType} from "./likes-commets-repository";
+import { LikesCommentsRepoDbType } from '../types/likes-comments-repository-types';
 dotenv.config()
 
 export const BlogsModel = mongoose.model('Blogs', blogSchema);

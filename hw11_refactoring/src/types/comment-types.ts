@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {LikesStatus} from "../repositories/likes-commets-repository";
+import { LikesStatus } from "./likes-comments-repository-types";
 
 export type CommentViewType = {
     id: string

@@ -1,4 +1,3 @@
-import {ObjectId} from "mongodb"
 import {PasswordRecoveryModel} from "./db";
 import { PasswordRecoveryType } from "../types/passwordRecovery-repository-types";
 

@@ -1,5 +1,5 @@
 import mongoose, {Schema} from "mongoose";
-import {LikesCommentsRepoDbType, LikesStatus} from "../repositories/likes-commets-repository";
+import {LikesCommentsRepoDbType, LikesStatus} from "../types/likes-comments-repository-types";
 
 export const likesCommentsSchema = new Schema<LikesCommentsRepoDbType>({
     _id: {type: Schema.Types.ObjectId, required: true},

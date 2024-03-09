@@ -1,6 +1,6 @@
 import {body} from "express-validator";
 import {inputVal} from "./errorValidator";
-import {authService} from "../domain/auth-service";
+import {authService} from "../composition-root";
 
 export const validationNewPasswordMiddleware = [
     body('newPassword')

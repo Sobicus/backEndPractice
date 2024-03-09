@@ -18,6 +18,7 @@ import {PasswordRecoveryRepository} from "./repositories/passwordRecovery-reposi
 import {AuthService} from "./domain/auth-service";
 import {RateLimitService} from "./domain/rate-limit-service";
 import {RateLimitRepository} from "./repositories/rate-limit-repository";
+import {JwtService} from "./application/jwt-service";
 
 export const blogRepository = new BlogsRepository()
 export const blogsQueryRepository = new BlogsQueryRepository()
@@ -39,3 +40,4 @@ export const passwordRecoveryRepository = new PasswordRecoveryRepository()
 export const authService = new AuthService(usersService, passwordRecoveryRepository)
 export const rateLimitRepository = new RateLimitRepository()
 export const rateLimitService = new RateLimitService(rateLimitRepository)
+export const jwtService = new JwtService()

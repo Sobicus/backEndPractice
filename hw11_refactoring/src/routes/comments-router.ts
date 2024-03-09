@@ -1,8 +1,7 @@
 import { Response, Router} from "express";
 import {validationCommentsContentMiddleware} from "../midlewares/input-comments-content-middleware";
 import {authMiddleware} from "../midlewares/auth-middleware";
-import { LikesStatus} from "../repositories/likes-commets-repository";
-import {validationComentLikeStatusMiddleware} from "../midlewares/like-status-middleware";
+import {validationCommentLikeStatusMiddleware} from "../midlewares/like-status-middleware";
 import {softAuthMiddleware} from "../midlewares/soft-auth-middleware";
 import {UsersViewType} from "../types/user-types";
 import {
@@ -15,6 +14,7 @@ import {CommentsQueryRepository} from "../repositories/comments-queryRepository"
 import {CommentsService} from "../domain/comments-service";
 import {commentQueryRepository, commentService, likesCommentsService} from "../composition-root";
 import {LikeCommentsService} from "../domain/like-comments-service";
+import { LikesStatus } from "../types/likes-comments-repository-types";
 
 export const commentsRouter = Router()
 
@@ -94,7 +94,7 @@ const commentsControllerInstance = new CommentsController(commentQueryRepository
 
 commentsRouter.get('/:id', softAuthMiddleware, commentsControllerInstance.getCommentById.bind(commentsControllerInstance))
 commentsRouter.put('/:id', authMiddleware, validationCommentsContentMiddleware, commentsControllerInstance.updateComments.bind(commentsControllerInstance))
-commentsRouter.put('/:id/like-status', authMiddleware, validationComentLikeStatusMiddleware, commentsControllerInstance.likeCommentUpdate.bind(commentsControllerInstance))
+commentsRouter.put('/:id/like-status', authMiddleware, validationCommentLikeStatusMiddleware, commentsControllerInstance.likeCommentUpdate.bind(commentsControllerInstance))
 commentsRouter.delete('/:id', authMiddleware, commentsControllerInstance.deleteComment.bind(commentsControllerInstance))
 
 

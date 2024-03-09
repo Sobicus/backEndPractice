@@ -1,7 +1,7 @@
 import {body} from "express-validator";
 import {inputVal} from "./errorValidator";
 
-export const validationComentLikeStatusMiddleware = [
+export const validationCommentLikeStatusMiddleware = [
     body('likeStatus')
         .isString().withMessage('likeStatus not a string')
         .trim().notEmpty().withMessage('likeStatus can`t be empty')

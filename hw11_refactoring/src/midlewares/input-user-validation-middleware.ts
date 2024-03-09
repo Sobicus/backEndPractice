@@ -1,6 +1,6 @@
 import {body} from "express-validator";
 import {inputVal} from "./errorValidator";
-import {userService} from "../domain/user-service";
+import { usersService } from "../composition-root";
 
 export const validationUsersMiddleware = [
     body('login')
@@ -18,13 +18,13 @@ export const validationUsersMiddleware = [
         .matches('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$').withMessage('Email must be include type like forexample@gmail.com'),
     body('email')
         .custom(async(email) => {
-            const checkUser = await userService.findUserByEmailOrLogin(email)
+            const checkUser = await usersService.findUserByEmailOrLogin(email)
                     if(checkUser) throw new Error(' already exist by email')
             return true
         }),
     body('login')
         .custom(async(login) => {
-            const checkUser = await userService.findUserByEmailOrLogin(login)
+            const checkUser = await usersService.findUserByEmailOrLogin(login)
                     if(checkUser) throw new Error(' already exist by login')
             return true
         }),
