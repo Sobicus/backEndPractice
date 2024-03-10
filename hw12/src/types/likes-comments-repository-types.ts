@@ -1,13 +1,13 @@
 import {ObjectId} from "mongodb";
 
-export type LikesCommentsRepoDbType = {
+export type LikesCommentsDbType = {
     _id: ObjectId
     userId: string
     commentId: string
     myStatus:LikesStatus
     createdAt: string
 }
-export type LikesCommentsRepoInputType = {
+export type LikesCommentsDbInputType = {
     userId: string
     commentId: string
     myStatus: LikesStatus

@@ -1,9 +1,9 @@
 import {ObjectId} from "mongodb";
 import {LikesCommentsModel} from "./db";
-import {LikesCommentsRepoDbType, LikesCommentsRepoInputType, LikesStatus} from "../types/likes-comments-repository-types";
+import {LikesCommentsDbType, LikesCommentsDbInputType, LikesStatus} from "../types/likes-comments-repository-types";
 
 export class LikesCommentsRepository {
-    async createCommentLike(commentModel: LikesCommentsRepoInputType) {
+    async createCommentLike(commentModel: LikesCommentsDbInputType) {
         const newReaction = await LikesCommentsModel.create({_id: new ObjectId(), ...commentModel})
         return newReaction
     }
@@ -13,7 +13,7 @@ export class LikesCommentsRepository {
         return result.modifiedCount === 1
     }
 
-    async findCommentLikeCommentIdUserId(commentId: string, userId: string): Promise<LikesCommentsRepoDbType | null> {
+    async findCommentLikeCommentIdUserId(commentId: string, userId: string): Promise<LikesCommentsDbType | null> {
         return LikesCommentsModel.findOne({
             commentId,
             userId

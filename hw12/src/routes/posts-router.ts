@@ -18,17 +18,21 @@ import {
 } from "../types/postsRouter-types";
 import {PostsQueryRepository} from "../repositories/posts-queryRepository";
 import {PostsService} from "../domain/posts-service";
-import {postQueryRepository, postService} from "../composition-root";
+import {likesPostsService, postQueryRepository, postService} from "../composition-root";
+import {LikesStatus} from "../types/likes-comments-repository-types";
+import {LikesPostsService} from "../domain/like-posts-service";
 
 export const postsRouter = Router()
 
 class PostsController {
     postsQueryRepository: PostsQueryRepository
     postService: PostsService
+    likesPostsService: LikesPostsService
 
-    constructor(postsQueryRepository: PostsQueryRepository, postService: PostsService) {
+    constructor(postsQueryRepository: PostsQueryRepository, postService: PostsService, likesPostsService: LikesPostsService) {
         this.postsQueryRepository = postsQueryRepository
         this.postService = postService
+        this.likesPostsService = likesPostsService
     }
 
     async getAllPosts(req: Request<{}, {}, {}, IQuery<SortPostsByEnum>>, res: Response) {
@@ -102,9 +106,21 @@ class PostsController {
         const comments = await this.postsQueryRepository.findCommentsByPostId(req.params.id, paggination, userId)
         return res.status(200).send(comments)
     }
+
+    async likePostUpdate(req: putRequestChangePost<{ postId: string }, { likeStatus: LikesStatus }>, res: Response) {
+        const postLikeStatus = req.body.likeStatus
+        const userId = req.userId!// or req.user!.id
+        const postId = req.params.postId
+        const result = await this.likesPostsService.likePostsUpdate(postId, userId, postLikeStatus)
+        if (result === '404') {
+            res.sendStatus(404)
+            return
+        }
+        return res.sendStatus(204)
+    }
 }
 
-const postsControllerInstance = new PostsController(postQueryRepository, postService)
+const postsControllerInstance = new PostsController(postQueryRepository, postService, likesPostsService)
 
 postsRouter.get('/', postsControllerInstance.getAllPosts.bind(postsControllerInstance))
 postsRouter.get('/:id', postsControllerInstance.findPostById.bind(postsControllerInstance))
@@ -113,6 +129,7 @@ postsRouter.put('/:id', checkAuthorization, ...validationPostsMiddleware, postsC
 postsRouter.delete('/:id', checkAuthorization, postsControllerInstance.deletePost.bind(postsControllerInstance))
 postsRouter.post('/:id/comments', authMiddleware, validationCommentsContentMiddleware, postsControllerInstance.createCommetByPostId.bind(postsControllerInstance))
 postsRouter.get('/:id/comments', softAuthMiddleware, postsControllerInstance.findCommentsByPostId.bind(postsControllerInstance))
+postsRouter.put('/:id/like-status', checkAuthorization, postsControllerInstance.likePostUpdate.bind(postsControllerInstance))
 
 
 
