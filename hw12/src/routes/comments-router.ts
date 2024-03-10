@@ -1,4 +1,4 @@
-import { Response, Router} from "express";
+import {Response, Router} from "express";
 import {validationCommentsContentMiddleware} from "../midlewares/input-comments-content-middleware";
 import {authMiddleware} from "../midlewares/auth-middleware";
 import {validationCommentLikeStatusMiddleware} from "../midlewares/like-status-middleware";
@@ -14,7 +14,7 @@ import {CommentsQueryRepository} from "../repositories/comments-queryRepository"
 import {CommentsService} from "../domain/comments-service";
 import {commentQueryRepository, commentService, likesCommentsService} from "../composition-root";
 import {LikeCommentsService} from "../domain/like-comments-service";
-import { LikesStatus } from "../types/likes-comments-repository-types";
+import {LikesStatus} from "../types/likes-comments-repository-types";
 
 export const commentsRouter = Router()
 
