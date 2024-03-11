@@ -1,4 +1,5 @@
 import {CommentsRepository} from "../repositories/comments-repository";
+import {ObjectResult, statusType} from "../commands/object-result";
 
 export class CommentsService {
     commentRepo: CommentsRepository
@@ -15,16 +16,30 @@ export class CommentsService {
             return await this.commentQueryRepo.getCommentById(commentId,userId)
         }
     */
-    async updateComments(commentId: string, content: string, userId: string): Promise<boolean | string> {
+    async updateComments(commentId: string, content: string, userId: string): Promise<ObjectResult> {
         const resault = await this.commentRepo.findCommentsById(commentId)
         if (!resault) {
-            return false
+            return {
+                status: statusType.NotFound,
+                errorMessages: 'can not found Comments',
+                data: null
+            }
         }
         if (resault.userId !== userId) {
-            return '403'
+            return {
+                status: statusType.Forbidden,
+                errorMessages: 'its not you comment',
+                data: null
+            }
         }
-        return await this.commentRepo.updateComment(commentId, content)
+        await this.commentRepo.updateComment(commentId, content)
+        return {
+            status: statusType.Forbidden,
+            errorMessages: 'its not you comment',
+            data: null
+        }
     }
+
 
     async deleteComment(commentId: string, userId: string): Promise<boolean | string> {
         const resault = await this.commentRepo.findCommentsById(commentId)

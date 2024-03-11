@@ -1,4 +1,4 @@
-import { Response, Router} from "express";
+import {Response, Router} from "express";
 import {validationCommentsContentMiddleware} from "../midlewares/input-comments-content-middleware";
 import {authMiddleware} from "../midlewares/auth-middleware";
 import {validationCommentLikeStatusMiddleware} from "../midlewares/like-status-middleware";
@@ -14,7 +14,8 @@ import {CommentsQueryRepository} from "../repositories/comments-queryRepository"
 import {CommentsService} from "../domain/comments-service";
 import {commentQueryRepository, commentService, likesCommentsService} from "../composition-root";
 import {LikeCommentsService} from "../domain/like-comments-service";
-import { LikesStatus } from "../types/likes-comments-repository-types";
+import {LikesStatus} from "../types/likes-comments-repository-types";
+import {statusType} from "../commands/object-result";
 
 export const commentsRouter = Router()
 
@@ -47,11 +48,11 @@ class CommentsController {
         id: string
     }, { content: string }, UsersViewType>, res: Response) {
         const commentIsUpdated = await this.commentsService.updateComments(req.params.id, req.body.content, req.user!.id)
-        if (!commentIsUpdated) {
+        if (commentIsUpdated.status===statusType.NotFound) {
             res.sendStatus(404)
             return
         }
-        if (commentIsUpdated === '403') {
+        if (commentIsUpdated.status === statusType.Forbidden) {
             res.sendStatus(403)
             return
         }

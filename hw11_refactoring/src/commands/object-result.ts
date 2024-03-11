@@ -9,7 +9,7 @@ export enum statusType{
     TooManyRequests='TooManyRequests',//429
     Success='Success',
 }
-export type ObjectResult<D>={
+export type ObjectResult<D=null>={
     status: statusType
     errorMessages?: string
     data:D

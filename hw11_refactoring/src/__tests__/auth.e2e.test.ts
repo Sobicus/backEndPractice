@@ -1,6 +1,6 @@
 import request from "supertest";
 import {app} from "../app";
-import {userService} from "../domain/user-service";
+import {usersService} from "../composition-root";
 
 describe('auth', () => {
     beforeAll(async () => {
@@ -14,13 +14,13 @@ describe('auth', () => {
         }).expect(204)
     })
     it('should return 204 user confirmation', async () => {
-        const user = await userService.findUserByEmailOrLogin('MyTest1')
+        const user = await usersService.findUserByEmailOrLogin('MyTest1')
         console.log('user111111111', user)
         await request(app).post('/auth/registration-confirmation').send(
             {
                 code: user!.emailConfirmation.confirmationCode
             }).expect(204)
-        const user2 = await userService.findUserByEmailOrLogin('MyTest1')
+        const user2 = await usersService.findUserByEmailOrLogin('MyTest1')
         console.log('user2222222222', user2)
     })
     it('reseding code', async () => {
@@ -29,13 +29,13 @@ describe('auth', () => {
             password: 'qwerty',
             email: 'simsbury651@gmail.com'
         }).expect(204)
-        const userNotConfirmUser = await userService.findUserByEmailOrLogin('MyTest')
+        const userNotConfirmUser = await usersService.findUserByEmailOrLogin('MyTest')
         console.log('code1', userNotConfirmUser!.emailConfirmation.confirmationCode)
         const cod1 = userNotConfirmUser!.emailConfirmation.confirmationCode
         await request(app).post('/auth/registration-email-resending').send({
             email: 'simsbury651@gmail.com'
         }).expect(204)
-        const userNotConfirmUserAfretEmailResending = await userService.findUserByEmailOrLogin('MyTest')
+        const userNotConfirmUserAfretEmailResending = await usersService.findUserByEmailOrLogin('MyTest')
         console.log('code2', userNotConfirmUserAfretEmailResending!.emailConfirmation.confirmationCode)
         const cod2 = userNotConfirmUserAfretEmailResending!.emailConfirmation.confirmationCode
         expect(cod1).not.toEqual(cod2)

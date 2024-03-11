@@ -26,6 +26,7 @@ describe('blogs', () => {
 
 
 describe('Mongoose integration', () => {
+    //mongo.memoryServer---------------------------------------NEED
     const mongoURI = 'mongodb://0.0.0.0:27017/home_works'
 
     beforeAll(async () => {
