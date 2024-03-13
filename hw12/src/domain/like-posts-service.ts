@@ -12,7 +12,7 @@ export class LikesPostsService {
         this.postRepository = postRepository
     }
 
-    async likePostsUpdate(postId: string, userId: string, likeStatus: LikesStatus) {
+    async likePostsUpdate(postId: string, userId: string, likeStatus: LikesStatus, login:string) {
         const post = this.postRepository.findPostById(postId)
         if (!post) {
             return '404'
@@ -22,6 +22,7 @@ export class LikesPostsService {
             const postReactionModel: LikesPostInputDBType = {
                 userId,
                 postId,
+                login,
                 myStatus: likeStatus,
                 createAt: new Date().toISOString()
             }

@@ -42,7 +42,8 @@ class PostsController {
     }
 
     async findPostById(req: RequestWithParams<{ id: string }>, res: Response) {
-        const post = await this.postsQueryRepository.findPostById(req.params.id)
+        const userId= req.user?._id.toString()
+        const post = await this.postsQueryRepository.findPostById(req.params.id, userId)
         if (!post) {
             res.sendStatus(404)
             return;
@@ -96,7 +97,7 @@ class PostsController {
     async findCommentsByPostId(req: RequestWithParamsAndQuery<{
         id: string
     }, queryCommentsType>, res: Response) {
-        const userId = req.user?.id
+        const userId = req.user?._id.toString()
         const paggination = getCommentsPagination(req.query)
         const post = await this.postsQueryRepository.doesPostExist(req.params.id)
         if (!post) {
@@ -109,9 +110,10 @@ class PostsController {
 
     async likePostUpdate(req: putRequestChangePost<{ postId: string }, { likeStatus: LikesStatus }>, res: Response) {
         const postLikeStatus = req.body.likeStatus
-        const userId = req.userId!// or req.user!.id
+        const userId = req.user!._id.toString()
+        const login = req.user!.login
         const postId = req.params.postId
-        const result = await this.likesPostsService.likePostsUpdate(postId, userId, postLikeStatus)
+        const result = await this.likesPostsService.likePostsUpdate(postId, userId, postLikeStatus, login)
         if (result === '404') {
             res.sendStatus(404)
             return

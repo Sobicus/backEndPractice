@@ -1,8 +1,9 @@
 import {PostsRepository} from "../repositories/posts-repository";
 import {CommentViewType, newCommentType} from "../types/comment-types";
-import {UsersViewType} from "../types/user-types";
+import {UsersDbType, UsersViewType} from "../types/user-types";
 import {PostsViewType} from "../types/post-types";
 import {postBodyRequest} from "../types/postsRouter-types";
+import {LikesStatus} from "../types/likes-comments-repository-types";
 
 export class PostsService {
     private postRepo: PostsRepository
@@ -27,10 +28,21 @@ export class PostsService {
             blogId,
             createdAt: new Date().toISOString()
         };
-
+        const extendedLikesInfo = {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikesStatus.None,
+            newestLikes: [
+                {
+                    addedAt: new Date().toISOString(),
+                    userId: "string",
+                    login: "string"
+                }
+            ]
+        }
         const mongoResponse = await this.postRepo.createPost(newPost)
         if (!mongoResponse) return null
-        return {id: mongoResponse.postId, blogName: mongoResponse.blogName, ...newPost};
+        return {id: mongoResponse.postId, blogName: mongoResponse.blogName, ...newPost, extendedLikesInfo}
     }
 
     async updatePost(postId: string, updateModel: postBodyRequest): Promise<boolean> {
@@ -45,14 +57,14 @@ export class PostsService {
         return await this.postRepo.deletePost(postId)
     }
 
-    async createCommetByPostId(postId: string, content: string, user: UsersViewType): Promise<CommentViewType | boolean> {
+    async createCommetByPostId(postId: string, content: string, user: UsersDbType): Promise<CommentViewType | boolean> {
         const post = await this.postRepo.findPostById(postId)
         if (!post) return false
         const comment: newCommentType = {
             createdAt: new Date().toISOString(),
             postId,
             content,
-            userId: user.id,
+            userId: user._id.toString(),
             userLogin: user.login
         }
         return await this.postRepo.createCommetByPostId(comment);

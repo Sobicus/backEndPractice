@@ -1,4 +1,5 @@
 import {ObjectId} from "mongodb";
+import {LikesStatus} from "./likes-comments-repository-types";
 
 export type PostsViewType = {
     id: string
@@ -8,8 +9,20 @@ export type PostsViewType = {
     blogId: string
     blogName: string
     createdAt: string
+    extendedLikesInfo: ExtendedLikesInfo
 }
+type ExtendedLikesInfo={
+    likesCount: number
+    dislikesCount: number
+    myStatus: LikesStatus
+    newestLikes: NewestLikes[]
 
+}
+type NewestLikes = {
+    addedAt: string
+    userId: string
+    login: string
+}
 export type PostsDbType = {
     _id: ObjectId
     title: string

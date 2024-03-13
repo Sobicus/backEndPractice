@@ -78,11 +78,11 @@ export class BlogsQueryRepository {
             .countDocuments({blogId: blogId})
         const pagesCount = Math.ceil(totalCount / pagination.pageSize)
         return {
-            "pagesCount": pagesCount,
-            "page": pagination.pageNumber,
-            "pageSize": pagination.pageSize,
-            "totalCount": totalCount,
-            "items": allPosts
+            pagesCount: pagesCount,
+            page: pagination.pageNumber,
+            pageSize: pagination.pageSize,
+            totalCount: totalCount,
+            items: allPosts
         }
     }
 }

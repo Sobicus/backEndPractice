@@ -5,12 +5,14 @@ export type LikesPostRepositoryType={
     _id:ObjectId
     postId:string
     userId:string
+    login:string
     myStatus:LikesStatus
     createAt:string
 }
 export type LikesPostInputDBType={
     postId:string
     userId:string
+    login:string
     myStatus:LikesStatus
     createAt:string
 }

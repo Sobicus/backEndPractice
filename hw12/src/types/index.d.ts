@@ -1,11 +1,11 @@
 //index.d.ts
-import {UsersOutputType} from "../repositories/users-repository";
+import {UsersDbType} from "./user-types";
 
 declare global {
     namespace Express {
         export interface Request {
             userId: string | null
-            user: UsersOutputType | null
+            user: UsersDbType | null
         }
     }
 }
