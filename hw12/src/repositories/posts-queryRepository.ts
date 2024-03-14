@@ -9,7 +9,7 @@ import {likesPostsRepository, likesPostsService} from "../composition-root";
 
 export class PostsQueryRepository {
 
-    async findAllPosts(postsPagination: IPostPagination): Promise<PaginationType<PostsViewType>> {
+    async findAllPosts(postsPagination: IPostPagination, userId?: string): Promise<PaginationType<PostsViewType>> {
         const posts = await PostsModel
             .find({})
             .sort({[postsPagination.sortBy]: postsPagination.sortDirection})
@@ -18,16 +18,38 @@ export class PostsQueryRepository {
             .lean()
         const totalCount = await PostsModel.countDocuments()
         const pagesCount = Math.ceil(totalCount / postsPagination.pageSize)
-        const allPosts = posts.map(p => (
-            {
+
+
+        const allPosts = await Promise.all(posts.map(async p => {
+            let myStatus = LikesStatus.None
+            if (userId) {
+                const reaction = await LikesPostsModel.findOne({postId: p._id, userId})
+                myStatus = reaction ? reaction.myStatus : LikesStatus.None
+            }
+            const newestLikes = await likesPostsRepository.findLastThreePostsLikesByPostId(p._id.toString())
+
+            return {
                 id: p._id.toString(),
                 title: p.title,
                 shortDescription: p.shortDescription,
                 content: p.content,
                 blogId: p.blogId,
                 blogName: p.blogName,
-                createdAt: p.createdAt
-            }))
+                createdAt: p.createdAt,
+                extendedLikesInfo: {
+                    likesCount: await LikesPostsModel.countDocuments({
+                        postId: p._id.toString(),
+                        myStatus: LikesStatus.Like
+                    }),
+                    dislikesCount: await LikesPostsModel.countDocuments({
+                        postId: p._id.toString(),
+                        myStatus: LikesStatus.Dislike
+                    }),
+                    myStatus: myStatus,
+                    newestLikes: newestLikes
+                }
+            }
+        }))
         return {
             pagesCount: pagesCount,
             page: postsPagination.pageNumber,
@@ -48,7 +70,7 @@ export class PostsQueryRepository {
             const reaction = await LikesPostsModel.findOne({postId, userId})
             myStatus = reaction ? reaction.myStatus : LikesStatus.None
         }
-       const newestLikes= await likesPostsRepository.findLastThreePostsLikesByPostId(postId)
+        const newestLikes = await likesPostsRepository.findLastThreePostsLikesByPostId(postId)
         return {
             id: post._id.toString(),
             title: post.title,
