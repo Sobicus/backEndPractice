@@ -73,7 +73,7 @@ class authController {
         return res.status(200).send({
             email: userData.email,
             login: userData.login,
-            userId: userData.id
+            userId: userData._id.toString()
         })
     }
 

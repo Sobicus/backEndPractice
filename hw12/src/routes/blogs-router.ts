@@ -54,7 +54,8 @@ class BlogsController {
     }, IQuery<SortBlogsByEnum>>, res: Response) {
         const blogId = req.params.id
         const queryParam = req.query
-        const posts = await this.blogsQueryRepository.findPostByBlogId(blogId, queryParam)
+        const userId = req.user?._id.toString()
+        const posts = await this.blogsQueryRepository.findPostByBlogId(blogId, queryParam, userId)
         if (!posts) {
             res.sendStatus(404)
             return

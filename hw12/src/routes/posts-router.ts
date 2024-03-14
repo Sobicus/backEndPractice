@@ -36,13 +36,14 @@ class PostsController {
     }
 
     async getAllPosts(req: Request<{}, {}, {}, IQuery<SortPostsByEnum>>, res: Response) {
+        const userId = req.user?._id.toString()
         const postsPagination = getPostsPagination(req.query)
-        const posts = await this.postsQueryRepository.findAllPosts(postsPagination)
+        const posts = await this.postsQueryRepository.findAllPosts(postsPagination, userId)
         res.status(200).send(posts)
     }
 
     async findPostById(req: RequestWithParams<{ id: string }>, res: Response) {
-        const userId= req.user?._id.toString()
+        const userId = req.user?._id.toString()
         const post = await this.postsQueryRepository.findPostById(req.params.id, userId)
         if (!post) {
             res.sendStatus(404)

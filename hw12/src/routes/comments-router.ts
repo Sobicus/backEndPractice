@@ -34,7 +34,7 @@ class CommentsController {
     }
 
     async getCommentById(req: commentsRequestParams<{ id: string }>, res: Response) {
-        const userId = req.user?.id
+        const userId = req.user?._id.toString()
         const comment = await this.commentsQueryRepository.getCommentById(req.params.id, userId)
         if (!comment) {
             res.sendStatus(404)
@@ -46,7 +46,7 @@ class CommentsController {
     async updateComments(req: commentsRequestParamsAndBodyUser<{
         id: string
     }, { content: string }, UsersViewType>, res: Response) {
-        const commentIsUpdated = await this.commentsService.updateComments(req.params.id, req.body.content, req.user!.id)
+        const commentIsUpdated = await this.commentsService.updateComments(req.params.id, req.body.content, req.user!._id.toString())
         if (!commentIsUpdated) {
             res.sendStatus(404)
             return
@@ -64,7 +64,7 @@ class CommentsController {
         likeStatus: LikesStatus
     }>, res: Response) {
         const commentsLikeStatus = req.body.likeStatus
-        const userId = req.user!.id
+        const userId = req.user!._id.toString()
         const commentId = req.params.id
         const result = await this.likesCommentsService.likeCommentUpdate(commentId, userId, commentsLikeStatus)
         if (result === '404') {
@@ -77,7 +77,7 @@ class CommentsController {
     async deleteComment(req: commentsRequestParamsAndUser<{
         id: string
     }, UsersViewType>, res: Response) {
-        const commentDelete = await this.commentsService.deleteComment(req.params.id, req.user!.id)
+        const commentDelete = await this.commentsService.deleteComment(req.params.id, req.user!._id.toString())
         if (!commentDelete) {
             res.sendStatus(404)
             return

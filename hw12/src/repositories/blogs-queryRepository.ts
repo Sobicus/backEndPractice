@@ -1,9 +1,11 @@
 import {ObjectId} from "mongodb";
 import {IBlockPagination, IQuery, PaginationType, SortBlogsByEnum} from "../types/paggination-type";
 import {getBlogsPagination} from "../helpers/pagination-helpers";
-import {BlogsModel, PostsModel} from "./db";
+import {BlogsModel, LikesPostsModel, PostsModel} from "./db";
 import {BlogViewType} from "../types/blog-types";
-import { PostsViewType } from "../types/post-types";
+import {PostsViewType} from "../types/post-types";
+import {LikesStatus} from "../types/likes-comments-repository-types";
+import {likesPostsRepository} from "../composition-root";
 
 
 export class BlogsQueryRepository {
@@ -52,7 +54,7 @@ export class BlogsQueryRepository {
         }
     }
 
-    async findPostByBlogId(blogId: string, query: IQuery<SortBlogsByEnum>): Promise<PaginationType<PostsViewType> | null> {
+    async findPostByBlogId(blogId: string, query: IQuery<SortBlogsByEnum>, userId?: string): Promise<PaginationType<PostsViewType> | null> {
         let blog = await BlogsModel
             .findOne({_id: new ObjectId(blogId)})
         if (!blog) {
@@ -65,14 +67,31 @@ export class BlogsQueryRepository {
             .sort({[pagination.sortBy]: pagination.sortDirection})
             .skip(pagination.skip).limit(pagination.pageSize)
             .lean();
-        const allPosts = posts.map(p => ({
-            id: p._id.toString(),
-            title: p.title,
-            shortDescription: p.shortDescription,
-            content: p.content,
-            blogId: p.blogId,
-            blogName: p.blogName,
-            createdAt: p.createdAt
+        const allPosts = await Promise.all(posts.map(async p => {
+            let myStatus = LikesStatus.None
+            if (userId) {
+                const reaction = await LikesPostsModel.findOne({postId: p._id, userId})
+                myStatus = reaction ? reaction.myStatus : LikesStatus.None
+            }
+            const newestLikes = await likesPostsRepository.findLastThreePostsLikesByPostId(p._id.toString())
+            return {
+                id: p._id.toString(),
+                title: p.title,
+                shortDescription: p.shortDescription,
+                content: p.content,
+                blogId: p.blogId,
+                blogName: p.blogName,
+                createdAt: p.createdAt,
+                extendedLikesInfo: {
+                    likesCount: await LikesPostsModel.countDocuments({
+                        postId: p._id.toString(),
+                        myStatus: LikesStatus.Like
+                    }),
+                    dislikesCount: await LikesPostsModel.countDocuments({postId: p._id, myStatus: LikesStatus.Dislike}),
+                    myStatus: myStatus,
+                    newestLikes: newestLikes
+                }
+            }
         }))
         const totalCount = await PostsModel
             .countDocuments({blogId: blogId})
