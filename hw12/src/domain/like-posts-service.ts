@@ -13,7 +13,7 @@ export class LikesPostsService {
     }
 
     async likePostsUpdate(postId: string, userId: string, likeStatus: LikesStatus, login:string) {
-        const post = this.postRepository.findPostById(postId)
+        const post =await this.postRepository.findPostById(postId)
         if (!post) {
             return '404'
         }

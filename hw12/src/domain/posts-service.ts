@@ -33,11 +33,6 @@ export class PostsService {
             dislikesCount: 0,
             myStatus: LikesStatus.None,
             newestLikes: [
-                {
-                    addedAt: new Date().toISOString(),
-                    userId: "string",
-                    login: "string"
-                }
             ]
         }
         const mongoResponse = await this.postRepo.createPost(newPost)

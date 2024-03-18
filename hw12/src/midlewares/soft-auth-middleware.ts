@@ -1,11 +1,9 @@
 import {NextFunction, Request, Response} from "express";
 import {queryCommentsType} from "../helpers/pagination-comments";
 import {RequestWithParamsAndQuery} from "../types/postsRouter-types";
-import {jwtService, usersService } from "../composition-root";
+import {jwtService, usersService} from "../composition-root";
 
-export const softAuthMiddleware = async (req: RequestWithParamsAndQuery<{
-    id: string
-}, queryCommentsType>, res: Response, next: NextFunction) => {
+export const softAuthMiddleware = async (req: Request<any, any, any, any>, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
         return next()
     }

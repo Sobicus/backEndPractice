@@ -10,7 +10,7 @@ import {IUser, usersSchema} from '../schemaMongoose/users-schema';
 import {passwordRecoverySchema} from "../schemaMongoose/passwordRecovery-schema";
 import {likesCommentsSchema} from "../schemaMongoose/likes-comments-schema";
 import { LikesCommentsDbType } from '../types/likes-comments-repository-types';
-import { likesPostsSchemema } from '../schemaMongoose/likes-posts-schema';
+import { likesPostsScheme } from '../schemaMongoose/likes-posts-schema';
 dotenv.config()
 
 export const BlogsModel = mongoose.model('Blogs', blogSchema);
@@ -22,7 +22,7 @@ export const SessionsModel = mongoose.model('Sessions', sessionsSchema)
 export const UsersModel = mongoose.model<IUser>('Users', usersSchema)
 export const PasswordRecoveryModel = mongoose.model('PasswordRecovery', passwordRecoverySchema)
 export const LikesCommentsModel = mongoose.model<LikesCommentsDbType>('LikesComments', likesCommentsSchema)
-export const LikesPostsModel = mongoose.model('LikesPosts', likesPostsSchemema)
+export const LikesPostsModel = mongoose.model('LikesPosts', likesPostsScheme)
 
 const mongoUri = process.env.MONGO_URL || 'mongodb://0.0.0.0:27017'
 console.log(process.env.MONGO_URL)

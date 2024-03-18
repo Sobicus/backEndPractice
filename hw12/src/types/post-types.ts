@@ -15,8 +15,7 @@ type ExtendedLikesInfo={
     likesCount: number
     dislikesCount: number
     myStatus: LikesStatus
-    newestLikes: NewestLikes[]
-
+    newestLikes: NewestLikes[] | []
 }
 type NewestLikes = {
     addedAt: string

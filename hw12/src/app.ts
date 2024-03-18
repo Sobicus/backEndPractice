@@ -9,7 +9,7 @@ import {securityDevicesRouter} from "./routes/securityDevices-router";
 import {
     BlogsModel,
     CommentsModel,
-    JwtTokenModel, LikesCommentsModel, PasswordRecoveryModel,
+    JwtTokenModel, LikesCommentsModel, LikesPostsModel, PasswordRecoveryModel,
     PostsModel,
     RateLimitModel,
     SessionsModel,
@@ -43,5 +43,6 @@ app.delete('/testing/all-data', async (req: Request, res: Response) => {
     await UsersModel.deleteMany({})
     await PasswordRecoveryModel.deleteMany({})
     await LikesCommentsModel.deleteMany({})
+    await LikesPostsModel.deleteMany({})
     res.sendStatus(204)
 })
