@@ -40,11 +40,11 @@ class CommentsController {
         id: string
     }, { content: string }, UsersViewType>, res: Response) {
         const commentIsUpdated = await this.commentsService.updateComments(req.params.id, req.body.content, req.user!._id.toString())
-        if (!commentIsUpdated) {
+        if (commentIsUpdated.status==='NotFound') {
             res.sendStatus(404)
             return
         }
-        if (commentIsUpdated === '403') {
+        if (commentIsUpdated.status === 'Forbidden') {
             res.sendStatus(403)
             return
         }

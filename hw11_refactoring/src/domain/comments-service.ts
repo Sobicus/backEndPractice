@@ -34,8 +34,8 @@ export class CommentsService {
         }
         await this.commentRepo.updateComment(commentId, content)
         return {
-            status: statusType.Forbidden,
-            errorMessages: 'its not you comment',
+            status: statusType.Success,
+            errorMessages: 'updated comment',
             data: null
         }
     }
