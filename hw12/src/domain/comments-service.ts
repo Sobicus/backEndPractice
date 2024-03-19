@@ -28,35 +28,48 @@ export class CommentsService {
         if (!resault) {
             return {
                 status: statusType.NotFound,
-                errorMessages: 'can not found Comments',
+                errorMessages: 'comment can not be found',
                 data: null
             }
         }
         if (resault.userId !== userId) {
             return {
                 status: statusType.Forbidden,
-                errorMessages: 'its not you comment',
+                errorMessages: 'its not your comment',
                 data: null
             }
         }
         await this.commentRepo.updateComment(commentId, content)
         return {
             status: statusType.Success,
-            errorMessages: 'comment has updated',
+            errorMessages: 'comment has been updated',
             data: null
         }
 
     }
 
-    async deleteComment(commentId: string, userId: string): Promise<boolean | string> {
+    async deleteComment(commentId: string, userId: string): Promise<ObjectResult> {
         const resault = await this.commentRepo.findCommentsById(commentId)
         if (!resault) {
-            return false
+            return {
+                status:statusType.NotFound,
+                errorMessages:'comment can not be found',
+                data:null
+            }
         }
         if (resault.userId !== userId) {
-            return '403'
+            return {
+                status:statusType.Forbidden,
+                errorMessages:'its not your comment',
+                data: null
+            }
         }
-        return await this.commentRepo.deleteComment(commentId)
+         await this.commentRepo.deleteComment(commentId)
+        return {
+            status:statusType.Success,
+            errorMessages:'comment has been deleted',
+            data: null
+        }
     }
 
     //check below

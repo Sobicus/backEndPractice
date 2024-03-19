@@ -40,7 +40,7 @@ class CommentsController {
         id: string
     }, { content: string }, UsersViewType>, res: Response) {
         const commentIsUpdated = await this.commentsService.updateComments(req.params.id, req.body.content, req.user!._id.toString())
-        if (commentIsUpdated.status==='NotFound') {
+        if (commentIsUpdated.status === 'NotFound') {
             res.sendStatus(404)
             return
         }
@@ -60,7 +60,7 @@ class CommentsController {
         const userId = req.user!._id.toString()
         const commentId = req.params.id
         const result = await this.likesCommentsService.likeCommentUpdate(commentId, userId, commentsLikeStatus)
-        if (result === '404') {
+        if (result.status === 'NotFound') {
             res.sendStatus(404)
             return
         }
@@ -71,11 +71,11 @@ class CommentsController {
         id: string
     }, UsersViewType>, res: Response) {
         const commentDelete = await this.commentsService.deleteComment(req.params.id, req.user!._id.toString())
-        if (!commentDelete) {
+        if (commentDelete.status === 'NotFound') {
             res.sendStatus(404)
             return
         }
-        if (commentDelete === '403') {
+        if (commentDelete.status === 'Forbidden') {
             res.sendStatus(403)
             return
         }

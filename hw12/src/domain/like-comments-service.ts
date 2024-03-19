@@ -1,6 +1,7 @@
 import {LikesCommentsRepository} from "../repositories/likes-commets-repository";
 import {CommentsRepository} from "../repositories/comments-repository";
 import {LikesStatus} from "../types/likes-comments-repository-types";
+import {ObjectResult, statusType} from "../commands/object-result";
 
 export class LikeCommentsService {
     likesCommentsRepository: LikesCommentsRepository
@@ -12,10 +13,14 @@ export class LikeCommentsService {
         this.commentRepository = commentRepository
     }
 
-    async likeCommentUpdate(commentId: string, userId: string, likeStatus: LikesStatus) {
+    async likeCommentUpdate(commentId: string, userId: string, likeStatus: LikesStatus):Promise<ObjectResult> {
         const comment = this.commentRepository.findCommentsById(commentId)
         if (!comment) {
-            return '404'
+            return {
+                status: statusType.NotFound,
+                errorMessages:'comment cannot be found',
+                data:null
+            }
         }
         const existingReaction = await this.likesCommentsRepository.findCommentLikeCommentIdUserId(commentId, userId)
         if (!existingReaction) {
@@ -25,12 +30,26 @@ export class LikeCommentsService {
                 myStatus: likeStatus,
                 createdAt: new Date().toISOString()
             }
-            return this.likesCommentsRepository.createCommentLike(commentStatusModel)
+             await this.likesCommentsRepository.createCommentLike(commentStatusModel)
+            return{
+                status:statusType.Success,
+                errorMessages:'comment likes has been created',
+                data:null
+            }
         }
         if (likeStatus === existingReaction.myStatus) {
-            return
+            return{
+                status:statusType.Success,
+                errorMessages:'comment likes the same',
+                data:null
+            }
         } else {
-            return this.likesCommentsRepository.updateCommentLike(commentId, userId, likeStatus)
+             await this.likesCommentsRepository.updateCommentLike(commentId, userId, likeStatus)
+            return{
+                status:statusType.Success,
+                errorMessages:'comment likes has been updated',
+                data:null
+            }
         }
     }
 }

@@ -106,7 +106,7 @@ class PostsController {
         const login = req.user!.login
         const postId = req.params.id
         const result = await this.likesPostsService.likePostsUpdate(postId, userId, postLikeStatus, login)
-        if (result === '404') {
+        if (result.status === 'NotFound') {
             res.sendStatus(404)
             return
         }
