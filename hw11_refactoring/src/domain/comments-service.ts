@@ -35,7 +35,7 @@ export class CommentsService {
         await this.commentRepo.updateComment(commentId, content)
         return {
             status: statusType.Success,
-            errorMessages: 'updated comment',
+            errorMessages: 'updated commentwwwwwwwwwwwwwwwwwwwwwwwwwww',
             data: null
         }
     }
