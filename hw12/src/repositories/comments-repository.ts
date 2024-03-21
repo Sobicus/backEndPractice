@@ -1,7 +1,9 @@
 import {CommentsDbType} from "../types/comment-types";
 import {ObjectId} from "mongodb";
 import {CommentsModel} from "./db";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentsRepository {
     async findCommentsById(commentId: string): Promise<CommentsDbType | null> {
         return CommentsModel

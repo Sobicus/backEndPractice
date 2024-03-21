@@ -1,7 +1,9 @@
 import {ObjectId} from "mongodb";
 import {SessionsModel} from "./db";
 import { allActiveSessionDbType, allActiveSessionViewType } from "../types/sessions-repository-types";
+import {injectable} from "inversify";
 
+@injectable()
 export class SessionsRepository {
     async createDeviceSession(issuedAt: string, deviceId: string, ip: string, deviceName: string, userId: string): Promise<boolean> {
         const newSession = {issuedAt, deviceId, ip, deviceName, userId}

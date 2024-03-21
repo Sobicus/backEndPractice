@@ -6,8 +6,9 @@ import {PasswordRecoveryRepository} from "../repositories/passwordRecovery-repos
 import {UserServiceType} from "../types/user-types";
 import {UsersService} from "./user-service";
 import { PasswordRecoveryType } from "../types/passwordRecovery-repository-types";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class AuthService {
     usersService: UsersService
     passwordRecoveryRepository: PasswordRecoveryRepository
@@ -26,7 +27,6 @@ export class AuthService {
             await emailAdapter.sendEmail(email, confirmationCode!.emailConfirmation.confirmationCode)
         } catch (error) {
             console.log(error)
-            //await userService.deleteUser(newUser.id)
             return null
         }
         return true
@@ -76,7 +76,6 @@ export class AuthService {
             await emailPasswordRecoveryAdapter.sendEmail(user.email, passwordRecoveryCode)
         } catch (error) {
             console.log(error)
-            //await userService.deleteUser(newUser.id)
             return null
         }
         return

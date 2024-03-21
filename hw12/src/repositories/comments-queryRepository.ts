@@ -2,7 +2,11 @@ import { CommentViewType} from "../types/comment-types";
 import {ObjectId} from "mongodb";
 import {CommentsModel, LikesCommentsModel} from "./db";
 import { LikesStatus } from "../types/likes-comments-repository-types";
+import {LikeCommentsService} from "../domain/like-comments-service";
+import {BlogsRepository} from "./blogs-repository";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentsQueryRepository {
     async getCommentById(commentId: string, userId?: string): Promise<CommentViewType | null> {
         const comment = await CommentsModel

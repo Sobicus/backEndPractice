@@ -5,7 +5,9 @@ import {DefaultCommentsPaginationType} from "../helpers/pagination-comments";
 import {CommentsModel, LikesCommentsModel, LikesPostsModel, PostsModel} from "./db";
 import {PostsViewType} from "../types/post-types";
 import {LikesStatus} from "../types/likes-comments-repository-types";
+import {injectable} from "inversify";
 
+@injectable()
 export class PostsQueryRepository {
 
     async findAllPosts(postsPagination: IPostPagination, userId?: string): Promise<PaginationType<PostsViewType>> {

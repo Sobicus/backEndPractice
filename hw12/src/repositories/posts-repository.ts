@@ -5,37 +5,12 @@ import {CreatePostType, PostsDbType} from "../types/post-types";
 import {blogsDbType} from "../types/blog-types";
 import { postBodyRequest } from "../types/postsRouter-types";
 import { LikesStatus } from "../types/likes-comments-repository-types";
+import {PasswordRecoveryRepository} from "./passwordRecovery-repository";
+import {injectable} from "inversify";
 
+@injectable()
 export class PostsRepository {
-    /*async findAllPosts(postsPagination: IPostPagination): Promise<PaginationType<postsViewType>> {
-        const posts = await PostsModel
-            .find({})
-            .sort({[postsPagination.sortBy]: postsPagination.sortDirection})
-            .limit(postsPagination.pageSize)
-            .skip(postsPagination.skip)
-            .lean()
-        const totalCount = await PostsModel
-            .countDocuments()
-        const pagesCount = Math.ceil(totalCount / postsPagination.pageSize)
-        const allPosts = posts.map(p => (
-            {
-                id: p._id.toString(),
-                title: p.title,
-                shortDescription: p.shortDescription,
-                content: p.content,
-                blogId: p.blogId,
-                blogName: p.blogName,
-                createdAt: p.createdAt
-            }))
-        return {
-            pagesCount: pagesCount,
-            page: postsPagination.pageNumber,
-            pageSize: postsPagination.pageSize,
-            totalCount: totalCount,
-            items: allPosts
-        }
-    }
-*/
+
     async findPostById(postId: string): Promise<PostsDbType | null> {
         return PostsModel.findOne({_id: new ObjectId(postId)})
     }

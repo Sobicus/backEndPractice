@@ -3,9 +3,14 @@ import {checkAuthorization} from "../midlewares/authorization-check-middleware";
 import {validationBlogsMiddleware} from "../midlewares/input-blogs-validation-middleware";
 import {validationPostsByBlogIdMidleware} from "../midlewares/input-postsByBlogId-validation-middleware";
 import {softAuthMiddleware} from "../midlewares/soft-auth-middleware";
-import {blogsControllerInstance} from "../composition-root";
+import {container} from "../composition-root";
+import {BlogsController} from "./blogs-controller";
 
 export const blogsRouter = Router()
+
+//const blogsControllerInstance = new BlogsController(blogService, blogsQueryRepository, postService)
+const blogsControllerInstance = container.resolve(BlogsController)
+
 
 blogsRouter.get('/', blogsControllerInstance.getAllBlogs.bind(blogsControllerInstance))
 blogsRouter.get(':id', blogsControllerInstance.getBlogById.bind(blogsControllerInstance))

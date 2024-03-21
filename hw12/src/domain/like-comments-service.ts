@@ -2,7 +2,9 @@ import {LikesCommentsRepository} from "../repositories/likes-commets-repository"
 import {CommentsRepository} from "../repositories/comments-repository";
 import {LikesStatus} from "../types/likes-comments-repository-types";
 import {ObjectResult, statusType} from "../commands/object-result";
+import {injectable} from "inversify";
 
+@injectable()
 export class LikeCommentsService {
     likesCommentsRepository: LikesCommentsRepository
     commentRepository: CommentsRepository

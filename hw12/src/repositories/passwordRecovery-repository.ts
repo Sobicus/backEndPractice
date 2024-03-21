@@ -1,6 +1,8 @@
 import {PasswordRecoveryModel} from "./db";
 import { PasswordRecoveryType } from "../types/passwordRecovery-repository-types";
+import {injectable} from "inversify";
 
+@injectable()
 export class PasswordRecoveryRepository {
     async createPasswordRecovery(passwordRecoveryModel: PasswordRecoveryType) {
         await PasswordRecoveryModel.create(passwordRecoveryModel)

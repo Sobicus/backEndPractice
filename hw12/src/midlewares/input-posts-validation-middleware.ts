@@ -1,7 +1,9 @@
 import {body} from "express-validator";
 import {inputVal} from "./errorValidator";
-import { blogsQueryRepository } from "../composition-root";
+import {container} from "../composition-root";
+import { BlogsQueryRepository } from "../repositories/blogs-queryRepository";
 
+const blogsQueryRepository= container.resolve(BlogsQueryRepository)
 
 export const validationPostsMiddleware = [
     body('title')

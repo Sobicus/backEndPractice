@@ -4,7 +4,9 @@ import {UsersDbType, UsersViewType} from "../types/user-types";
 import {PostsViewType} from "../types/post-types";
 import {postBodyRequest} from "../types/postsRouter-types";
 import {LikesStatus} from "../types/likes-comments-repository-types";
+import {injectable} from "inversify";
 
+@injectable()
 export class PostsService {
     private postRepo: PostsRepository
 

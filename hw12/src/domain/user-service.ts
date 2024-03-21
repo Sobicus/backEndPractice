@@ -4,7 +4,9 @@ import {randomUUID} from "crypto";
 import add from "date-fns/add";
 import {ObjectId} from "mongodb";
 import {UserServiceType, UsersDbType, UsersViewType} from "../types/user-types";
+import {injectable} from "inversify";
 
+@injectable()
 export class UsersService {
     userRepository: UsersRepository
 
@@ -35,7 +37,6 @@ export class UsersService {
         }
         const id = await this.userRepository.createUser(createUserModel)
         return {id, login, email, createdAt}
-        // return createUserModel.emailConfirmation.confirmationCode
     }
 
     async deleteUser(userId: string): Promise<boolean> {
@@ -51,15 +52,12 @@ export class UsersService {
     async checkCredentials(loginOrMail: string, password: string): Promise<null | UserServiceType> {
         const user = await this.userRepository.findByLoginOrEmail(loginOrMail)
         if (!user) return null
-        //if (!user.emailConfirmation.isConfirmed) return null
         const passwordHash = await this._generateHash(password, user.passwordSalt)
-        //return user.passwordHash === passwordHash; // if this true return users
-        // return user._id.toString()
         if (user.passwordHash !== passwordHash) return null
         return user
     }
 
-//
+
     async findUserById(userId: string): Promise<UsersDbType | null> {
         return await this.userRepository.findUserById(userId)
     }
@@ -85,9 +83,5 @@ export class UsersService {
         const passwordHash = await this._generateHash(newPassword, passwordSalt)
         return await this.userRepository.changePassword(userId, passwordSalt, passwordHash)
     }
-
-    /*async findUserByLoginOrEmail(login:string,email:string):Promise<UsersDbType | null>{
-        return await this.userRepo.findUserByLoginOrEmail(login,email)
-    }*/
 }
 

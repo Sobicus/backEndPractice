@@ -1,5 +1,7 @@
 import {RateLimitRepository} from "../repositories/rate-limit-repository";
+import {injectable} from "inversify";
 
+@injectable()
 export class RateLimitService {
     rateLimitRepository: RateLimitRepository
 

@@ -2,9 +2,10 @@ import {JwtService} from "../application/jwt-service";
 import {SessionsService} from "../domain/session-service";
 import {Request, Response} from "express";
 import {RequestParamsSecurityDevicesType} from "../types/securityDevicesRouter-types";
-import {jwtService, sessionsService} from "../composition-root";
+import {injectable} from "inversify";
 
-class securityDevicesController {
+@injectable()
+export class securityDevicesController {
     jwtService: JwtService
     sessionsService: SessionsService
 
@@ -50,4 +51,3 @@ class securityDevicesController {
     }
 }
 
-export const securityDevicesControllerInstance = new securityDevicesController(jwtService, sessionsService)

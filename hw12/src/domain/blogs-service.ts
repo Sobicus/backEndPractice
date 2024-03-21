@@ -1,8 +1,9 @@
 import {BlogsRepository} from "../repositories/blogs-repository";
 import {BlogViewType} from "../types/blog-types";
 import {blogBodyRequest} from "../types/blogsRouter-types";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class BlogsService {
     blogRepo: BlogsRepository
 
@@ -10,22 +11,7 @@ export class BlogsService {
         this.blogRepo = blogRepo
     }
 
-    /*
-        async findAllBlogs(pagination: IBlockPagination): Promise<PaginationType<BlogViewType>> {
-            return await this.blogRepo.findAllBlogs(pagination)
-        }
-    */
-    /*
-    async findBlogById(blogId: string): Promise<BlogViewType | null> {
-        return await this.blogRepo.findBlogById(blogId)
-    }
-*/
 
-    /*
-    async findPostByBlogId(blogId: string, query: IQuery<SortBlogsByEnum>): Promise<PaginationType<postsViewType> | null> {
-        return await this.blogRepo.findPostByBlogId(blogId, query)
-    }
-*/
     async createBlog(createModel: blogBodyRequest): Promise<BlogViewType> {
         const createdAt = new Date().toISOString()
         const isMembership = false
@@ -34,9 +20,6 @@ export class BlogsService {
         return {id: mongoResponse, ...createModel, createdAt, isMembership}
     }
 
-    // async createPostByBlogId(title: string, shortDescription: string, content: string, blogId: string): Promise<postsViewType | null> {
-    //     return this.blogRepo.createPostByBlogId(title, shortDescription, content, blogId)
-    // }
 
     async updateBlog(blogId: string, updateModel: blogBodyRequest): Promise<boolean> {
         return await this.blogRepo.updateBlog(blogId, updateModel)

@@ -2,7 +2,9 @@ import {PaginationType} from "../types/paggination-type";
 import {IQueryUsersPagination} from "../helpers/pagination-users-helpers";
 import {UsersModel} from "./db";
 import { UsersViewType } from "../types/user-types";
+import {injectable} from "inversify";
 
+@injectable()
 export class UsersQueryRepository {
     async findAllUsers(pagination: IQueryUsersPagination): Promise<PaginationType<UsersViewType>> {
         const filter = {

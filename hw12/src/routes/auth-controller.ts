@@ -11,10 +11,10 @@ import {
 } from "../types/authRouter-types";
 import {Request, Response} from "express";
 import {randomUUID} from "crypto";
-import jwt from "jsonwebtoken";
-import {authService, jwtService, sessionsService, usersService} from "../composition-root";
+import {injectable} from "inversify";
 
-class authController {
+@injectable()
+export class authController {
     usersService: UsersService
     sessionsService: SessionsService
     authService: AuthService
@@ -36,16 +36,10 @@ class authController {
         const deviceId = randomUUID()
         const accessToken = await this.jwtService.createAccessJWT(user.id!) // Change hardcode
         const refreshToken = await this.jwtService.createRefreshJWT(user.id!, deviceId) // Change hardcode
-
-        const decodeJwtAccessToken = jwt.decode(accessToken.accessToken)
-
-        const decodeJwt = jwt.decode(accessToken.accessToken)
-
         const ip = req.socket.remoteAddress//what we do with ip becouse ts think that ip can be undefined
         const deviceName = req.headers['user-agent']//what we do with deviceName becouse ts think that deviceName can be undefined
         const addDeviceSession = await this.sessionsService.createDeviceSession(refreshToken.refreshToken, ip!, deviceName!)
         if (!addDeviceSession) return res.sendStatus(401)
-//------------above new logic------------------
         res.status(200)
             .cookie('refreshToken', refreshToken.refreshToken, {httpOnly: true, secure: true})
             .send(accessToken)
@@ -64,7 +58,6 @@ class authController {
     }
 
     async createUser(req: PostRequestAuthType<PostRequestRegistrationAuthType>, res: Response) {
-        //await userService.createUser(req.body.login, req.body.password, req.body.email)
         const newUser = await this.authService.createUser(req.body.login, req.body.password, req.body.email)
         if (!newUser) {
             return res.sendStatus(400)
@@ -90,7 +83,7 @@ class authController {
     }
 
     async resendingRegistrationEmail(req: PostRequestAuthType<{ email: string }>, res: Response) {
-        const result = await authService.resendingRegistrationEmail(req.body.email)
+        await this.authService.resendingRegistrationEmail(req.body.email)
         return res.sendStatus(204)
     }
 
@@ -104,11 +97,9 @@ class authController {
         if (!getSessionByUserIdAndDeviceId) return res.sendStatus(401)
         if (payload.iat * 1000 !== new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime()) return res.sendStatus(401)
 
-// const isExpiredToken = await jwtTokensService.isExpiredToken(refreshToken)
-// if (isExpiredToken) return res.sendStatus(401)// check need i this verification or this redundant
+
         const newAccessToken = await this.jwtService.createAccessJWT(userId)
         const newRefreshToken = await this.jwtService.createRefreshJWT(userId, deviceId)
-// await jwtTokensService.expiredTokens(refreshToken)//do need something check?
         const result = await this.sessionsService.updateSession(newRefreshToken.refreshToken)
         if (!result) return res.sendStatus(401)
         res.status(200)
@@ -126,21 +117,11 @@ class authController {
         const {userId, deviceId} = expiredOrNot;
         const getSessionByUserIdAndDeviceId = await this.sessionsService.getSessionByUserIdAndDeviceId(userId, deviceId)
         if (!getSessionByUserIdAndDeviceId) return res.sendStatus(401)
-//  console.log('expiredOrNot logout',expiredOrNot.iat)
-//  console.log('getSessionByUserIdAndDeviceId.issuedAt logout',getSessionByUserIdAndDeviceId.issuedAt)
-//  const date=new Date(expiredOrNot.iat * 1000).toISOString()
-//  console.log('date logout',date)
-//  console.log('date logout',new Date(date)!==new Date(getSessionByUserIdAndDeviceId.issuedAt))
-//  console.log('new Date(expiredOrNot.iat) == new Date(getSessionByUserIdAndDeviceId.issuedAt)',  expiredOrNot.iat*1000 !== new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime(), expiredOrNot.iat*1000, new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime())
-// console.log('getSessionByUserIdAndDeviceId.issuedAt',getSessionByUserIdAndDeviceId.issuedAt)
-// if (expiredOrNot.iat*1000 !== new Date(getSessionByUserIdAndDeviceId.issuedAt).getTime()) return res.sendStatus(401)
+
         console.log('new Date(expiredOrNot.iat*1000).toISOString()', new Date(expiredOrNot.iat * 1000).toISOString())
         console.log('getSessionByUserIdAndDeviceId.issuedAt', getSessionByUserIdAndDeviceId.issuedAt)
         console.log('new Date(expiredOrNot.iat*1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt', new Date(expiredOrNot.iat * 1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt)
         if (new Date(expiredOrNot.iat * 1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt) return res.sendStatus(401)
-//const isExpiredToken = await jwtTokensService.isExpiredToken(refreshToken)
-//if (isExpiredToken) return res.sendStatus(401)// check need i this verification or this redundant
-//await jwtTokensService.expiredTokens(refreshToken)
         const result = await this.sessionsService.deleteSessionDevice(userId, deviceId)
         if (!result) return res.sendStatus(401)
         return res.clearCookie('refreshToken').sendStatus(204)
@@ -161,4 +142,3 @@ class authController {
     }
 }
 
-export const authControllerInstance = new authController(usersService, sessionsService, authService, jwtService)

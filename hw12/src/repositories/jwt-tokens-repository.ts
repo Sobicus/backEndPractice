@@ -1,6 +1,8 @@
 import {ObjectId} from "mongodb";
 import {JwtTokenModel} from "./db";
+import {injectable} from "inversify";
 
+@injectable()
 export class JwtTokensRepository {
     async expiredTokens(_id: ObjectId, refreshToken: string):Promise<string> {
         const result = await JwtTokenModel

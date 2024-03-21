@@ -3,9 +3,10 @@ import {UsersService} from "../domain/user-service";
 import {Request, Response} from "express";
 import {getPaginationUsersHelpers, IQueryUsers} from "../helpers/pagination-users-helpers";
 import {postRequestWithBodyUsers, RequestWithParamsUsers, UsersInputRequestUsers} from "../types/usersRoter-types";
-import {usersQueryRepository, usersService} from "../composition-root";
+import {injectable} from "inversify";
 
-class UsersController {
+@injectable()
+export class UsersController {
     usersQueryRepository: UsersQueryRepository
     usersService: UsersService
 
@@ -36,4 +37,3 @@ class UsersController {
     }
 }
 
-export const usersControllerInstance = new UsersController(usersQueryRepository, usersService)

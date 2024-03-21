@@ -4,10 +4,14 @@ import {validationPostsMiddleware} from "../midlewares/input-posts-validation-mi
 import {authMiddleware} from "../midlewares/auth-middleware";
 import {validationCommentsContentMiddleware} from "../midlewares/input-comments-content-middleware";
 import {softAuthMiddleware} from "../midlewares/soft-auth-middleware";
-import {postsControllerInstance} from "./posts-controller";
 import {validationPostLikesMiddleware} from "../midlewares/input-post-postLikes-middleware";
+import {container} from "../composition-root";
+import { PostsController } from "./posts-controller";
 
 export const postsRouter = Router()
+
+//const postsControllerInstance = new PostsController(postQueryRepository, postService, likesPostsService)
+const postsControllerInstance = container.resolve(PostsController)
 
 postsRouter.get('/', softAuthMiddleware, postsControllerInstance.getAllPosts.bind(postsControllerInstance))
 postsRouter.get('/:id', softAuthMiddleware, postsControllerInstance.findPostById.bind(postsControllerInstance))

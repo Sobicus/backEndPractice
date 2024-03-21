@@ -1,6 +1,8 @@
 import {CommentsRepository} from "../repositories/comments-repository";
 import {ObjectResult, statusType} from "../commands/object-result";
+import {injectable} from "inversify";
 
+@injectable()
 export class CommentsService {
     commentRepo: CommentsRepository
 

@@ -9,9 +9,10 @@ import {
 import {Response} from "express";
 import {UsersViewType} from "../types/user-types";
 import {LikesStatus} from "../types/likes-comments-repository-types";
-import {commentQueryRepository, commentService, likesCommentsService} from "../composition-root";
+import {injectable} from "inversify";
 
-class CommentsController {
+@injectable()
+export class CommentsController {
     commentsQueryRepository: CommentsQueryRepository
     commentsService: CommentsService
     likesCommentsService: LikeCommentsService
@@ -83,4 +84,3 @@ class CommentsController {
     }
 }
 
-export const commentsControllerInstance = new CommentsController(commentQueryRepository, commentService, likesCommentsService)

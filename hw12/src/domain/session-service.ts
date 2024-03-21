@@ -1,7 +1,9 @@
 import {SessionsRepository} from "../repositories/sessions-repository";
 import jwt from "jsonwebtoken";
 import { allActiveSessionDbType, allActiveSessionViewType } from "../types/sessions-repository-types";
+import {injectable} from "inversify";
 
+@injectable()
 export class SessionsService {
     sessionsRepo: SessionsRepository
 
@@ -16,7 +18,6 @@ export class SessionsService {
         const deviceId: string = decodeJwtRefreshToken['deviceId'];
         const iat: number = decodeJwtRefreshToken['iat']
         const issuedAt = new Date(iat * 1000).toISOString()
-        // const deviceId = randomUUID()
         console.log('issuedAt session-service', issuedAt)
         return this.sessionsRepo.createDeviceSession(issuedAt, deviceId, ip, deviceName, userId)
     }
@@ -27,7 +28,6 @@ export class SessionsService {
 
     async updateSession(refreshToken: string): Promise<boolean> {
         const decodeJwtRefreshToken: any = jwt.decode(refreshToken)
-        //const userId: string = decodeJwtRefreshToken['userId'];
         const deviceId: string = decodeJwtRefreshToken['deviceId'];
         const iat: number = decodeJwtRefreshToken['iat']
         const issuedAt = new Date(iat * 1000).toISOString();

@@ -1,6 +1,8 @@
 import {JwtTokensRepository} from "../repositories/jwt-tokens-repository";
 import {ObjectId} from "mongodb";
+import {injectable} from "inversify";
 
+@injectable()
 export class JwtTokensService {
     jwtTokensRepo: JwtTokensRepository
 

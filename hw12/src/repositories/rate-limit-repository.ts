@@ -1,6 +1,8 @@
 import {ObjectId, WithId} from "mongodb";
 import {RateLimitModel} from "./db";
+import {injectable} from "inversify";
 
+@injectable()
 export class RateLimitRepository {
     async createNewRateSession(ip: string, path: string, date: number): Promise<boolean> {
         const result = await RateLimitModel

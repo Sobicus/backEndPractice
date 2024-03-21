@@ -5,9 +5,9 @@ import {BlogsModel, LikesPostsModel, PostsModel} from "./db";
 import {BlogViewType} from "../types/blog-types";
 import {PostsViewType} from "../types/post-types";
 import {LikesStatus} from "../types/likes-comments-repository-types";
-import {likesPostsRepository} from "../composition-root";
+import {injectable} from "inversify";
 
-
+@injectable()
 export class BlogsQueryRepository {
     async findAllBlogs(pagination: IBlockPagination): Promise<PaginationType<BlogViewType>> {
         const filter = {name: {$regex: pagination.searchNameTerm, $options: 'i'}}

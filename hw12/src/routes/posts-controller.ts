@@ -13,9 +13,10 @@ import {
 import {UsersViewType} from "../types/user-types";
 import {getCommentsPagination, queryCommentsType} from "../helpers/pagination-comments";
 import {LikesStatus} from "../types/likes-comments-repository-types";
-import {likesPostsService, postQueryRepository, postService} from "../composition-root";
+import {injectable} from "inversify";
 
-class PostsController {
+@injectable()
+export class PostsController {
     postsQueryRepository: PostsQueryRepository
     postService: PostsService
     likesPostsService: LikesPostsService
@@ -114,4 +115,3 @@ class PostsController {
     }
 }
 
-export const postsControllerInstance = new PostsController(postQueryRepository, postService, likesPostsService)
