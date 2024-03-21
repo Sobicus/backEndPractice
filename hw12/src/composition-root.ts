@@ -21,6 +21,7 @@ import {RateLimitRepository} from "./repositories/rate-limit-repository";
 import {JwtService} from "./application/jwt-service";
 import {LikesPostsRepository} from "./repositories/likes-posts-repository";
 import {LikesPostsService} from "./domain/like-posts-service";
+import {BlogsController} from "./routes/blogs-controller";
 
 export const blogRepository = new BlogsRepository()
 export const blogsQueryRepository = new BlogsQueryRepository()
@@ -45,3 +46,15 @@ export const rateLimitService = new RateLimitService(rateLimitRepository)
 export const jwtService = new JwtService()
 export const likesPostsRepository = new LikesPostsRepository()
 export const likesPostsService = new LikesPostsService(likesPostsRepository, postRepository)
+
+/*
+const objects: any = []
+export const ioc = {
+    getInstance<T>(ClassType: any) {
+        const targetInstance = objects.find(o => o instanceof ClassType)
+        return targetInstance as T
+    }
+}
+*/
+
+export const blogsControllerInstance = new BlogsController(blogService, blogsQueryRepository, postService)

@@ -3,7 +3,7 @@ import {checkAuthorization} from "../midlewares/authorization-check-middleware";
 import {validationBlogsMiddleware} from "../midlewares/input-blogs-validation-middleware";
 import {validationPostsByBlogIdMidleware} from "../midlewares/input-postsByBlogId-validation-middleware";
 import {softAuthMiddleware} from "../midlewares/soft-auth-middleware";
-import { blogsControllerInstance } from "./blogs-controller";
+import {blogsControllerInstance} from "../composition-root";
 
 export const blogsRouter = Router()
 

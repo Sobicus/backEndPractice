@@ -28,7 +28,7 @@ export class CommentsService {
         if (!resault) {
             return {
                 status: statusType.NotFound,
-                errorMessages: 'comment can not be found',
+                errorMessages: 'comment can not be> yarn add inversify reflect-metadata\n found',
                 data: null
             }
         }

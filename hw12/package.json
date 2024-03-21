@@ -14,11 +14,13 @@
     "date-fns": "^2.30.0",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
+    "inversify": "^6.0.2",
     "jest": "^29.7.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.0.0",
     "mongoose": "^8.0.3",
     "nodemailer": "^6.9.7",
+    "reflect-metadata": "^0.2.1",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "uuid": "^9.0.1"

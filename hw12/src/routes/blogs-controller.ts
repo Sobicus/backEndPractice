@@ -11,9 +11,10 @@ import {
     RequestWithParamsAmdQueryBlogs,
     RequestWithParamsBlogs
 } from "../types/blogsRouter-types";
-import {blogService, blogsQueryRepository, postService} from "../composition-root";
+import {injectable} from "inversify";
 
-class BlogsController {
+@injectable()
+export class BlogsController {
     blogsService: BlogsService
     blogsQueryRepository: BlogsQueryRepository
     postService: PostsService
@@ -96,4 +97,3 @@ class BlogsController {
     }
 }
 
-export const blogsControllerInstance = new BlogsController(blogService, blogsQueryRepository, postService)
