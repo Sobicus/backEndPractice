@@ -5,10 +5,6 @@ import {RateLimitService} from "../domain/rate-limit-service";
 const rateLimitService = container.resolve(RateLimitService)
 
 export const rateLimitMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    // console.log('baseUrl', req.baseUrl)
-    // console.log('url', req.url)
-    // console.log('originalUrl', req.originalUrl)
-
     const path = req.originalUrl.split('?')[0]
     console.log('path', path)
     const createDate = new Date().getTime()

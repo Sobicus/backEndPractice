@@ -18,4 +18,3 @@ export class JwtTokensService {
         return await this.jwtTokensRepo.isExpiredToken(refreshToken)
     }
 }
-//export const jwtTokensService = new JwtTokensService()

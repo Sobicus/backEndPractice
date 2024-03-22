@@ -19,8 +19,6 @@ export class AuthService {
     }
 
     async createUser(login: string, password: string, email: string): Promise<boolean | null> {
-        /*const checkUser = await userService.findUserByLoginOrEmail(login, email)
-        if(checkUser)return null*/
         await this.usersService.createUser(login, password, email)
         const confirmationCode = await this.usersService.findUserByEmailOrLogin(email)
         try {

@@ -1,7 +1,7 @@
 import mongoose, {Schema} from "mongoose";
-import { blogsDbType } from "../types/blog-types";
+import { BlogsDbType } from "../types/blog-types";
 
-export const blogSchema = new mongoose.Schema<blogsDbType>({
+export const blogSchema = new mongoose.Schema<BlogsDbType>({
     name: {type: String, required: true},
     description: {type: String, required: true},
     websiteUrl: {type: String, required: true},

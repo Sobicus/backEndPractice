@@ -10,17 +10,11 @@ export const getCommentsPagination = (query: queryCommentsType):DefaultCommentsP
     if (query.pageNumber && !isNaN(Math.trunc(query.pageNumber)) && Math.trunc(query.pageNumber) > 0) {
         defaultCommentsPagination.pageNumber = Math.trunc(query.pageNumber)
     }
-    // if (query.pageNumber && !isNaN(parseInt(query.pageNumber.toString(), 10))
-    //     && parseInt(query.pageNumber.toString(), 10) > 0) {
-    //     defaultCommentsPagination.pageNumber = parseInt(query.pageNumber.toString(), 10)
-    // }
+
     if (query.pageSize && !isNaN(Math.trunc(query.pageSize)) && Math.trunc(query.pageSize) > 0) {
         defaultCommentsPagination.pageSize = Math.trunc(query.pageSize)
     }
-    // if (query.pageSize && !isNaN(parseInt(query.pageSize.toString(), 10))
-    //     && parseInt(query.pageSize.toString(), 10) > 0) {
-    //     defaultCommentsPagination.pageSize = parseInt(query.pageSize.toString(), 10)
-    // }
+
     if (query.sortBy) {
         defaultCommentsPagination.sortBy = query.sortBy
     }

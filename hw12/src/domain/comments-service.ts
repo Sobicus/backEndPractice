@@ -10,23 +10,11 @@ export class CommentsService {
 
     constructor(commentRepo: CommentsRepository) {
         this.commentRepo = commentRepo
-        //this.commentQueryRepo = new CommentsQueryRepository()
     }
 
-    /*
-        async getCommentById(commentId: string,userId?:string): Promise<CommentViewType | null> {
-            return await this.commentQueryRepo.getCommentById(commentId,userId)
-        }
-    */
     async updateComments(commentId: string, content: string, userId: string): Promise<ObjectResult> {
         const resault = await this.commentRepo.findCommentsById(commentId)
-        /* if (!resault) {
-             return false
-         }
-         if (resault.userId !== userId) {
-             return '403'
-         }
-         return await this.commentRepo.updateComment(commentId, content)*/
+
         if (!resault) {
             return {
                 status: statusType.NotFound,
@@ -73,11 +61,5 @@ export class CommentsService {
             data: null
         }
     }
-
-    //check below
-    /*async getDbCommentById(commentId: string): Promise<CommentsDbType | null> {
-        return await this.commentRepo.getCommentById(commentId)
-    }*/
 }
 
-//export const commentService = new CommentService()

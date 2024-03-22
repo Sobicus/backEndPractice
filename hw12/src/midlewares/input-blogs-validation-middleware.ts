@@ -16,5 +16,4 @@ export const validationBlogsMiddleware = [
         .isLength({max: 100}).withMessage('WebsiteUrl cannot be more than 100 characters')
         .trim().notEmpty().withMessage('WebsiteUrl can`t be empty and cannot consist of only spaces'),
     inputVal
-    // errorValidator
 ]

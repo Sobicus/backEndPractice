@@ -16,8 +16,3 @@ export class JwtTokensRepository {
         return true
     }
 }
-
-type refreshTokenType = {
-    _id: ObjectId
-    refreshToken: string
-}

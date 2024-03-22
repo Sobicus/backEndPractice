@@ -1,17 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-/*
-export const errorValidator = (req: Request, res: Response, next: NextFunction) => {
-    const result = validationResult(req);
-    if (result.isEmpty()) {
-        next()
-        return
-    }
-    const errors = result.array().map(error => ({
-        message: error.msg,
-        field: error.path
-    }));
-    res.status(400).send({errorsMessages: errors});
-}*/
+
 import {validationResult} from 'express-validator';
 
 // определяем функцию форматирования ошибок с типами

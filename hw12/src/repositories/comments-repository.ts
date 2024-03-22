@@ -10,11 +10,6 @@ export class CommentsRepository {
             .findOne({_id: commentId})
     }
 
-    /*async getCommentById(commentId: string): Promise<CommentsDbType | null> {
-        return CommentsModel
-            .findOne({_id: new ObjectId(commentId)})
-    }*/
-
     async updateComment(commentId: string, content: string): Promise<boolean> {
         const resultUpdateCommentModel = await CommentsModel
             .updateOne({_id: new ObjectId(commentId)}, {$set: {content: content}})

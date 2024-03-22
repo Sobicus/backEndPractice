@@ -1,4 +1,4 @@
-export type blogsDbType = {
+export type BlogsDbType = {
     name: string
     description: string
     websiteUrl: string

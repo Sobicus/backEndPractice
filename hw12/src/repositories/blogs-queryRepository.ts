@@ -38,6 +38,7 @@ export class BlogsQueryRepository {
         }
     }
 
+
     async findBlogById(blogId: string): Promise<BlogViewType | null> {
         let blog = await BlogsModel
             .findOne({_id: new ObjectId(blogId)})
@@ -60,7 +61,6 @@ export class BlogsQueryRepository {
         if (!blog) {
             return null
         }
-        /*const blogId = blog._id.toString()*/
         const pagination = getBlogsPagination(query)
         const posts = await PostsModel
             .find({blogId: blogId})
@@ -74,17 +74,18 @@ export class BlogsQueryRepository {
                 myStatus = reaction ? reaction.myStatus : LikesStatus.None
             }
             const newestLikes = await LikesPostsModel.find({
-                postId:p._id.toString(),
+                postId: p._id.toString(),
                 myStatus: LikesStatus.Like
             }).sort({'createAt': -1})
                 .limit(3)
                 .skip(0)
                 .lean()
-            const newestLikesViewModel =newestLikes.map(l=>{
-                return{
+            const newestLikesViewModel = newestLikes.map(l => {
+                return {
                     addedAt: l.createAt,
                     userId: l.userId,
-                    login: l.login            }
+                    login: l.login
+                }
             })
             return {
                 id: p._id.toString(),

@@ -22,4 +22,3 @@ export const validationNewPasswordMiddleware = [
         }),
     inputVal
 ]
-// ^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$

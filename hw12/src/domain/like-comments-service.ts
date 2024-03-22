@@ -9,7 +9,6 @@ export class LikeCommentsService {
     likesCommentsRepository: LikesCommentsRepository
     commentRepository: CommentsRepository
 
-
     constructor(likesCommentsRepository: LikesCommentsRepository, commentRepository: CommentsRepository) {
         this.likesCommentsRepository = likesCommentsRepository
         this.commentRepository = commentRepository

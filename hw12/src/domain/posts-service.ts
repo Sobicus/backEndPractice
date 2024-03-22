@@ -14,14 +14,6 @@ export class PostsService {
         this.postRepo = postRepo
     }
 
-    /* async findAllPosts(postsPagination: IDefaultPagination<SortPostsByEnum>): Promise<PaginationType<postsViewType>> {
-         return await this.postRepo.findAllPosts(postsPagination)
-     }
- */
-    // async findPostById(postId: string): Promise<PostsDbType | null> {
-    //     return await this.postRepo.findPostById(postId)
-    // }
-
     async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<PostsViewType | null> {
         const newPost = {
             title,
@@ -66,10 +58,4 @@ export class PostsService {
         }
         return await this.postRepo.createCommetByPostId(comment);
     }
-
-    /*  async findCommentsByPostId(postId: string, paggination: DefaultCommentsPaginationType,userId?: string) {
-          return await this.postRepo.findCommentsByPostId(postId, paggination,userId)
-      }*/
 }
-
-//export const postService = new PostsService()

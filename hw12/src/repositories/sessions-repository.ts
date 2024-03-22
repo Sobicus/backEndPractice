@@ -11,7 +11,6 @@ export class SessionsRepository {
             .create({_id: new ObjectId(), ...newSession})
         console.log('newSession', newSession)
         console.log('newSession  result._id !== undefined', result._id !== undefined)
-        // return result.acknowledged
         return result._id !== undefined
     }
 
@@ -52,8 +51,6 @@ export class SessionsRepository {
 
     async getDeviceByDeviceId(deviceId: string): Promise<allActiveSessionDbType | null> {
         const deviceByDeviceId = await SessionsModel
-            // .findOne({deviceId}).select('_id issuedAt deviceId ip deviceName userId')
-            // .findOne({deviceId}, {_id:1, issuedAt:1, deviceId:1, ip:1, deviceName:1, userId:1,}).lean()
             .findOne({deviceId})
         if (!deviceByDeviceId) return null
         return {

@@ -33,4 +33,3 @@ export const validationUsersMiddleware = [
         }),
     inputVal
 ]
-    // ^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$

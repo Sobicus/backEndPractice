@@ -11,7 +11,6 @@ export class BlogsService {
         this.blogRepo = blogRepo
     }
 
-
     async createBlog(createModel: blogBodyRequest): Promise<BlogViewType> {
         const createdAt = new Date().toISOString()
         const isMembership = false
@@ -19,7 +18,6 @@ export class BlogsService {
         const mongoResponse = await this.blogRepo.createBlog(newBlog)
         return {id: mongoResponse, ...createModel, createdAt, isMembership}
     }
-
 
     async updateBlog(blogId: string, updateModel: blogBodyRequest): Promise<boolean> {
         return await this.blogRepo.updateBlog(blogId, updateModel)

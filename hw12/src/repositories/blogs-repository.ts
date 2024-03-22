@@ -1,16 +1,15 @@
 import {ObjectId} from "mongodb";
 import {BlogsModel} from "./db";
-import { blogsDbType} from "../types/blog-types";
+import { BlogsDbType} from "../types/blog-types";
 import { blogBodyRequest } from "../types/blogsRouter-types";
 import {injectable} from "inversify";
 
 @injectable()
 export class BlogsRepository {
-        async createBlog(createModel: blogsDbType): Promise<string>/*Promise<InsertOneResult>*/ /*Promise<BlogViewType>*/ {
+        async createBlog(createModel: BlogsDbType): Promise<string>/*Promise<InsertOneResult>*/ /*Promise<BlogViewType>*/ {
         const resultNewBlog = await BlogsModel
             .create(createModel)
         return resultNewBlog._id.toString()
-        //.insertedId.toString()
     }
 
     async updateBlog(blogId: string, updateModel: blogBodyRequest): Promise<boolean> {

@@ -6,7 +6,6 @@ import {injectable} from "inversify";
 @injectable()
 export class SessionsService {
     sessionsRepo: SessionsRepository
-
     constructor(sessionsRepository: SessionsRepository) {
         this.sessionsRepo = sessionsRepository
     }

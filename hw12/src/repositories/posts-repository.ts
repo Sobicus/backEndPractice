@@ -2,7 +2,7 @@ import {ObjectId} from "mongodb";
 import {CommentViewType, newCommentType} from "../types/comment-types";
 import {BlogsModel, CommentsModel, PostsModel} from "./db";
 import {CreatePostType, PostsDbType} from "../types/post-types";
-import {blogsDbType} from "../types/blog-types";
+import {BlogsDbType} from "../types/blog-types";
 import { postBodyRequest } from "../types/postsRouter-types";
 import { LikesStatus } from "../types/likes-comments-repository-types";
 import {PasswordRecoveryRepository} from "./passwordRecovery-repository";
@@ -16,7 +16,7 @@ export class PostsRepository {
     }
 
     async createPost(newPost: CreatePostType): Promise<{ blogName: string, postId: string } | null> {
-        let blog: blogsDbType | null = await BlogsModel
+        let blog: BlogsDbType | null = await BlogsModel
             .findOne({_id: new ObjectId(newPost.blogId)})
         if (!blog) return null;
         let newPostByDb = await PostsModel
@@ -38,56 +38,6 @@ export class PostsRepository {
         return resultDeletePost.deletedCount === 1
     }
 
-    /*
-        async findCommentsByPostId(postId: string, paggination: DefaultCommentsPaginationType, userId?: string): Promise<CommentsViewType> {
-            // const paggination = getCommentsPagination(query)
-            const commets = await CommentsModel
-                .find({postId: postId})
-                .sort({[paggination.sortBy]: paggination.sortDirection})
-                .limit(paggination.pageSize)
-                .skip(paggination.skip).lean()
-            const comments = await Promise.all(commets.map(async el => {
-                    let myStatus = LikesStatus.None
-
-                    if (userId) {
-                        const reaction = await LikesCommentsModel
-                            .findOne({userId, commentId: el._id.toString()}).exec()
-                        myStatus = reaction ? reaction.myStatus : LikesStatus.None
-                    }
-                    return {
-                        id: el._id.toString(),
-                        content: el.content,
-                        commentatorInfo: {
-                            userId: el.userId,
-                            userLogin: el.userLogin
-                        },
-                        createdAt: el.createdAt,
-                        likesInfo: {
-                            likesCount: await LikesCommentsModel.countDocuments({
-                                commentId: el._id.toString(),
-                                myStatus: LikesStatus.Like
-                            }),
-                            dislikesCount: await LikesCommentsModel.countDocuments({
-                                commentId: el._id.toString(),
-                                myStatus: LikesStatus.Dislike
-                            }),
-                            myStatus: myStatus
-                        }
-                    }
-                }
-            ))
-            const totalCount = await CommentsModel
-                .countDocuments({postId: postId})
-            const pageCount = Math.ceil(totalCount / paggination.pageSize)
-            return {
-                pagesCount: pageCount,
-                page: paggination.pageNumber,
-                pageSize: paggination.pageSize,
-                totalCount: totalCount,
-                items: comments
-            }
-        }
-    */
     async createCommetByPostId(comment: newCommentType): Promise<CommentViewType> {
         const newComment = await CommentsModel
             .create({...comment})//<CommentsRepositoryType> can not
