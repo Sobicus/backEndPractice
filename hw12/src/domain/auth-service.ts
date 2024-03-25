@@ -32,11 +32,13 @@ export class AuthService {
 
     async confirmEmail(confirmationCode: string): Promise<boolean> {
         const user = await this.usersService.findUserByConfirmationCode(confirmationCode)
-        console.log('user', user)
-        console.log('user', user)
         if (!user) return false
         if (!user.emailConfirmation.confirmationCode) return false
-        if (user.emailConfirmation.confirmationCode !== confirmationCode) return false
+        //extension of mangun methods
+        //after
+        if (!user.canBeConfirmed(confirmationCode)) return false
+        //before
+        //if (user.emailConfirmation.confirmationCode !== confirmationCode) return false
         if (user.emailConfirmation.expirationDate < new Date()) return false
         let result = await this.usersService.updateConfirmation(user._id)
         return result

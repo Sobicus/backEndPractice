@@ -5,6 +5,8 @@ import add from "date-fns/add";
 import {ObjectId} from "mongodb";
 import {UserServiceType, UsersDbType, UsersViewType} from "../types/user-types";
 import {injectable} from "inversify";
+import {UserAccountDBMethodsType, UserHydrationSchema, UserModelType} from "../schemaMongoose/users-schema";
+import {HydratedDocument} from "mongoose";
 
 @injectable()
 export class UsersService {
@@ -62,7 +64,7 @@ export class UsersService {
         return await this.userRepository.findUserById(userId)
     }
 
-    async findUserByConfirmationCode(confirmationCode: string): Promise<UsersDbType | null> {
+    async findUserByConfirmationCode(confirmationCode: string): Promise<UserHydrationSchema | null> {
         return await this.userRepository.findUserByConfirmationCode(confirmationCode)
     }
 

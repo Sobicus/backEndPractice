@@ -2,13 +2,15 @@ import {ObjectId} from "mongodb";
 import {UsersModel} from "./db";
 import {UserServiceType, UsersDbType, UsersViewType } from "../types/user-types";
 import {injectable} from "inversify";
+import {UserAccountDBMethodsType, UserHydrationSchema, UserModelType} from "../schemaMongoose/users-schema";
+import {HydratedDocument} from "mongoose";
 
 @injectable()
 export class UsersRepository {
     async createUser(createUserModel: UserServiceType): Promise<string> {
-        const resultCreatedUser = await UsersModel
-            .create({_id: new ObjectId(), ...createUserModel})
-        return resultCreatedUser._id.toString()
+         const resultCreatedUser = await UsersModel
+            .create({createUserModel})
+         return resultCreatedUser._id.toString()
     }
 
     async deleteUser(userId: string): Promise<boolean> {
@@ -48,8 +50,8 @@ export class UsersRepository {
     }
 
 
-    async findUserByConfirmationCode(confirmationCode: string): Promise<UsersDbType | null> {
-        const user = await UsersModel
+    async findUserByConfirmationCode(confirmationCode: string): Promise<UserHydrationSchema|null> {
+        const user:UserHydrationSchema|null = await UsersModel
             .findOne({'emailConfirmation.confirmationCode': confirmationCode})
         if (!user) return null
         return user
