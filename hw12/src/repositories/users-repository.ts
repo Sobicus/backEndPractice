@@ -1,9 +1,8 @@
 import {ObjectId} from "mongodb";
 import {UsersModel} from "./db";
-import {UserServiceType, UsersDbType, UsersViewType } from "../types/user-types";
+import {UserServiceType, UsersDbType } from "../types/user-types";
 import {injectable} from "inversify";
-import {UserAccountDBMethodsType, UserHydrationSchema, UserModelType} from "../schemaMongoose/users-schema";
-import {HydratedDocument} from "mongoose";
+import { UserHydrationSchema} from "../schemaMongoose/users-schema";
 
 @injectable()
 export class UsersRepository {

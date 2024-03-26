@@ -8,6 +8,7 @@ export class BlogsService {
     blogRepo: BlogsRepository
 
     constructor(blogRepo: BlogsRepository) {
+
         this.blogRepo = blogRepo
     }
 

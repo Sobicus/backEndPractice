@@ -1,8 +1,8 @@
-import {ObjectId} from "mongodb";
 import {BlogsModel} from "./db";
 import { BlogsDbType} from "../types/blog-types";
 import { blogBodyRequest } from "../types/blogsRouter-types";
 import {injectable} from "inversify";
+import {ObjectId} from "mongodb";
 
 @injectable()
 export class BlogsRepository {
