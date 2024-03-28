@@ -1,13 +1,21 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { BlogsService } from '../aplication/blogs.service';
 import { BlogsQueryRepository } from '../infrastructure/blogs.query-repository';
-import { ObjectId } from 'mongodb';
-
-export class InputBlogModelType {
-  name: string;
-  description: string;
-  websiteUrl: string;
-}
+import { BlogInputModelType } from './models/input/create-blog.input.model';
+import {
+  blogPagination,
+  paginationBlogInputModelType,
+} from '../../../base/pagination-blogs-helper';
 
 @Controller('blogs')
 export class BlogsController {
@@ -17,39 +25,36 @@ export class BlogsController {
   ) {}
 
   @Get()
-  getAllBlogs() {
-    return this.blogQueryRepository.getAllBlogs();
+  getAllBlogs(@Query() pagination: paginationBlogInputModelType) {
+    const query = blogPagination(pagination);
+    return this.blogQueryRepository.getAllBlogs(query);
   }
 
   @Get(':id')
-  getAllBlog(@Param('id') userId: string) {
-    if (!ObjectId.isValid(userId)) {
-      return 'objectId is not valid';
+  //@HttpCode(201)
+  async getAllBlog(@Param('id') userId: string) {
+    const res = await this.blogQueryRepository.getBlogById(userId);
+    if (!res) {
+      throw new NotFoundException();
     }
-    return this.blogQueryRepository.getBlogById(userId);
   }
 
   @Post()
-  async createBlog(@Body() inputModel: InputBlogModelType) {
+  async createBlog(@Body() inputModel: BlogInputModelType) {
     const newBlogId = await this.blogService.createBlog(inputModel);
     return this.blogQueryRepository.getBlogById(newBlogId);
   }
 
-  @Put()
-  updateBlogs(@Body() inputModel: InputBlogModelType) {
-    return this.blogService.updateBlog(blogId);
+  @Put(':id')
+  async updateBlog(
+    @Param('id') blogId: string,
+    @Body() inputModel: BlogInputModelType,
+  ) {
+    const res = await this.blogService.updateBlog(blogId, inputModel);
+    return res.errorMessages;
+  }
+  @Delete(':id')
+  async deleteBlog(@Param('id') blogId: string) {
+    return await this.blogService.deleteBlog(blogId);
   }
 }
-
-// type BlogsQueryType = {
-//   searchNameTerm: string;
-//   sortBy: string;
-//   sortDirection: InputDescription;
-//   pageNumber: number;
-//   pageSize: number;
-// };
-
-// enum InputDescription {
-//   asc = 'asc',
-//   desc = 'desc',
-// }
