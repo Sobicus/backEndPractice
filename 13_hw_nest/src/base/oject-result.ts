@@ -1,6 +1,6 @@
 export enum statusType {
   OK = 'OK', //200
-  Created = 'Created', //201
+  Created = 'Created', //`201
   NoContent = 'NoContent', //204
   BadRequest = 'BadRequest', //400
   Unauthorized = 'Unauthorized', //401
@@ -16,6 +16,6 @@ export enum statusType {
 // };
 export class ObjectClassResult<D = null> {
   status: statusType;
-  errorMessages?: string;
+  statusMessages?: string;
   data: D;
 }

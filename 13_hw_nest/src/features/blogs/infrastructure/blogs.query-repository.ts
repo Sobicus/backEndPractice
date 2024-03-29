@@ -7,14 +7,14 @@ import {
   BlogOutputModelType,
   PaginationBlogsType,
 } from '../api/models/output/blog.output.model';
-import { paginationBlogOutModelType } from '../../../base/pagination-blogs-helper';
+import { paginationBlogsOutModelType } from '../../../base/pagination-blogs-helper';
 
 @Injectable()
 export class BlogsQueryRepository {
   constructor(@InjectModel(Blogs.name) private BlogsModel: Model<Blogs>) {}
 
   async getAllBlogs(
-    pagination: paginationBlogOutModelType,
+    pagination: paginationBlogsOutModelType,
   ): Promise<PaginationBlogsType> {
     const filter = {
       name: { $regex: pagination.searchNameTerm, $options: 'i' },

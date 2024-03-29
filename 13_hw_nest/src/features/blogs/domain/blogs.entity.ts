@@ -17,6 +17,16 @@ export class Blogs {
   @Prop({ type: Boolean, required: true, default: false })
   isMembership: boolean;
 
+  static create({ name, websiteUrl, description }: BlogInputModelType) {
+    const blog = new this();
+    blog.name = name;
+    blog.websiteUrl = websiteUrl;
+    blog.description = description;
+    blog.createdAt = new Date().toISOString();
+    blog.isMembership = false;
+    return blog;
+  }
+
   update({ name, websiteUrl, description }: BlogInputModelType) {
     this.name = name;
     this.websiteUrl = websiteUrl;

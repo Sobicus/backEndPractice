@@ -1,6 +1,6 @@
 export const blogPagination = (
-  query: paginationBlogInputModelType,
-): paginationBlogOutModelType => {
+  query: paginationBlogsInputModelType,
+): paginationBlogsOutModelType => {
   const defaultValues = {
     searchNameTerm: '',
     sortBy: 'createdAt',
@@ -44,14 +44,14 @@ enum Description {
   asc = 1,
   desc = -1,
 }
-export type paginationBlogInputModelType = {
+export type paginationBlogsInputModelType = {
   searchNameTerm: string;
   sortBy: string;
   sortDirection: sortDirection;
   pageNumber: number;
   pageSize: number;
 };
-export type paginationBlogOutModelType = {
+export type paginationBlogsOutModelType = {
   searchNameTerm: string;
   sortBy: string;
   sortDirection: Description;

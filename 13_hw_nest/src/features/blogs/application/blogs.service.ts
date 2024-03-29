@@ -2,29 +2,33 @@ import { Injectable } from '@nestjs/common';
 import { BlogsRepository } from '../infrastructure/blogs.repository';
 import { BlogInputModelType } from '../api/models/input/create-blog.input.model';
 import { ObjectClassResult, statusType } from '../../../base/oject-result';
+import { Blogs } from '../domain/blogs.entity';
 
 @Injectable()
 export class BlogsService {
   constructor(private blogRepository: BlogsRepository) {}
 
-  async createBlog(InputBlogModel: BlogInputModelType): Promise<string> {
-    const createdAt = new Date().toISOString();
-    const isMembership = false;
-    return await this.blogRepository.createBlogs({
-      ...InputBlogModel,
-      createdAt,
-      isMembership,
-    });
+  async createBlog(inputBlogModel: BlogInputModelType): Promise<string> {
+    // const createdAt = new Date().toISOString();
+    // const isMembership = false;
+    // return await this.blogRepository.createBlogs({
+    //   ...InputBlogModel,
+    //   createdAt,
+    //   isMembership,
+    // });
+    const blog = Blogs.create(inputBlogModel);
+    const createdBlog = await this.blogRepository.saveBlog(blog);
+    return createdBlog._id.toString();
   }
   async updateBlog(
     blogId: string,
     inputModel: BlogInputModelType,
   ): Promise<ObjectClassResult> {
-    const blog = await this.blogRepository.getBlog(blogId);
+    const blog = await this.blogRepository.getBlogByBlogId(blogId);
     if (!blog) {
       return {
         status: statusType.NotFound,
-        errorMessages: 'Blog has not found',
+        statusMessages: 'Blog has not found',
         data: null,
       };
     }
@@ -32,23 +36,23 @@ export class BlogsService {
     await this.blogRepository.updateBlog(blog);
     return {
       status: statusType.Success,
-      errorMessages: 'Blog has been update',
+      statusMessages: 'Blog has been update',
       data: null,
     };
   }
-  async deleteBlog(blogId: string) {
-    const blog = await this.blogRepository.getBlog(blogId);
+  async deleteBlog(blogId: string): Promise<ObjectClassResult> {
+    const blog = await this.blogRepository.getBlogByBlogId(blogId);
     if (!blog) {
       return {
         status: statusType.NotFound,
-        errorMessages: 'Blog has not found',
+        statusMessages: 'Blog has not found',
         data: null,
       };
     }
     await this.blogRepository.deleteBlog(blogId);
     return {
       status: statusType.Success,
-      errorMessages: 'Blog has been delete',
+      statusMessages: 'Blog has been delete',
       data: null,
     };
   }

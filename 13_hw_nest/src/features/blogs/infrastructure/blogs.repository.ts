@@ -8,7 +8,7 @@ import { ObjectId } from 'mongodb';
 export class BlogsRepository {
   constructor(@InjectModel(Blogs.name) private BlogsModel: Model<Blogs>) {}
 
-  async getBlog(blogId: string): Promise<BlogsDocument | null> {
+  async getBlogByBlogId(blogId: string): Promise<BlogsDocument | null> {
     return this.BlogsModel.findOne({ _id: new ObjectId(blogId) });
   }
 
@@ -27,8 +27,9 @@ export class BlogsRepository {
       _id: new ObjectId(blogId),
     });
   }
-  private async saveBlog(blog: BlogsDocument) {
-    await blog.save();
+  async saveBlog(blog: Blogs) {
+    const blogModel = new this.BlogsModel(blog);
+    return await blogModel.save();
   }
 }
 

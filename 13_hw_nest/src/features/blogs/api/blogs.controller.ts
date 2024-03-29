@@ -9,31 +9,31 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { BlogsService } from '../aplication/blogs.service';
+import { BlogsService } from '../application/blogs.service';
 import { BlogsQueryRepository } from '../infrastructure/blogs.query-repository';
 import { BlogInputModelType } from './models/input/create-blog.input.model';
 import {
   blogPagination,
-  paginationBlogInputModelType,
+  paginationBlogsInputModelType,
 } from '../../../base/pagination-blogs-helper';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private blogService: BlogsService,
-    private blogQueryRepository: BlogsQueryRepository,
+    private blogsService: BlogsService,
+    private blogsQueryRepository: BlogsQueryRepository,
   ) {}
 
   @Get()
-  getAllBlogs(@Query() pagination: paginationBlogInputModelType) {
+  async getAllBlogs(@Query() pagination: paginationBlogsInputModelType) {
     const query = blogPagination(pagination);
-    return this.blogQueryRepository.getAllBlogs(query);
+    return await this.blogsQueryRepository.getAllBlogs(query);
   }
 
   @Get(':id')
   //@HttpCode(201)
-  async getAllBlog(@Param('id') userId: string) {
-    const res = await this.blogQueryRepository.getBlogById(userId);
+  async getBlogById(@Param('id') userId: string) {
+    const res = await this.blogsQueryRepository.getBlogById(userId);
     if (!res) {
       throw new NotFoundException();
     }
@@ -41,8 +41,8 @@ export class BlogsController {
 
   @Post()
   async createBlog(@Body() inputModel: BlogInputModelType) {
-    const newBlogId = await this.blogService.createBlog(inputModel);
-    return this.blogQueryRepository.getBlogById(newBlogId);
+    const newBlogId = await this.blogsService.createBlog(inputModel);
+    return this.blogsQueryRepository.getBlogById(newBlogId);
   }
 
   @Put(':id')
@@ -50,11 +50,11 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Body() inputModel: BlogInputModelType,
   ) {
-    const res = await this.blogService.updateBlog(blogId, inputModel);
-    return res.errorMessages;
+    const res = await this.blogsService.updateBlog(blogId, inputModel);
+    return res.statusMessages;
   }
   @Delete(':id')
   async deleteBlog(@Param('id') blogId: string) {
-    return await this.blogService.deleteBlog(blogId);
+    return await this.blogsService.deleteBlog(blogId);
   }
 }
