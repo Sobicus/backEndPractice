@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { BlogsRepository } from '../infrastructure/blogs.repository';
 import { BlogInputModelType } from '../api/models/input/create-blog.input.model';
 import { ObjectClassResult, statusType } from '../../../base/oject-result';
-import { Blogs } from '../domain/blogs.entity';
+import { Blogs, BlogsDocument } from '../domain/blogs.entity';
 
 @Injectable()
 export class BlogsService {
   constructor(private blogRepository: BlogsRepository) {}
-
+  async getBlogById(blogId: string): Promise<BlogsDocument | null> {
+    return await this.blogRepository.getBlogByBlogId(blogId);
+  }
   async createBlog(inputBlogModel: BlogInputModelType): Promise<string> {
     // const createdAt = new Date().toISOString();
     // const isMembership = false;

@@ -16,12 +16,21 @@ import {
   blogPagination,
   paginationBlogsInputModelType,
 } from '../../../base/pagination-blogs-helper';
+import { PostsService } from '../../posts/application/posts.service';
+import { PostsQueryRepository } from '../../posts/infrastructure/posts.query-repository';
+import {
+  PaginationPostsInputModelType,
+  postPagination,
+} from '../../../base/pagination-posts-helpers';
+import { PostInputModelBlogControllerType } from '../../posts/api/models/input/create-post.input.model';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private blogsService: BlogsService,
     private blogsQueryRepository: BlogsQueryRepository,
+    private postService: PostsService,
+    private postQueryRepository: PostsQueryRepository,
   ) {}
 
   @Get()
@@ -56,5 +65,28 @@ export class BlogsController {
   @Delete(':id')
   async deleteBlog(@Param('id') blogId: string) {
     return await this.blogsService.deleteBlog(blogId);
+  }
+  @Get(':id/posts')
+  async getPostsByBlogId(
+    @Param('id') blogId: string,
+    @Query() query: PaginationPostsInputModelType,
+  ) {
+    const res = await this.blogsService.getBlogById(blogId);
+    if (!res) {
+      throw new NotFoundException();
+    }
+    const pagination = postPagination(query);
+    return this.postQueryRepository.getPostByBlogId(blogId, pagination);
+  }
+  @Post(':id/posts')
+  async createPostByBlogId(
+    @Param('id') blogId: string,
+    @Body() inputModel: PostInputModelBlogControllerType,
+  ) {
+    const post = await this.postService.createPost({ ...inputModel, blogId });
+    if (post.status === 'NotFound') {
+      throw new NotFoundException();
+    }
+    return await this.postQueryRepository.getPostById(post.data as string);
   }
 }

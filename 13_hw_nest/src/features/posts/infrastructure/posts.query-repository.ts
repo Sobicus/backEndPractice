@@ -79,4 +79,44 @@ export class PostsQueryRepository {
       },
     };
   }
+  async getPostByBlogId(
+    blogId: string,
+    pagination: PaginationPostsOutputModelType,
+  ): Promise<PaginationPostsType | null> {
+    const posts = await this.PostsModel.find({ blogId: blogId })
+      .sort({ [pagination.sortBy]: pagination.sortDirection })
+      .limit(pagination.pageSize)
+      .skip(pagination.skip)
+      .lean();
+    const allPosts = posts.map((p) => ({
+      id: p._id.toString(),
+      title: p.title,
+      shortDescription: p.shortDescription,
+      content: p.content,
+      blogId: p.blogId,
+      blogName: p.blogName,
+      createdAt: p.createdAt,
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+        newestLikes: [
+          {
+            addedAt: '2024-03-29T00:09:59.478Z',
+            userId: 'string',
+            login: 'string',
+          },
+        ],
+      },
+    }));
+    const totalCount = await this.PostsModel.countDocuments();
+    const pagesCount = Math.ceil(totalCount / pagination.pageSize);
+    return {
+      pagesCount: pagesCount,
+      page: pagination.pageNumber,
+      pageSize: pagination.pageSize,
+      totalCount: totalCount,
+      items: allPosts,
+    };
+  }
 }
