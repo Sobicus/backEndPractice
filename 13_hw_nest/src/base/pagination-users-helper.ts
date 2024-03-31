@@ -1,16 +1,20 @@
-export const blogsPagination = (
-  query: paginationBlogsInputModelType,
-): paginationBlogsOutModelType => {
+export const usersPagination = (
+  query: PaginationUsersInputModelType,
+): PaginationUsersOutModelType => {
   const defaultValues = {
-    searchNameTerm: '',
+    searchLoginTerm: '',
+    searchEmailTerm: '',
     sortBy: 'createdAt',
     sortDirection: Description.desc,
     pageNumber: 1,
     pageSize: 10,
     skip: 0,
   };
-  if (query.searchNameTerm) {
-    defaultValues.searchNameTerm = query.searchNameTerm;
+  if (query.searchLoginTerm) {
+    defaultValues.searchLoginTerm = query.searchLoginTerm;
+  }
+  if (query.searchEmailTerm) {
+    defaultValues.searchEmailTerm = query.searchEmailTerm;
   }
   if (query.sortBy) {
     defaultValues.sortBy = query.sortBy;
@@ -36,7 +40,7 @@ export const blogsPagination = (
 
   return defaultValues;
 };
-export enum sortDirection {
+enum sortDirection {
   asc = 'asc',
   desc = 'desc',
 }
@@ -44,15 +48,17 @@ enum Description {
   asc = 1,
   desc = -1,
 }
-export type paginationBlogsInputModelType = {
-  searchNameTerm: string;
+export type PaginationUsersInputModelType = {
+  searchLoginTerm: string;
+  searchEmailTerm: string;
   sortBy: string;
   sortDirection: sortDirection;
   pageNumber: number;
   pageSize: number;
 };
-export type paginationBlogsOutModelType = {
-  searchNameTerm: string;
+export type PaginationUsersOutModelType = {
+  searchLoginTerm: string;
+  searchEmailTerm: string;
   sortBy: string;
   sortDirection: Description;
   pageNumber: number;

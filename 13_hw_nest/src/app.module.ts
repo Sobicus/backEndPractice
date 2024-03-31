@@ -10,6 +10,16 @@ import { PostsService } from './features/posts/application/posts.service';
 import { PostsController } from './features/posts/api/models/posts.controller';
 import { Posts, PostsSchema } from './features/posts/domain/posts.entity';
 import { PostsQueryRepository } from './features/posts/infrastructure/posts.query-repository';
+import {
+  Comments,
+  CommentsSchema,
+} from './features/comments/domain/comments.entity';
+import { CommentsQueryRepository } from './features/comments/infrastructure/comments.query-repocitory';
+import { CommentsController } from './features/comments/api/comments.controller';
+import { Users, UsersSchema } from './features/users/domain/users.entity';
+import { UsersController } from './features/users/api/users.controller';
+import { UsersRepository } from './features/users/infrastructure/users.repository';
+import { UsersQueryRepository } from './features/users/infrastructure/users.query-repository';
 
 @Module({
   imports: [
@@ -17,9 +27,16 @@ import { PostsQueryRepository } from './features/posts/infrastructure/posts.quer
     MongooseModule.forFeature([
       { name: Blogs.name, schema: BlogsSchema },
       { name: Posts.name, schema: PostsSchema },
+      { name: Comments.name, schema: CommentsSchema },
+      { name: Users.name, schema: UsersSchema },
     ]),
   ],
-  controllers: [BlogsController, PostsController],
+  controllers: [
+    BlogsController,
+    PostsController,
+    CommentsController,
+    UsersController,
+  ],
   providers: [
     BlogsService,
     BlogsRepository,
@@ -27,6 +44,9 @@ import { PostsQueryRepository } from './features/posts/infrastructure/posts.quer
     PostsRepository,
     PostsService,
     PostsQueryRepository,
+    CommentsQueryRepository,
+    UsersRepository,
+    UsersQueryRepository,
   ],
 })
 export class AppModule {}

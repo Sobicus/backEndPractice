@@ -13,7 +13,7 @@ import { BlogsService } from '../application/blogs.service';
 import { BlogsQueryRepository } from '../infrastructure/blogs.query-repository';
 import { BlogInputModelType } from './models/input/create-blog.input.model';
 import {
-  blogPagination,
+  blogsPagination,
   paginationBlogsInputModelType,
 } from '../../../base/pagination-blogs-helper';
 import { PostsService } from '../../posts/application/posts.service';
@@ -35,7 +35,7 @@ export class BlogsController {
 
   @Get()
   async getAllBlogs(@Query() pagination: paginationBlogsInputModelType) {
-    const query = blogPagination(pagination);
+    const query = blogsPagination(pagination);
     return await this.blogsQueryRepository.getAllBlogs(query);
   }
 
