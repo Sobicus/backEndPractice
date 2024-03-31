@@ -1,9 +1,9 @@
 import {
   Body,
+  Controller,
   Delete,
   Get,
   HttpCode,
-  Injectable,
   NotFoundException,
   Param,
   Post,
@@ -17,7 +17,7 @@ import {
   usersPagination,
 } from '../../../base/pagination-users-helper';
 
-@Injectable()
+@Controller('users')
 export class UsersController {
   constructor(
     private usersService: UsersService,

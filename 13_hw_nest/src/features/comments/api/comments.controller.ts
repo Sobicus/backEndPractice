@@ -1,7 +1,7 @@
-import { Get, Injectable, NotFoundException, Param } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { CommentsQueryRepository } from '../infrastructure/comments.query-repocitory';
 
-@Injectable()
+@Controller('comments')
 export class CommentsController {
   constructor(private commentsQueryRepository: CommentsQueryRepository) {}
 

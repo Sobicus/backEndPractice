@@ -20,6 +20,7 @@ import { Users, UsersSchema } from './features/users/domain/users.entity';
 import { UsersController } from './features/users/api/users.controller';
 import { UsersRepository } from './features/users/infrastructure/users.repository';
 import { UsersQueryRepository } from './features/users/infrastructure/users.query-repository';
+import { UsersService } from './features/users/application/users.service';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { UsersQueryRepository } from './features/users/infrastructure/users.quer
     CommentsQueryRepository,
     UsersRepository,
     UsersQueryRepository,
+    UsersService,
   ],
 })
 export class AppModule {}
