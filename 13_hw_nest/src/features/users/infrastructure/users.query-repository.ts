@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import {
   UserOutputDTO,
-  UsersOtputDTO,
+  UsersOutputDTO,
 } from '../api/models/output/users.output.module';
 import { PaginationUsersOutModelType } from '../../../base/pagination-users-helper';
 
@@ -15,7 +15,7 @@ export class UsersQueryRepository {
 
   async getAllUsers(
     pagination: PaginationUsersOutModelType,
-  ): Promise<UsersOtputDTO> {
+  ): Promise<UsersOutputDTO> {
     const filter = {
       $or: [
         { login: { $regex: pagination.searchLoginTerm ?? '', $options: 'i' } },
@@ -33,8 +33,8 @@ export class UsersQueryRepository {
       email: u.email,
       createdAt: u.createdAt,
     }));
-    const totalCount = await this.UsersModel.countDocuments();
-    const pagesCount = Math.floor(totalCount / pagination.pageSize);
+    const totalCount = await this.UsersModel.countDocuments(filter);
+    const pagesCount = Math.ceil(totalCount / pagination.pageSize);
     return {
       pagesCount: pagesCount,
       page: pagination.pageNumber,

@@ -109,7 +109,7 @@ export class PostsQueryRepository {
         ],
       },
     }));
-    const totalCount = await this.PostsModel.countDocuments();
+    const totalCount = await this.PostsModel.countDocuments({ blogId: blogId });
     const pagesCount = Math.ceil(totalCount / pagination.pageSize);
     return {
       pagesCount: pagesCount,

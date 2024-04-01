@@ -21,10 +21,16 @@ import { UsersController } from './features/users/api/users.controller';
 import { UsersRepository } from './features/users/infrastructure/users.repository';
 import { UsersQueryRepository } from './features/users/infrastructure/users.query-repository';
 import { UsersService } from './features/users/application/users.service';
+import { ConfigModule } from '@nestjs/config';
+import { TestingAllDataController } from './features/dropAll/api/testing-all-data.controller';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017', { dbName: 'NestSJBD' }),
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(
+      process.env.MONGO_URL || 'mongodb://127.0.0.1:27017',
+      { dbName: 'NestSJBD' },
+    ),
     MongooseModule.forFeature([
       { name: Blogs.name, schema: BlogsSchema },
       { name: Posts.name, schema: PostsSchema },
@@ -37,6 +43,7 @@ import { UsersService } from './features/users/application/users.service';
     PostsController,
     CommentsController,
     UsersController,
+    TestingAllDataController,
   ],
   providers: [
     BlogsService,

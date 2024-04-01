@@ -23,7 +23,11 @@ export class PostsRepository {
   private async savePost(postModel: PostsDocument) {
     await postModel.save();
   }
+  async deleteALl() {
+    await this.PostsModel.deleteMany()
+  }
 }
+//TODO check type
 type postCreateDTO = {
   title: string;
   shortDescription: string;

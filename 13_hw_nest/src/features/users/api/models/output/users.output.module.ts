@@ -4,7 +4,7 @@ export type UserOutputDTO = {
   email: string;
   createdAt: string;
 };
-export type UsersOtputDTO = {
+export type UsersOutputDTO = {
   pagesCount: number;
   page: number;
   pageSize: number;

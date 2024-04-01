@@ -31,6 +31,9 @@ export class BlogsRepository {
     const blogModel = new this.BlogsModel(blog);
     return await blogModel.save();
   }
+  async deleteAll() {
+    await this.BlogsModel.deleteMany();
+  }
 }
 
 type CreateBlogDto = {
