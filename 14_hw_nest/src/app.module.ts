@@ -29,7 +29,7 @@ import { TestingAllDataController } from './features/dropAll/api/testing-all-dat
     ConfigModule.forRoot(),
     MongooseModule.forRoot(
       process.env.MONGO_URL || 'mongodb://127.0.0.1:27017',
-      { dbName: 'NestSJBD' },
+      { dbName: 'NestJSBD' },
     ),
     MongooseModule.forFeature([
       { name: Blogs.name, schema: BlogsSchema },

@@ -19,7 +19,8 @@ export class BlogsRepository {
   }
 
   async updateBlog(blog: BlogsDocument) {
-    await this.saveBlog(blog);
+    // await this.saveBlog(blog);
+    return await blog.save();
   }
 
   async deleteBlog(blogId: string) {
@@ -27,7 +28,7 @@ export class BlogsRepository {
       _id: new ObjectId(blogId),
     });
   }
-  async saveBlog(blog: Blogs) {
+  async saveBlog(blog: BlogsDocument) {
     const blogModel = new this.BlogsModel(blog);
     return await blogModel.save();
   }

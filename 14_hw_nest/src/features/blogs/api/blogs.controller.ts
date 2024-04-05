@@ -74,6 +74,7 @@ export class BlogsController {
     if (res.status === 'NotFound') {
       throw new NotFoundException();
     }
+    return;
   }
   @Get(':id/posts')
   async getPostsByBlogId(

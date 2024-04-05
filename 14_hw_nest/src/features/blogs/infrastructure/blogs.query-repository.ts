@@ -24,14 +24,16 @@ export class BlogsQueryRepository {
       .limit(pagination.pageSize)
       .skip(pagination.skip)
       .lean();
-    const allBlogs = blogs.map((b) => ({
-      id: b._id.toString(),
-      name: b.name,
-      description: b.description,
-      websiteUrl: b.websiteUrl,
-      createdAt: b.createdAt,
-      isMembership: b.isMembership,
-    }));
+    const allBlogs = blogs.map((b) => {
+      return {
+        id: b._id.toString(),
+        name: b.name,
+        description: b.description,
+        websiteUrl: b.websiteUrl,
+        createdAt: b.createdAt,
+        isMembership: b.isMembership,
+      };
+    });
     const totalCount = await this.BlogsModel.countDocuments(filter);
     const pagesCount = Math.ceil(totalCount / pagination.pageSize);
     return {

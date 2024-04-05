@@ -17,14 +17,18 @@ export class Blogs {
   @Prop({ type: Boolean, required: true, default: false })
   isMembership: boolean;
 
-  static create({ name, websiteUrl, description }: BlogInputModelType) {
+  static create({
+    name,
+    websiteUrl,
+    description,
+  }: BlogInputModelType): BlogsDocument {
     const blog = new this();
     blog.name = name;
     blog.websiteUrl = websiteUrl;
     blog.description = description;
     blog.createdAt = new Date().toISOString();
     blog.isMembership = false;
-    return blog;
+    return blog as BlogsDocument;
   }
 
   update({ name, websiteUrl, description }: BlogInputModelType) {
@@ -35,6 +39,9 @@ export class Blogs {
 }
 
 export const BlogsSchema = SchemaFactory.createForClass(Blogs);
+BlogsSchema.statics = {
+  create: Blogs.create,
+};
 
 BlogsSchema.methods = {
   update: Blogs.prototype.update,
