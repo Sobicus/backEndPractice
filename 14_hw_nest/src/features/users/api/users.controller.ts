@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../infrastructure/users.query-repository';
@@ -16,7 +17,9 @@ import {
   PaginationUsersInputModelType,
   usersPagination,
 } from '../../../base/pagination-users-helper';
+import { AuthGuard } from '../../../base/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(

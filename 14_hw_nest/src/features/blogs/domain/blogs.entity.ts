@@ -39,6 +39,7 @@ export class Blogs {
 }
 
 export const BlogsSchema = SchemaFactory.createForClass(Blogs);
+
 BlogsSchema.statics = {
   create: Blogs.create,
 };

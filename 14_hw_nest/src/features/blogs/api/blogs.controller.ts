@@ -6,6 +6,7 @@ import {
   HttpCode,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -42,7 +43,7 @@ export class BlogsController {
 
   @Get(':id')
   //@HttpCode(201)
-  async getBlogById(@Param('id') userId: string) {
+  async getBlogById(@Param('id', ParseIntPipe) userId: string) {
     const res = await this.blogsQueryRepository.getBlogById(userId);
     if (!res) {
       throw new NotFoundException();
