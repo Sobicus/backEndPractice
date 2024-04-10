@@ -7,7 +7,7 @@ import {
   BlogOutputModelType,
   PaginationBlogsType,
 } from '../api/models/output/blog.output.model';
-import { paginationBlogsOutModelType } from '../../../base/pagination-blogs-helper';
+import { paginationBlogsOutModelType } from '../../../base/helpers/pagination-blogs-helper';
 
 @Injectable()
 export class BlogsQueryRepository {

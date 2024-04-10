@@ -7,7 +7,7 @@ import {
   UserOutputDTO,
   UsersOutputDTO,
 } from '../api/models/output/users.output.module';
-import { PaginationUsersOutModelType } from '../../../base/pagination-users-helper';
+import { PaginationUsersOutModelType } from '../../../base/helpers/pagination-users-helper';
 
 @Injectable()
 export class UsersQueryRepository {

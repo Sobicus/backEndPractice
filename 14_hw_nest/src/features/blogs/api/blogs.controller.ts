@@ -17,13 +17,13 @@ import { BlogInputModelType } from './models/input/create-blog.input.model';
 import {
   blogsPagination,
   paginationBlogsInputModelType,
-} from '../../../base/pagination-blogs-helper';
+} from '../../../base/helpers/pagination-blogs-helper';
 import { PostsService } from '../../posts/application/posts.service';
 import { PostsQueryRepository } from '../../posts/infrastructure/posts.query-repository';
 import {
   PaginationPostsInputModelType,
   postPagination,
-} from '../../../base/pagination-posts-helpers';
+} from '../../../base/helpers/pagination-posts-helpers';
 import { PostInputModelBlogControllerType } from '../../posts/api/models/input/create-post.input.model';
 
 @Controller('blogs')

@@ -4,7 +4,7 @@ import { Posts } from '../domain/posts.entity';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 
-import { PaginationPostsOutputModelType } from 'src/base/pagination-posts-helpers';
+import { PaginationPostsOutputModelType } from 'src/base/helpers/pagination-posts-helpers';
 import {
   PaginationPostsType,
   PostOutputModelType,

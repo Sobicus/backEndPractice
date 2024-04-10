@@ -16,7 +16,7 @@ import { PostInputModelType } from './input/create-post.input.model';
 import {
   PaginationPostsInputModelType,
   postPagination,
-} from '../../../../base/pagination-posts-helpers';
+} from '../../../../base/helpers/pagination-posts-helpers';
 
 @Controller('posts')
 export class PostsController {

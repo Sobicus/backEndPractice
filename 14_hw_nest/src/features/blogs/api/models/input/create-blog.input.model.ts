@@ -1,5 +1,5 @@
 import { IsString, Length, Matches } from 'class-validator';
-import { Trim } from 'src/base/trim';
+import { Trim } from 'src/base/decorators/trim';
 
 export class BlogInputModelType {
   @IsString()
