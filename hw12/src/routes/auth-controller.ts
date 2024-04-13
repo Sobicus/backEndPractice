@@ -117,10 +117,6 @@ export class authController {
         const {userId, deviceId} = expiredOrNot;
         const getSessionByUserIdAndDeviceId = await this.sessionsService.getSessionByUserIdAndDeviceId(userId, deviceId)
         if (!getSessionByUserIdAndDeviceId) return res.sendStatus(401)
-
-        console.log('new Date(expiredOrNot.iat*1000).toISOString()', new Date(expiredOrNot.iat * 1000).toISOString())
-        console.log('getSessionByUserIdAndDeviceId.issuedAt', getSessionByUserIdAndDeviceId.issuedAt)
-        console.log('new Date(expiredOrNot.iat*1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt', new Date(expiredOrNot.iat * 1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt)
         if (new Date(expiredOrNot.iat * 1000).toISOString() !== getSessionByUserIdAndDeviceId.issuedAt) return res.sendStatus(401)
         const result = await this.sessionsService.deleteSessionDevice(userId, deviceId)
         if (!result) return res.sendStatus(401)

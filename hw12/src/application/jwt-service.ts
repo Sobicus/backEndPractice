@@ -17,7 +17,7 @@ export class JwtService  {
 
     async getUserIdByToken(token: string) {
         try {
-            const result: any = jwt.verify(token, process.env.JWT_SECRET || '222')
+            const result:any = jwt.verify(token, process.env.JWT_SECRET || '222')
             return result.userId
         } catch (error) {
             console.log('error in verify token:', error)

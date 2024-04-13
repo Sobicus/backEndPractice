@@ -19,26 +19,27 @@ import {
 } from '../../../base/helpers/pagination-users-helper';
 import { AuthGuard } from '../../../base/guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(
     private usersService: UsersService,
     private usersQueryRepository: UsersQueryRepository,
   ) {}
-  @UseGuards(AuthGuard)
+
   @Get()
   async getAllUsers(@Query() query: PaginationUsersInputModelType) {
     const pagination = usersPagination(query);
     return this.usersQueryRepository.getAllUsers(pagination);
   }
-  @UseGuards(AuthGuard)
+
   @Post()
   async CreateUser(@Body() inputModel: UserInputModelType) {
     const userId = await this.usersService.createUser(inputModel);
     const user = await this.usersQueryRepository.getUserById(userId);
     if (user) return user;
   }
-  @UseGuards(AuthGuard)
+
   @Delete(':id')
   @HttpCode(204)
   async DeleteUser(@Param('id') userId: string) {

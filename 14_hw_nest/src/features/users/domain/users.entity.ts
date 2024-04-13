@@ -8,9 +8,11 @@ export class Users {
   @Prop({ type: String, required: true })
   login: string;
   @Prop({ type: String, required: true })
-  password: string;
-  @Prop({ type: String, required: true })
   email: string;
+  @Prop({ type: String, required: true })
+  passwordSalt: string;
+  @Prop({ type: String, required: true })
+  passwordHash: string;
   @Prop({ type: String, required: true })
   createdAt: string;
 }
