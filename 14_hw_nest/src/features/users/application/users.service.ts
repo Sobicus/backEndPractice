@@ -45,4 +45,17 @@ export class UsersService {
   async _generateHash(password: string, salt: string) {
     return bcrypt.hashSync(password, salt);
   }
+  async checkCredentials(loginOrEmail: string, password: string) {
+    const user =
+      await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
+    if (!user) {
+      return {
+        status: statusType.Unauthorized,
+        statusMessages: 'login/email/password has been incorrect',
+        data: null,
+      };
+    }
+    const passwordHash = await this._generateHash(password, user.passwordSalt);
+    if(password)
+  }
 }

@@ -5,6 +5,6 @@ import { UsersService } from '../../users/application/users.service';
 @Controller('auth')
 export class AuthController {
   constructor(private userService: UsersService) {}
-  @Post()
-  async login(@Body() loginInputModel: LoginInputModelType) {}
+  @Post('login')
+  async signIn(@Body() loginInputModel: LoginInputModelType) {}
 }

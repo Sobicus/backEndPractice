@@ -24,4 +24,10 @@ export class UsersRepository {
   async deleteAll() {
     await this.UsersModel.deleteMany();
   }
+
+  async findUserByLoginOrEmail(loginOrEmail: string): Promise<Users | null> {
+    return await this.UsersModel.findOne({
+      $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
+    });
+  }
 }
