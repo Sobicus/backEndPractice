@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Users } from '../domain/users.entity';
+import { Users, UsersDocument } from '../domain/users.entity';
 import { ObjectId } from 'mongodb';
 
 @Injectable()
@@ -25,8 +25,10 @@ export class UsersRepository {
     await this.UsersModel.deleteMany();
   }
 
-  async findUserByLoginOrEmail(loginOrEmail: string): Promise<Users | null> {
-    return await this.UsersModel.findOne({
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<UsersDocument | null> {
+    return this.UsersModel.findOne({
       $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
     });
   }

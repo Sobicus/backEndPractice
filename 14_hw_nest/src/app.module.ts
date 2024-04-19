@@ -24,10 +24,16 @@ import { UsersService } from './features/users/application/users.service';
 import { ConfigModule } from '@nestjs/config';
 import { TestingAllDataController } from './features/dropAll/api/testing-all-data.controller';
 import { AuthController } from './features/auth/api/auth.controller';
+import { AuthService } from './features/auth/application/auth.service';
+import { JwtModule } from '@nestjs/jwt';
+import { JWTService } from './base/application/jwt.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    JwtModule.register({
+      global: true,
+    }),
     MongooseModule.forRoot(
       process.env.MONGO_URL || 'mongodb://127.0.0.1:27017',
       { dbName: 'NestJSBD' },
@@ -58,6 +64,8 @@ import { AuthController } from './features/auth/api/auth.controller';
     UsersRepository,
     UsersQueryRepository,
     UsersService,
+    AuthService,
+    JWTService,
   ],
 })
 export class AppModule {}
