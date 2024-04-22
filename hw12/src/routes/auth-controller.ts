@@ -28,18 +28,27 @@ export class authController {
     }
 
     async createDeviceSession(req: PostRequestAuthType<BodyRegistrationAuthType>, res: Response) {
+        //ищем юзера по email or login
         const user = await this.usersService.checkCredentials(req.body.loginOrEmail, req.body.password)
+        //если юзер нет статусКод 401
         if (!user) {
             res.sendStatus(401)
             return
         }
+        //генерация deviceId
         const deviceId = randomUUID()
+        //create accessToken and refreshToken
         const accessToken = await this.jwtService.createAccessJWT(user.id!) // Change hardcode
         const refreshToken = await this.jwtService.createRefreshJWT(user.id!, deviceId) // Change hardcode
+        //сохраняем айпишник
         const ip = req.socket.remoteAddress//what we do with ip becouse ts think that ip can be undefined
+        //сохраняем название устройства с которого был сделан запрос
         const deviceName = req.headers['user-agent']//what we do with deviceName becouse ts think that deviceName can be undefined
+        //создаем девай сессию, откуда к нам прилетез запрос
         const addDeviceSession = await this.sessionsService.createDeviceSession(refreshToken.refreshToken, ip!, deviceName!)
+        //проверка что сессия создалась---тут скорей надо логику поменять потому как это больше похоже на заглушку для тайпскрипта
         if (!addDeviceSession) return res.sendStatus(401)
+        //и тут мы отдаем нашь refreshToken в cookie и accessToken в бади
         res.status(200)
             .cookie('refreshToken', refreshToken.refreshToken, {httpOnly: true, secure: true})
             .send(accessToken)

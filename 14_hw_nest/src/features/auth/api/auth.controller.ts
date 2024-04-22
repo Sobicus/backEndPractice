@@ -1,11 +1,15 @@
 import {
   Body,
   Controller,
+  HttpCode,
   Post,
   Res,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LoginInputModelType } from './models/input/auth-.input.model';
+import {
+  LoginInputModelType,
+  RegistrationUserModelType,
+} from './models/input/auth-.input.model';
 import { UsersService } from '../../users/application/users.service';
 import { Response } from 'express';
 import { AuthService } from '../application/auth.service';
@@ -38,5 +42,11 @@ export class AuthController {
       secure: true,
     });
     return { accessToken: tokensPair.accessToken };
+  }
+  @HttpCode(204)
+  @Post('registration')
+  async registration(@Body() registrationDTO: RegistrationUserModelType) {
+    console.log(registrationDTO);
+    await this.userService.createUser(registrationDTO);
   }
 }
