@@ -5,10 +5,15 @@ import { ObjectClassResult, statusType } from '../../../base/oject-result';
 import bcrypt from 'bcrypt';
 import { UsersDocument } from '../domain/users.entity';
 import { LoginInputModelType } from '../../auth/api/models/input/auth-.input.model';
+import { EmailService } from '../../../base/mail/email-server.service';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class UsersService {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(
+    private usersRepository: UsersRepository,
+    private emailService: EmailService,
+  ) {}
 
   async createUser(inputModel: UserInputModelType): Promise<string> {
     const passwordSalt = await bcrypt.genSalt(10);
@@ -23,6 +28,11 @@ export class UsersService {
       passwordSalt,
       passwordHash,
       createdAt,
+      emailConfirmation: {
+        confirmationCode: randomUUID(),
+        expirationDate: new Date(),
+        isConfirmed: false,
+      },
     };
     return await this.usersRepository.createUser(newUser);
   }

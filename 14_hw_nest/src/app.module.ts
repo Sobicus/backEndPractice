@@ -27,12 +27,37 @@ import { AuthController } from './features/auth/api/auth.controller';
 import { AuthService } from './features/auth/application/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { JWTService } from './base/application/jwt.service';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { EmailService } from './base/mail/email-server.service';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     JwtModule.register({
       global: true,
+    }),
+    MailerModule.forRoot({
+      transport: {
+        service: 'gmail',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'maksymdeveloper88@gmail.com',
+          pass: process.env.EMAIL_PASS,
+        },
+      },
+      defaults: {
+        from: 'Maksym <maksymdeveloper88@gmail.com>',
+      },
+      template: {
+        dir: join(__dirname + '/base/mail/template'),
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
     }),
     MongooseModule.forRoot(
       process.env.MONGO_URL || 'mongodb://127.0.0.1:27017',
@@ -66,6 +91,7 @@ import { JWTService } from './base/application/jwt.service';
     UsersService,
     AuthService,
     JWTService,
+    EmailService,
   ],
 })
 export class AppModule {}

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, createParamDecorator } from '@nestjs/common';
 import { PostsRepository } from '../infrastructure/posts.repository';
 import { BlogsRepository } from '../../blogs/infrastructure/blogs.repository';
 import { ObjectClassResult, statusType } from '../../../base/oject-result';

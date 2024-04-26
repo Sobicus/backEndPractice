@@ -20,9 +20,9 @@ export class AuthService {
 
     async createUser(login: string, password: string, email: string): Promise<boolean | null> {
         await this.usersService.createUser(login, password, email)
-        const confirmationCode = await this.usersService.findUserByEmailOrLogin(email)
+        const newUser = await this.usersService.findUserByEmailOrLogin(email)
         try {
-            await emailAdapter.sendEmail(email, confirmationCode!.emailConfirmation.confirmationCode)
+            await emailAdapter.sendEmail(email, newUser!.emailConfirmation.confirmationCode)
         } catch (error) {
             console.log(error)
             return null

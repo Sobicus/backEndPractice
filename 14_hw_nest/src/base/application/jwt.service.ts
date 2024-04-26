@@ -4,7 +4,6 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class JWTService {
   constructor(private jwtService: JwtService) {}
-
   async createJWT(userId: string) {
     const payload = { userId };
     return {

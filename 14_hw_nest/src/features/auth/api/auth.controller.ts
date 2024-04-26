@@ -47,6 +47,6 @@ export class AuthController {
   @Post('registration')
   async registration(@Body() registrationDTO: RegistrationUserModelType) {
     console.log(registrationDTO);
-    await this.userService.createUser(registrationDTO);
+    await this.authService.registrationUsers(registrationDTO);
   }
 }
