@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blogs, BlogsDocument } from '../domain/blogs.entity';
 import { Model } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class BlogsRepository {
   constructor(@InjectModel(Blogs.name) private BlogsModel: Model<Blogs>) {}
 
   async getBlogByBlogId(blogId: string): Promise<BlogsDocument | null> {
-    return this.BlogsModel.findOne({ _id: new ObjectId(blogId) });
+    return this.BlogsModel.findOne({ _id: new Types.ObjectId(blogId) });
   }
 
   async createBlogs(createBlogsDto: CreateBlogDto): Promise<string> {
@@ -25,7 +25,7 @@ export class BlogsRepository {
 
   async deleteBlog(blogId: string) {
     await this.BlogsModel.deleteOne({
-      _id: new ObjectId(blogId),
+      _id: new Types.ObjectId(blogId),
     });
   }
   async saveBlog(blog: BlogsDocument) {

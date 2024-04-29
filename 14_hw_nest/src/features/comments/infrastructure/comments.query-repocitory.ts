@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Comments } from '../domain/comments.entity';
-import { ObjectId } from 'mongodb';
 import { CommentsOutputModels } from '../api/models/output/comments.output.models';
 
 @Injectable()
@@ -14,7 +13,7 @@ export class CommentsQueryRepository {
     commentsId: string,
   ): Promise<CommentsOutputModels | null> {
     const post = await this.CommentsModel.findOne({
-      _id: new ObjectId(commentsId),
+      _id: new Types.ObjectId(commentsId),
     });
     if (!post) {
       return null;

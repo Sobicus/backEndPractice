@@ -1,4 +1,4 @@
-import { IsString, Length } from 'class-validator';
+import { IsString, Length, MAX, MaxLength } from 'class-validator';
 
 export class PostInputModelType {
   @IsString()
@@ -8,7 +8,8 @@ export class PostInputModelType {
   @Length(1, 100)
   shortDescription: string;
   @IsString()
-  @Length(1000)
+  @MaxLength(1000)
+  // @Length(1000)
   content: string;
   @IsString()
   blogId: string;

@@ -18,8 +18,11 @@ export class BlogsService {
     //   createdAt,
     //   isMembership,
     // });
+    console.log(inputBlogModel);
     const blog = Blogs.create(inputBlogModel);
+    console.log(blog);
     const createdBlog = await this.blogRepository.saveBlog(blog);
+    console.log(createdBlog);
     return createdBlog._id.toString();
   }
   async updateBlog(

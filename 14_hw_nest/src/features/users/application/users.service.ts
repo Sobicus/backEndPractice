@@ -7,6 +7,7 @@ import { UsersDocument } from '../domain/users.entity';
 import { LoginInputModelType } from '../../auth/api/models/input/auth-.input.model';
 import { EmailService } from '../../../base/mail/email-server.service';
 import { randomUUID } from 'crypto';
+import { add } from 'date-fns/add';
 
 @Injectable()
 export class UsersService {
@@ -30,7 +31,12 @@ export class UsersService {
       createdAt,
       emailConfirmation: {
         confirmationCode: randomUUID(),
-        expirationDate: new Date(),
+        expirationDate: add(new Date(), {
+          days: 1,
+          hours: 1,
+          minutes: 1,
+          seconds: 1,
+        }),
         isConfirmed: false,
       },
     };
@@ -46,7 +52,7 @@ export class UsersService {
         data: null,
       };
     }
-    await this.usersRepository.deleteUser(userId);
+    await this.usersRepository.removeUser(userId);
     return {
       status: statusType.Success,
       statusMessages: 'User has been delete',

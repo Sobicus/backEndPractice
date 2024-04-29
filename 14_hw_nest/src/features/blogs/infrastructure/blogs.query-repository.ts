@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blogs } from '../domain/blogs.entity';
 import { Model } from 'mongoose';
-import { ObjectId } from 'mongodb';
 import {
   BlogOutputModelType,
   PaginationBlogsType,
 } from '../api/models/output/blog.output.model';
 import { paginationBlogsOutModelType } from '../../../base/helpers/pagination-blogs-helper';
+// import { ObjectId } from 'mongoose/types/';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -46,7 +47,11 @@ export class BlogsQueryRepository {
   }
 
   async getBlogById(blogId: string): Promise<BlogOutputModelType | null> {
-    const blog = await this.BlogsModel.findOne({ _id: new ObjectId(blogId) });
+    console.log('blogId ', blogId);
+    const blog = await this.BlogsModel.findOne({
+      _id: new Types.ObjectId(blogId),
+    });
+    console.log('blog get', blog);
     if (!blog) {
       return null;
     }

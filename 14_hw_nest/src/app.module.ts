@@ -31,6 +31,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { EmailService } from './base/mail/email-server.service';
 import { join } from 'path';
+import { ConfirmationCodeIsValidConstraint } from './features/auth/infrastructure/validate';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { join } from 'path';
     AuthService,
     JWTService,
     EmailService,
+    ConfirmationCodeIsValidConstraint,
   ],
 })
 export class AppModule {}

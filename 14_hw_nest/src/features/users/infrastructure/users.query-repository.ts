@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Users } from '../domain/users.entity';
-import { Model } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { Model, Types } from 'mongoose';
+
 import {
   UserOutputDTO,
   UsersOutputDTO,
@@ -44,8 +44,11 @@ export class UsersQueryRepository {
       items: allUsers,
     };
   }
+
   async getUserById(userId: string): Promise<UserOutputDTO | null> {
-    const user = await this.UsersModel.findOne({ _id: new ObjectId(userId) });
+    const user = await this.UsersModel.findOne({
+      _id: new Types.ObjectId(userId),
+    });
     if (!user) {
       return null;
     }

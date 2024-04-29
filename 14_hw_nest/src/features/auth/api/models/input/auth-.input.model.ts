@@ -1,4 +1,5 @@
 import { IsString, Length, Matches } from 'class-validator';
+import { ConfirmationCodeIsValid } from '../../../infrastructure/validate';
 
 export class LoginInputModelType {
   @IsString()
@@ -17,4 +18,9 @@ export class RegistrationUserModelType {
   @IsString()
   @Matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
   email: string;
+}
+export class InputCodeModel {
+  @IsString()
+  @ConfirmationCodeIsValid()
+  code: string;
 }

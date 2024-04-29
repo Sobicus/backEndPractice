@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import {
+  InputCodeModel,
   LoginInputModelType,
   RegistrationUserModelType,
 } from './models/input/auth-.input.model';
@@ -48,5 +49,11 @@ export class AuthController {
   async registration(@Body() registrationDTO: RegistrationUserModelType) {
     console.log(registrationDTO);
     await this.authService.registrationUsers(registrationDTO);
+  }
+  @HttpCode(204)
+  @Post('registration-confirmation')
+  async registrationConfirmation(@Body() confirmationCode: InputCodeModel) {
+    console.log('confirmationCode ', confirmationCode);
+    await this.authService.registrationConfirmation(confirmationCode.code);
   }
 }

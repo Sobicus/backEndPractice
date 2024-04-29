@@ -3,6 +3,7 @@ import { UsersService } from '../../users/application/users.service';
 import { RegistrationUserModelType } from '../api/models/input/auth-.input.model';
 import { UsersRepository } from 'src/features/users/infrastructure/users.repository';
 import { EmailService } from '../../../base/mail/email-server.service';
+import { ObjectClassResult, statusType } from '../../../base/oject-result';
 
 @Injectable()
 export class AuthService {
@@ -20,5 +21,22 @@ export class AuthService {
       registrationDTO.login,
       newUser!.emailConfirmation.confirmationCode,
     );
+  }
+  async registrationConfirmation(code: string): Promise<ObjectClassResult> {
+    const user = await this.usersRepository.findUserByCode(code);
+    if (!user) {
+      return {
+        status: statusType.NotFound,
+        statusMessages: 'user has`n found',
+        data: null,
+      };
+    }
+    user.emailConfirmation.confirmationCode = 'null';
+    user.emailConfirmation.isConfirmed = true;
+    return {
+      status: statusType.Success,
+      statusMessages: 'user has been confirmed',
+      data: null,
+    };
   }
 }

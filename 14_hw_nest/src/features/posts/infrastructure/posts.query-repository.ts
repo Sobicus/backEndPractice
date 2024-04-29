@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Posts } from '../domain/posts.entity';
 import { Model } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 
 import { PaginationPostsOutputModelType } from 'src/base/helpers/pagination-posts-helpers';
 import {
@@ -53,7 +53,9 @@ export class PostsQueryRepository {
     };
   }
   async getPostById(postId: string): Promise<PostOutputModelType | null> {
-    const post = await this.PostsModel.findOne({ _id: new ObjectId(postId) });
+    const post = await this.PostsModel.findOne({
+      _id: new Types.ObjectId(postId),
+    });
     if (!post) {
       return null;
     }
