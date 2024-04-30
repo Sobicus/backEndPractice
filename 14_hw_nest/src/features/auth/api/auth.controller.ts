@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import {
   InputCodeModel,
+  InputEmailModel,
   LoginInputModelType,
   RegistrationUserModelType,
 } from './models/input/auth-.input.model';
@@ -44,16 +45,23 @@ export class AuthController {
     });
     return { accessToken: tokensPair.accessToken };
   }
+
   @HttpCode(204)
   @Post('registration')
   async registration(@Body() registrationDTO: RegistrationUserModelType) {
     console.log(registrationDTO);
     await this.authService.registrationUsers(registrationDTO);
   }
+
   @HttpCode(204)
   @Post('registration-confirmation')
   async registrationConfirmation(@Body() confirmationCode: InputCodeModel) {
     console.log('confirmationCode ', confirmationCode);
     await this.authService.registrationConfirmation(confirmationCode.code);
+  }
+
+  @Post('registration-email-resending')
+  async registrationEmailresending(@Body() email: InputEmailModel) {
+    await this.authService.registrationEmailResending(email.email);
   }
 }

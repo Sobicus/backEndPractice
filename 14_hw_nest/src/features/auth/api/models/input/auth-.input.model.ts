@@ -24,3 +24,8 @@ export class InputCodeModel {
   @ConfirmationCodeIsValid()
   code: string;
 }
+export class InputEmailModel {
+  @IsString()
+  @Matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+  email: string;
+}

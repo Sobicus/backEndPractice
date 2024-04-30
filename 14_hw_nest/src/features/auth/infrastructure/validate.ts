@@ -30,10 +30,7 @@ export class ConfirmationCodeIsValidConstraint
 {
   constructor(private readonly usersRepository: UsersRepository) {}
 
-  async validate(value: any, validationArguments: ValidationArguments) {
-    console.log('validate ', value);
-    console.log('validationArguments ', validationArguments);
-    console.log('this.usersRepository ', this.usersRepository);
+  async validate(value: any, validationArguments?: ValidationArguments) {
     const user = await this.usersRepository.findUserByCode(value);
     console.log('user in validate ', user);
     if (!user) {
