@@ -32,10 +32,13 @@ export class UsersRepository {
     });
   }
 
-  async findUserByCode(code: string): Promise<Users | null> {
+  async findUserByCode(code: string): Promise<UsersDocument | null> {
     console.log('code in repo', code);
     return this.UsersModel.findOne({
       'emailConfirmation.confirmationCode': code,
     });
+  }
+  async saveUser(user: UsersDocument | Users) {
+    await this.UsersModel.create(user);
   }
 }

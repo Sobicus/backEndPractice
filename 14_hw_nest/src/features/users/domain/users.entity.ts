@@ -1,5 +1,8 @@
 import { HydratedDocument } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { randomUUID } from 'crypto';
+import { add } from 'date-fns/add';
+import { UserInputModelType } from '../api/models/input/create-users.input.model';
 
 @Schema()
 export class EmailConfirmation {
@@ -28,8 +31,40 @@ export class Users {
   createdAt: string;
   @Prop({ type: EmailConfirmationSchema, require: true, _id: false })
   emailConfirmation: EmailConfirmation;
+
+  constructor(
+    inputModel: UserInputModelType,
+    passwordSalt: string,
+    passwordHash: string,
+  ) {
+    (this.login = inputModel.login),
+      (this.email = inputModel.email),
+      (this.passwordSalt = passwordSalt),
+      (this.passwordHash = passwordHash),
+      (this.createdAt = new Date().toISOString()),
+      (this.emailConfirmation = {
+        confirmationCode: randomUUID(),
+        expirationDate: add(new Date(), {
+          days: 1,
+          hours: 1,
+          minutes: 1,
+          seconds: 1,
+        }),
+        isConfirmed: false,
+      });
+  }
+
+  updateConfirmationCode() {
+    this.emailConfirmation.confirmationCode = randomUUID();
+    this.emailConfirmation.expirationDate = add(new Date(), {
+      days: 1,
+      hours: 1,
+      minutes: 1,
+      seconds: 1,
+    });
+  }
 }
 
 export const UsersSchema = SchemaFactory.createForClass(Users);
-
+UsersSchema.loadClass(Users);
 export type UsersDocument = HydratedDocument<Users>;

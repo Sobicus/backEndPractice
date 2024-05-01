@@ -3,7 +3,7 @@ import { UsersRepository } from '../infrastructure/users.repository';
 import { UserInputModelType } from '../api/models/input/create-users.input.model';
 import { ObjectClassResult, statusType } from '../../../base/oject-result';
 import bcrypt from 'bcrypt';
-import { UsersDocument } from '../domain/users.entity';
+import { Users, UsersDocument } from '../domain/users.entity';
 import { LoginInputModelType } from '../../auth/api/models/input/auth-.input.model';
 import { EmailService } from '../../../base/mail/email-server.service';
 import { randomUUID } from 'crypto';
@@ -22,25 +22,27 @@ export class UsersService {
       inputModel.password,
       passwordSalt,
     );
-    const createdAt = new Date().toISOString();
-    const newUser = {
-      login: inputModel.login,
-      email: inputModel.email,
-      passwordSalt,
-      passwordHash,
-      createdAt,
-      emailConfirmation: {
-        confirmationCode: randomUUID(),
-        expirationDate: add(new Date(), {
-          days: 1,
-          hours: 1,
-          minutes: 1,
-          seconds: 1,
-        }),
-        isConfirmed: false,
-      },
-    };
-    return await this.usersRepository.createUser(newUser);
+    // const createdAt = new Date().toISOString();
+    // const newUser = {
+    //   login: inputModel.login,
+    //   email: inputModel.email,
+    //   passwordSalt,
+    //   passwordHash,
+    //   createdAt,
+    //   emailConfirmation: {
+    //     confirmationCode: randomUUID(),
+    //     expirationDate: add(new Date(), {
+    //       days: 1,
+    //       hours: 1,
+    //       minutes: 1,
+    //       seconds: 1,
+    //     }),
+    //     isConfirmed: false,
+    //   },
+    // };
+    const user = new Users(inputModel, passwordSalt, passwordHash);
+    await this.usersRepository.saveUser(user);
+    return await this.usersRepository.createUser(user);
   }
 
   async deleteUser(userId: string): Promise<ObjectClassResult> {

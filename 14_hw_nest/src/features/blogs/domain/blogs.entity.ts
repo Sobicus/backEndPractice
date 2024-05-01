@@ -2,8 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { BlogInputModelType } from '../api/models/input/create-blog.input.model';
 
-export type BlogsDocument = HydratedDocument<Blogs>;
-
 @Schema()
 export class Blogs {
   @Prop({ type: String, required: true })
@@ -39,6 +37,8 @@ export class Blogs {
 }
 
 export const BlogsSchema = SchemaFactory.createForClass(Blogs);
+
+export type BlogsDocument = HydratedDocument<Blogs>;
 
 BlogsSchema.statics = {
   create: Blogs.create,

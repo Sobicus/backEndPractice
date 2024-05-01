@@ -4,7 +4,6 @@ import { RegistrationUserModelType } from '../api/models/input/auth-.input.model
 import { UsersRepository } from 'src/features/users/infrastructure/users.repository';
 import { EmailService } from '../../../base/mail/email-server.service';
 import { ObjectClassResult, statusType } from '../../../base/oject-result';
-import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +33,7 @@ export class AuthService {
     }
     user.emailConfirmation.confirmationCode = 'null';
     user.emailConfirmation.isConfirmed = true;
+    await this.usersRepository.saveUser(user);
     return {
       status: statusType.Success,
       statusMessages: 'user has been confirmed',
@@ -55,7 +55,18 @@ export class AuthService {
         statusMessages: 'user has been already confirmed',
         data: null,
       };
-      const newCodeConfirmation = randomUUID();
     }
+    user.updateConfirmationCode();
+    await this.usersRepository.saveUser(user);
+    await this.emailService.sendUserConfirmationCode(
+      user.email,
+      user.login,
+      user.emailConfirmation.confirmationCode,
+    );
+    return {
+      status: statusType.OK,
+      statusMessages: 'registration code has been resending',
+      data: null,
+    };
   }
 }
