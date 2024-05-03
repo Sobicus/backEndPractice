@@ -41,7 +41,7 @@ export class AuthService {
     };
   }
   async registrationEmailResending(email: string): Promise<ObjectClassResult> {
-    const user = await this.usersRepository.findUserByLoginOrEmail(email);
+    const user = await this.usersRepository.findUserByEmail(email);
     if (!user) {
       return {
         status: statusType.NotFound,
@@ -68,5 +68,15 @@ export class AuthService {
       statusMessages: 'registration code has been resending',
       data: null,
     };
+  }
+  async passwordRecovery(email: string): Promise<ObjectClassResult> {
+    const user = await this.usersRepository.findUserByEmail(email);
+    if (!user) {
+      return {
+        status: statusType.NotFound,
+        statusMessages: 'user has`t been found',
+        data: null,
+      };
+    }
   }
 }

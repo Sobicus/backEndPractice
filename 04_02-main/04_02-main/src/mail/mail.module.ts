@@ -4,7 +4,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 
 import { MailService } from './mail.service';
-import { AuthService } from "../features/auth/service/auth.service";
 
 @Module({
   imports: [

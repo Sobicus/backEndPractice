@@ -64,4 +64,9 @@ export class AuthController {
   async registrationEmailresending(@Body() email: InputEmailModel) {
     await this.authService.registrationEmailResending(email.email);
   }
+
+  @Post('password-recovery')
+  async passwordRecovery(@Body() email: InputEmailModel) {
+    await this.authService.passwordRecovery(email);
+  }
 }
