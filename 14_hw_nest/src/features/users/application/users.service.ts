@@ -6,8 +6,6 @@ import bcrypt from 'bcrypt';
 import { Users, UsersDocument } from '../domain/users.entity';
 import { LoginInputModelType } from '../../auth/api/models/input/auth-.input.model';
 import { EmailService } from '../../../base/mail/email-server.service';
-import { randomUUID } from 'crypto';
-import { add } from 'date-fns/add';
 
 @Injectable()
 export class UsersService {

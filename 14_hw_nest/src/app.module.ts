@@ -32,6 +32,11 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { EmailService } from './base/mail/email-server.service';
 import { join } from 'path';
 import { ConfirmationCodeIsValidConstraint } from './features/auth/infrastructure/validate';
+import { PasswordRecoveryRepository } from './features/users/infrastructure/accountData/passwordRecoveryRepository';
+import {
+  PasswordRecovery,
+  PasswordRecoverySchema,
+} from './features/users/infrastructure/accountData/passwordRecovery.entity';
 
 @Module({
   imports: [
@@ -69,6 +74,7 @@ import { ConfirmationCodeIsValidConstraint } from './features/auth/infrastructur
       { name: Posts.name, schema: PostsSchema },
       { name: Comments.name, schema: CommentsSchema },
       { name: Users.name, schema: UsersSchema },
+      { name: PasswordRecovery.name, schema: PasswordRecoverySchema },
     ]),
   ],
   controllers: [
@@ -94,6 +100,7 @@ import { ConfirmationCodeIsValidConstraint } from './features/auth/infrastructur
     JWTService,
     EmailService,
     ConfirmationCodeIsValidConstraint,
+    PasswordRecoveryRepository,
   ],
 })
 export class AppModule {}

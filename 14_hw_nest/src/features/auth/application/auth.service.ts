@@ -4,6 +4,8 @@ import { RegistrationUserModelType } from '../api/models/input/auth-.input.model
 import { UsersRepository } from 'src/features/users/infrastructure/users.repository';
 import { EmailService } from '../../../base/mail/email-server.service';
 import { ObjectClassResult, statusType } from '../../../base/oject-result';
+import { PasswordRecoveryRepository } from '../../users/infrastructure/accountData/passwordRecoveryRepository';
+import { PasswordRecovery } from '../../users/infrastructure/accountData/passwordRecovery.entity';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +13,7 @@ export class AuthService {
     private userService: UsersService,
     private usersRepository: UsersRepository,
     private emailService: EmailService,
+    private passwordRecoveryRepository: PasswordRecoveryRepository,
   ) {}
 
   async registrationUsers(registrationDTO: RegistrationUserModelType) {
@@ -22,6 +25,7 @@ export class AuthService {
       newUser!.emailConfirmation.confirmationCode,
     );
   }
+
   async registrationConfirmation(code: string): Promise<ObjectClassResult> {
     const user = await this.usersRepository.findUserByCode(code);
     if (!user) {
@@ -40,6 +44,7 @@ export class AuthService {
       data: null,
     };
   }
+
   async registrationEmailResending(email: string): Promise<ObjectClassResult> {
     const user = await this.usersRepository.findUserByEmail(email);
     if (!user) {
@@ -69,6 +74,7 @@ export class AuthService {
       data: null,
     };
   }
+
   async passwordRecovery(email: string): Promise<ObjectClassResult> {
     const user = await this.usersRepository.findUserByEmail(email);
     if (!user) {
@@ -78,5 +84,19 @@ export class AuthService {
         data: null,
       };
     }
+    const passwordRecovery = new PasswordRecovery(user._id.toString());
+    await this.passwordRecoveryRepository.savePasswordRecovery(
+      passwordRecovery,
+    );
+    await this.emailService.sendPasswordRecoveryCode(
+      user.email,
+      user.login,
+      passwordRecovery.recoveryCode,
+    );
+    return {
+      status: statusType.OK,
+      statusMessages: 'Password recovery code has been sand',
+      data: null,
+    };
   }
 }

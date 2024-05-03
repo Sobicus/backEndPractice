@@ -67,6 +67,7 @@ export class AuthController {
 
   @Post('password-recovery')
   async passwordRecovery(@Body() email: InputEmailModel) {
-    await this.authService.passwordRecovery(email);
+    await this.authService.passwordRecovery(email.email);
   }
+  @Post(){}
 }
