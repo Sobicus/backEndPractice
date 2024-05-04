@@ -9,6 +9,7 @@ import {
 import {
   InputCodeModel,
   InputEmailModel,
+  InputNewPasswordModel,
   LoginInputModelType,
   RegistrationUserModelType,
 } from './models/input/auth-.input.model';
@@ -60,14 +61,21 @@ export class AuthController {
     await this.authService.registrationConfirmation(confirmationCode.code);
   }
 
+  @HttpCode(204)
   @Post('registration-email-resending')
   async registrationEmailresending(@Body() email: InputEmailModel) {
     await this.authService.registrationEmailResending(email.email);
   }
 
+  @HttpCode(204)
   @Post('password-recovery')
   async passwordRecovery(@Body() email: InputEmailModel) {
     await this.authService.passwordRecovery(email.email);
   }
-  @Post(){}
+
+  @HttpCode(204)
+  @Post('new-password')
+  async newPassword(@Body() newPasswordModel: InputNewPasswordModel) {
+    await this.authService.newPassword(newPasswordModel);
+  }
 }

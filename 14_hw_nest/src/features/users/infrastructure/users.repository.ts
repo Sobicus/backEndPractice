@@ -43,4 +43,11 @@ export class UsersRepository {
   async findUserByEmail(email: string): Promise<UsersDocument | null> {
     return this.UsersModel.findOne({ email });
   }
+  async changePassword(
+    userId: string,
+    passwordSalt: string,
+    passwordHash: string,
+  ) {
+    await this.UsersModel.updateOne({ userId }, { passwordSalt, passwordHash });
+  }
 }

@@ -29,3 +29,10 @@ export class InputEmailModel {
   @Matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
   email: string;
 }
+export class InputNewPasswordModel {
+  @IsString()
+  @Length(6, 20)
+  newPassword: string;
+  @IsString()
+  recoveryCode: string;
+}

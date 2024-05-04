@@ -95,4 +95,13 @@ export class UsersService {
       data: user,
     };
   }
+  async changePassword(userId: string, newPassword: string) {
+    const passwordSalt = await bcrypt.genSalt(10);
+    const passwordHash = await this._generateHash(newPassword, passwordSalt);
+    await this.usersRepository.changePassword(
+      userId,
+      passwordSalt,
+      passwordHash,
+    );
+  }
 }

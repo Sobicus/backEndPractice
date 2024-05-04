@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '../../users/application/users.service';
-import { RegistrationUserModelType } from '../api/models/input/auth-.input.model';
+import {
+  InputNewPasswordModel,
+  RegistrationUserModelType,
+} from '../api/models/input/auth-.input.model';
 import { UsersRepository } from 'src/features/users/infrastructure/users.repository';
 import { EmailService } from '../../../base/mail/email-server.service';
 import { ObjectClassResult, statusType } from '../../../base/oject-result';
@@ -96,6 +99,47 @@ export class AuthService {
     return {
       status: statusType.OK,
       statusMessages: 'Password recovery code has been sand',
+      data: null,
+    };
+  }
+  async newPassword(
+    newPasswordModel: InputNewPasswordModel,
+  ): Promise<ObjectClassResult> {
+    const recoveryDTO =
+      await this.passwordRecoveryRepository.findRecoveryCodeByCode(
+        newPasswordModel.recoveryCode,
+      );
+    if (!recoveryDTO) {
+      return {
+        status: statusType.NotFound,
+        statusMessages: 'Recovery code has been not valid',
+        data: null,
+      };
+    }
+    console.log(recoveryDTO.recoveryCodeExpireDate);
+    console.log(new Date());
+    console.log(recoveryDTO.recoveryCodeExpireDate < new Date());
+    if (recoveryDTO.alreadyChangePassword) {
+      return {
+        status: statusType.TooManyRequests,
+        statusMessages: 'Recovery code has been used already',
+        data: null,
+      };
+    }
+    if (recoveryDTO.recoveryCodeExpireDate < new Date()) {
+      return {
+        status: statusType.BadRequest,
+        statusMessages: 'Recovery code has been expired',
+        data: null,
+      };
+    }
+    await this.userService.changePassword(
+      recoveryDTO.userId,
+      newPasswordModel.newPassword,
+    );
+    return {
+      status: statusType.OK,
+      statusMessages: 'Password has been changed',
       data: null,
     };
   }
