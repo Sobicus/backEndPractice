@@ -3,6 +3,7 @@ import {
   Controller,
   HttpCode,
   Post,
+  Req,
   Res,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -31,7 +32,7 @@ export class AuthController {
     @Body() loginDTO: LoginInputModelType,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('loginDTO ', loginDTO);
+    console.log(request.headers['user-agent']);
     const user = await this.userService.checkCredentials(loginDTO);
     console.log('user ', user);
     if (user.status === 'Unauthorized') {
