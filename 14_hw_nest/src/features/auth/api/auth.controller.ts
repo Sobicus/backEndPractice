@@ -2,10 +2,11 @@ import {
   Body,
   Controller,
   HttpCode,
+  Ip,
   Post,
-  Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import {
   InputCodeModel,
@@ -18,6 +19,9 @@ import { UsersService } from '../../users/application/users.service';
 import { Response } from 'express';
 import { AuthService } from '../application/auth.service';
 import { JWTService } from 'src/base/application/jwt.service';
+import { UserAgent } from '../../../base/decorators/userAgent';
+import { JwtService } from '@nestjs/jwt';
+import { LocalAuthGuard } from '../../../base/guards/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -25,19 +29,24 @@ export class AuthController {
     private userService: UsersService,
     private authService: AuthService,
     private jwtService: JWTService,
+    private jwtService1: JwtService,
   ) {}
-
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   async signIn(
     @Body() loginDTO: LoginInputModelType,
-    @Res({ passthrough: true }) res: Response,
+    @UserAgent() userAgent: string,
+    @CurrentUserId() user: string,
+    @Ip() ip: string,
+    @Res({ passthrough: true })
+    res: Response,
   ) {
-    console.log(request.headers['user-agent']);
-    const user = await this.userService.checkCredentials(loginDTO);
-    console.log('user ', user);
-    if (user.status === 'Unauthorized') {
-      throw new UnauthorizedException();
-    }
+    // const user = await this.userService.checkCredentials(loginDTO);
+    // console.log('userAgent ', userAgent);
+    // if (user.status === 'Unauthorized') {
+    //   throw new UnauthorizedException();
+    // }
+
     const tokensPair = await this.jwtService.createJWT(
       user.data!._id.toString(),
     );

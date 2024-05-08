@@ -37,9 +37,24 @@ import {
   PasswordRecovery,
   PasswordRecoverySchema,
 } from './features/users/infrastructure/accountData/passwordRecovery.entity';
+import { LocalAuthGuard } from './base/guards/local-auth.guard';
+import { LocalStrategy } from './base/guards/strategy/local/local.strategy';
+import { PassportModule } from '@nestjs/passport';
+
+const repositories = [
+  BlogsRepository,
+  BlogsQueryRepository,
+  PostsRepository,
+  PostsQueryRepository,
+  CommentsQueryRepository,
+  UsersRepository,
+  UsersQueryRepository,
+  PasswordRecoveryRepository,
+];
 
 @Module({
   imports: [
+    PassportModule,
     ConfigModule.forRoot(),
     JwtModule.register({
       global: true,
@@ -86,21 +101,16 @@ import {
     TestingAllDataController,
   ],
   providers: [
+    ...repositories,
     BlogsService,
-    BlogsRepository,
-    BlogsQueryRepository,
-    PostsRepository,
     PostsService,
-    PostsQueryRepository,
-    CommentsQueryRepository,
-    UsersRepository,
-    UsersQueryRepository,
     UsersService,
     AuthService,
     JWTService,
     EmailService,
     ConfirmationCodeIsValidConstraint,
-    PasswordRecoveryRepository,
+    LocalStrategy,
+    LocalAuthGuard,
   ],
 })
 export class AppModule {}

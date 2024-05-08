@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../../users/application/users.service';
 import {
   InputNewPasswordModel,
+  LoginInputModelType,
   RegistrationUserModelType,
 } from '../api/models/input/auth-.input.model';
 import { UsersRepository } from 'src/features/users/infrastructure/users.repository';
@@ -9,6 +10,8 @@ import { EmailService } from '../../../base/mail/email-server.service';
 import { ObjectClassResult, statusType } from '../../../base/oject-result';
 import { PasswordRecoveryRepository } from '../../users/infrastructure/accountData/passwordRecoveryRepository';
 import { PasswordRecovery } from '../../users/infrastructure/accountData/passwordRecovery.entity';
+import { UsersDocument } from '../../users/domain/users.entity';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -142,5 +145,40 @@ export class AuthService {
       statusMessages: 'Password has been changed',
       data: null,
     };
+  }
+  // NEW logic about passport local stategy------------------------------->>>>
+  async checkCredentials(
+    loginDTO: LoginInputModelType,
+  ): Promise<ObjectClassResult<UsersDocument | null>> {
+    const user = await this.usersRepository.findUserByLoginOrEmail(
+      loginDTO.loginOrEmail,
+    );
+    console.log('user in checkCredentials ', user);
+    if (!user) {
+      return {
+        status: statusType.Unauthorized,
+        statusMessages: 'login/email/password has been incorrect',
+        data: null,
+      };
+    }
+    const passwordHash = await this._generateHash(
+      loginDTO.password,
+      user.passwordSalt,
+    );
+    if (passwordHash !== user.passwordHash) {
+      return {
+        status: statusType.Unauthorized,
+        statusMessages: 'login/email/password has been incorrect',
+        data: null,
+      };
+    }
+    return {
+      status: statusType.Success,
+      statusMessages: 'User has been found',
+      data: user,
+    };
+  }
+  async _generateHash(password: string, salt: string) {
+    return bcrypt.hashSync(password, salt);
   }
 }
