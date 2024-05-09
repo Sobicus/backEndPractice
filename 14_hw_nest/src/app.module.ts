@@ -40,6 +40,12 @@ import {
 import { LocalAuthGuard } from './base/guards/local-auth.guard';
 import { LocalStrategy } from './base/guards/strategy/local/local.strategy';
 import { PassportModule } from '@nestjs/passport';
+import {
+  Sessions,
+  SessionsSchema,
+} from './features/users/infrastructure/sessionsData/sessions.entity';
+import { SessionsRepository } from './features/users/infrastructure/sessionsData/sessions-repository';
+import { SessionService } from './features/users/infrastructure/sessionsData/session.service';
 
 const repositories = [
   BlogsRepository,
@@ -50,6 +56,16 @@ const repositories = [
   UsersRepository,
   UsersQueryRepository,
   PasswordRecoveryRepository,
+  SessionsRepository,
+];
+const service = [
+  BlogsService,
+  PostsService,
+  UsersService,
+  AuthService,
+  JWTService,
+  EmailService,
+  SessionService,
 ];
 
 @Module({
@@ -90,6 +106,7 @@ const repositories = [
       { name: Comments.name, schema: CommentsSchema },
       { name: Users.name, schema: UsersSchema },
       { name: PasswordRecovery.name, schema: PasswordRecoverySchema },
+      { name: Sessions.name, schema: SessionsSchema },
     ]),
   ],
   controllers: [
@@ -102,12 +119,7 @@ const repositories = [
   ],
   providers: [
     ...repositories,
-    BlogsService,
-    PostsService,
-    UsersService,
-    AuthService,
-    JWTService,
-    EmailService,
+    ...service,
     ConfirmationCodeIsValidConstraint,
     LocalStrategy,
     LocalAuthGuard,

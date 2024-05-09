@@ -3,8 +3,7 @@ import { UsersRepository } from '../infrastructure/users.repository';
 import { UserInputModelType } from '../api/models/input/create-users.input.model';
 import { ObjectClassResult, statusType } from '../../../base/oject-result';
 import bcrypt from 'bcrypt';
-import { Users, UsersDocument } from '../domain/users.entity';
-import { LoginInputModelType } from '../../auth/api/models/input/auth-.input.model';
+import { Users } from '../domain/users.entity';
 import { EmailService } from '../../../base/mail/email-server.service';
 
 @Injectable()
@@ -68,38 +67,39 @@ export class UsersService {
   async _generateHash(password: string, salt: string) {
     return bcrypt.hashSync(password, salt);
   }
+  // Give this logic to authService in Passport local strategic
 
-  async checkCredentials(
-    loginDTO: LoginInputModelType,
-  ): Promise<ObjectClassResult<UsersDocument | null>> {
-    const user = await this.usersRepository.findUserByLoginOrEmail(
-      loginDTO.loginOrEmail,
-    );
-    console.log('user in checkCredentials ', user);
-    if (!user) {
-      return {
-        status: statusType.Unauthorized,
-        statusMessages: 'login/email/password has been incorrect',
-        data: null,
-      };
-    }
-    const passwordHash = await this._generateHash(
-      loginDTO.password,
-      user.passwordSalt,
-    );
-    if (passwordHash !== user.passwordHash) {
-      return {
-        status: statusType.Unauthorized,
-        statusMessages: 'login/email/password has been incorrect',
-        data: null,
-      };
-    }
-    return {
-      status: statusType.Success,
-      statusMessages: 'User has been found',
-      data: user,
-    };
-  }
+  // async checkCredentials(
+  //   loginDTO: LoginInputModelType,
+  // ): Promise<ObjectClassResult<UsersDocument | null>> {
+  //   const user = await this.usersRepository.findUserByLoginOrEmail(
+  //     loginDTO.loginOrEmail,
+  //   );
+  //   console.log('user in checkCredentials ', user);
+  //   if (!user) {
+  //     return {
+  //       status: statusType.Unauthorized,
+  //       statusMessages: 'login/email/password has been incorrect',
+  //       data: null,
+  //     };
+  //   }
+  //   const passwordHash = await this._generateHash(
+  //     loginDTO.password,
+  //     user.passwordSalt,
+  //   );
+  //   if (passwordHash !== user.passwordHash) {
+  //     return {
+  //       status: statusType.Unauthorized,
+  //       statusMessages: 'login/email/password has been incorrect',
+  //       data: null,
+  //     };
+  //   }
+  //   return {
+  //     status: statusType.Success,
+  //     statusMessages: 'User has been found',
+  //     data: user,
+  //   };
+  // }
   async changePassword(userId: string, newPassword: string) {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(newPassword, passwordSalt);

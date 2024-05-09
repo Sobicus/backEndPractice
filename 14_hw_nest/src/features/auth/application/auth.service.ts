@@ -153,7 +153,6 @@ export class AuthService {
     const user = await this.usersRepository.findUserByLoginOrEmail(
       loginDTO.loginOrEmail,
     );
-    console.log('user in checkCredentials ', user);
     if (!user) {
       return {
         status: statusType.Unauthorized,

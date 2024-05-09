@@ -17,30 +17,29 @@ import {
   PaginationUsersInputModelType,
   usersPagination,
 } from '../../../base/helpers/pagination-users-helper';
-import { LocalAuthGuard } from '../../../base/guards/local-auth.guard';
+import { UserAuthGuard } from '../../../base/guards/auth.guard';
 
-//@UseGuards(AuthGuard)
-
+@UseGuards(UserAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(
     private usersService: UsersService,
     private usersQueryRepository: UsersQueryRepository,
   ) {}
-  //@UseGuards(LocalAuthGuard)
+
   @Get()
   async getAllUsers(@Query() query: PaginationUsersInputModelType) {
     const pagination = usersPagination(query);
     return this.usersQueryRepository.getAllUsers(pagination);
   }
-  //@UseGuards(LocalAuthGuard)
+
   @Post()
   async CreateUser(@Body() inputModel: UserInputModelType) {
     const userId = await this.usersService.createUser(inputModel);
     const user = await this.usersQueryRepository.getUserById(userId);
     if (user) return user;
   }
-  //@UseGuards(LocalAuthGuard)
+
   @Delete(':id')
   @HttpCode(204)
   async DeleteUser(@Param('id') userId: string) {

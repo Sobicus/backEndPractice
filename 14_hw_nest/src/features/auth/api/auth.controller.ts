@@ -5,7 +5,6 @@ import {
   Ip,
   Post,
   Res,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,8 +19,10 @@ import { Response } from 'express';
 import { AuthService } from '../application/auth.service';
 import { JWTService } from 'src/base/application/jwt.service';
 import { UserAgent } from '../../../base/decorators/userAgent';
-import { JwtService } from '@nestjs/jwt';
 import { LocalAuthGuard } from '../../../base/guards/local-auth.guard';
+import { CurrentUserId } from 'src/base/decorators/currentUserId';
+import { SessionService } from '../../users/infrastructure/sessionsData/session.service';
+import { randomUUID } from 'crypto';
 
 @Controller('auth')
 export class AuthController {
@@ -29,14 +30,15 @@ export class AuthController {
     private userService: UsersService,
     private authService: AuthService,
     private jwtService: JWTService,
-    private jwtService1: JwtService,
+    private sessionService: SessionService,
   ) {}
+
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async signIn(
     @Body() loginDTO: LoginInputModelType,
-    @UserAgent() userAgent: string,
-    @CurrentUserId() user: string,
+    @UserAgent() deviceName: string,
+    @CurrentUserId() userId: string,
     @Ip() ip: string,
     @Res({ passthrough: true })
     res: Response,
@@ -46,9 +48,12 @@ export class AuthController {
     // if (user.status === 'Unauthorized') {
     //   throw new UnauthorizedException();
     // }
-
-    const tokensPair = await this.jwtService.createJWT(
-      user.data!._id.toString(),
+    const deviceId = randomUUID();
+    const tokensPair = await this.jwtService.createJWT(userId, deviceId);
+    await this.sessionService.createDeviceSession(
+      tokensPair.refreshToken,
+      deviceName,
+      ip,
     );
     res.cookie('refreshToken', tokensPair.refreshToken, {
       httpOnly: true,
