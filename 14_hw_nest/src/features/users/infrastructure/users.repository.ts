@@ -37,8 +37,9 @@ export class UsersRepository {
       'emailConfirmation.confirmationCode': code,
     });
   }
-  async saveUser(user: UsersDocument | Users) {
-    await this.UsersModel.create(user);
+  async saveUser(user: UsersDocument | Users): Promise<string> {
+    const res = await this.UsersModel.create(user);
+    return res._id.toString();
   }
   async findUserByEmail(email: string): Promise<UsersDocument | null> {
     return this.UsersModel.findOne({ email });

@@ -38,13 +38,7 @@ export class UsersService {
     //   },
     // };
     const user = new Users(inputModel, passwordSalt, passwordHash);
-    await this.usersRepository.saveUser(user);
-    //todo What we can do? need some beautiful
-    //return await this.usersRepository.createUser(user);
-    const newUser = await this.usersRepository.findUserByEmail(
-      inputModel.email,
-    );
-    return newUser!._id.toString();
+    return this.usersRepository.saveUser(user);
   }
 
   async deleteUser(userId: string): Promise<ObjectClassResult> {

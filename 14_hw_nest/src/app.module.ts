@@ -37,15 +37,17 @@ import {
   PasswordRecovery,
   PasswordRecoverySchema,
 } from './features/users/infrastructure/accountData/passwordRecovery.entity';
-import { LocalAuthGuard } from './base/guards/local-auth.guard';
 import { LocalStrategy } from './base/guards/strategy/local/local.strategy';
 import { PassportModule } from '@nestjs/passport';
 import {
   Sessions,
   SessionsSchema,
 } from './features/users/infrastructure/sessionsData/sessions.entity';
-import { SessionsRepository } from './features/users/infrastructure/sessionsData/sessions-repository';
 import { SessionService } from './features/users/infrastructure/sessionsData/session.service';
+import { SessionsRepository } from './features/users/infrastructure/sessionsData/sessions.repository';
+import { LoginGuard } from './base/guards/login.guard';
+import { JwtAuthGuard } from './base/guards/jwt-refreash.guard';
+import { JwtStrategy } from './base/guards/strategy/jwt/jwt-cokie.strategy';
 
 const repositories = [
   BlogsRepository,
@@ -122,7 +124,9 @@ const service = [
     ...service,
     ConfirmationCodeIsValidConstraint,
     LocalStrategy,
-    LocalAuthGuard,
+    JwtStrategy,
+    LoginGuard,
+    JwtAuthGuard,
   ],
 })
 export class AppModule {}

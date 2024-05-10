@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { SessionsRepository } from './sessions-repository';
 import { JwtService } from '@nestjs/jwt';
-import * as process from 'node:process';
+import { SessionsRepository } from './sessions.repository';
+import { SessionsDocument } from './sessions.entity';
 
 @Injectable()
 export class SessionService {
@@ -13,17 +13,45 @@ export class SessionService {
     refreshToken: string,
     deviceName: string,
     ip: string,
-  ) {
-    console.log('refreshToken', refreshToken);
-    console.log('deviceName', deviceName);
-    console.log('ip', ip);
-    console.log('decode', await this.jwtService.decode(refreshToken));
-    console.log(
-      'verify',
-      await this.jwtService.verifyAsync(refreshToken, {
-        secret: process.env.JWT_SECRET,
-      }),
+  ): Promise<void> {
+    const decodeJwtRefreshToken = this.jwtService.decode(refreshToken);
+    const userId: string = decodeJwtRefreshToken['userId'];
+    const deviceId: string = decodeJwtRefreshToken['deviceId'];
+    const iat: number = decodeJwtRefreshToken['iat'];
+    const issuedAt = new Date(iat * 1000).toISOString();
+    console.log('after decode decodeJwtRefreshToken', decodeJwtRefreshToken);
+    console.log('after decode userId', userId);
+    console.log('after decode deviceId', deviceId);
+    console.log('after decode iat', iat);
+    console.log('after decode issuedAt', issuedAt);
+    console.log('after decode new Date', new Date(iat).toISOString());
+    const newSession = { issuedAt, deviceId, ip, deviceName, userId };
+    await this.sessionRepository.createDeviceSession(newSession);
+  }
+  async findSessionByUserIdAndDeviceId(
+    userId: string,
+    deviceId: string,
+  ): Promise<null | SessionsDocument> {
+    return this.sessionRepository.findSessionByUserIdAndDeviceId(
+      userId,
+      deviceId,
     );
-    return;
+  }
+  async deleteSession(userId: string, deviceId: string): Promise<void> {
+    await this.sessionRepository.deleteSession(userId, deviceId);
+  }
+  async updateSession(
+    userId: string,
+    deviceId: string,
+    refreshToken: string,
+  ): Promise<boolean> {
+    const decodeJwtRefreshToken = await this.jwtService.decode(refreshToken);
+    const iat = decodeJwtRefreshToken['iat'];
+    const issuedAt = new Date(iat * 1000).toISOString();
+    return await this.sessionRepository.updateSession(
+      userId,
+      deviceId,
+      issuedAt,
+    );
   }
 }

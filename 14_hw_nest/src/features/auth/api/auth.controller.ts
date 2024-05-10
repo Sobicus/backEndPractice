@@ -5,6 +5,7 @@ import {
   Ip,
   Post,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -19,10 +20,12 @@ import { Response } from 'express';
 import { AuthService } from '../application/auth.service';
 import { JWTService } from 'src/base/application/jwt.service';
 import { UserAgent } from '../../../base/decorators/userAgent';
-import { LocalAuthGuard } from '../../../base/guards/local-auth.guard';
 import { CurrentUserId } from 'src/base/decorators/currentUserId';
 import { SessionService } from '../../users/infrastructure/sessionsData/session.service';
 import { randomUUID } from 'crypto';
+import { LoginGuard } from '../../../base/guards/login.guard';
+import { JwtAuthGuard } from '../../../base/guards/jwt-refreash.guard';
+import { RefreshPayload } from 'src/base/decorators/refreshPayload';
 
 @Controller('auth')
 export class AuthController {
@@ -33,7 +36,7 @@ export class AuthController {
     private sessionService: SessionService,
   ) {}
 
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(LoginGuard)
   @Post('login')
   async signIn(
     @Body() loginDTO: LoginInputModelType,
@@ -92,5 +95,46 @@ export class AuthController {
   @Post('new-password')
   async newPassword(@Body() newPasswordModel: InputNewPasswordModel) {
     await this.authService.newPassword(newPasswordModel);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(204)
+  @Post('logout')
+  async logout(
+    @RefreshPayload()
+    { userId, deviceId }: { userId: string; deviceId: string },
+  ) {
+    const session = await this.sessionService.findSessionByUserIdAndDeviceId(
+      userId,
+      deviceId,
+    );
+    if (!session) {
+      throw new UnauthorizedException();
+    }
+    await this.sessionService.deleteSession(deviceId, userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('refresh-token')
+  async refreshTokens(
+    @RefreshPayload()
+    { userId, deviceId }: { userId: string; deviceId: string },
+    @Res({ passthrough: true })
+    res: Response,
+  ) {
+    const tokensPair = await this.jwtService.createJWT(userId, deviceId);
+    const result = await this.sessionService.updateSession(
+      userId,
+      deviceId,
+      tokensPair.refreshToken,
+    );
+    if (!result) {
+      throw new UnauthorizedException();
+    }
+    res.cookie('refreshToken', tokensPair.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+    return { accessToken: tokensPair.accessToken };
   }
 }

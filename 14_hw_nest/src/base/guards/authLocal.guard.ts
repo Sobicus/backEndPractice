@@ -34,7 +34,7 @@ export class UserAuthGuard implements CanActivate {
     const [username, password] = credentials.split(':');
 
     // Здесь вы можете выполнить проверку логина и пароля, например, сравнение с ожидаемыми значениями
-    if (username !== 'admin' && password !== 'qwerty') {
+    if (username !== 'admin' || password !== 'qwerty') {
       // Успешная авторизация
       throw new UnauthorizedException();
     }
