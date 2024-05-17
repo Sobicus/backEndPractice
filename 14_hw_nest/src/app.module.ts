@@ -19,7 +19,6 @@ import { CommentsController } from './features/comments/api/comments.controller'
 import { Users, UsersSchema } from './features/users/domain/users.entity';
 import { UsersController } from './features/users/api/users.controller';
 import { UsersRepository } from './features/users/infrastructure/users.repository';
-import { UsersQueryRepository } from './features/users/infrastructure/users.query-repository';
 import { UsersService } from './features/users/application/users.service';
 import { ConfigModule } from '@nestjs/config';
 import { TestingAllDataController } from './features/dropAll/api/testing-all-data.controller';
@@ -47,7 +46,14 @@ import { SessionService } from './features/users/infrastructure/sessionsData/ses
 import { SessionsRepository } from './features/users/infrastructure/sessionsData/sessions.repository';
 import { LoginGuard } from './base/guards/login.guard';
 import { JwtAuthGuard } from './base/guards/jwt-refreash.guard';
-import { JwtStrategy } from './base/guards/strategy/jwt/jwt-cokie.strategy';
+import { UsersQueryRepository } from './features/users/infrastructure/users-query.repository';
+import { JwtStrategy } from './base/guards/strategy/jwt/jwt-cookie.strategy';
+import { JwtAccessStrategy } from './base/guards/strategy/jwt/jwt-header.strategy';
+import { JwtAccessAuthGuard } from './base/guards/jwt-access.guard';
+import {
+  IsUserAlreadyExist,
+  IsUserAlreadyExistConstraint,
+} from './base/guards/emailOrLoginAlreadyExist.guard';
 
 const repositories = [
   BlogsRepository,
@@ -127,6 +133,9 @@ const service = [
     JwtStrategy,
     LoginGuard,
     JwtAuthGuard,
+    JwtAccessStrategy,
+    JwtAccessAuthGuard,
+    IsUserAlreadyExistConstraint,
   ],
 })
 export class AppModule {}

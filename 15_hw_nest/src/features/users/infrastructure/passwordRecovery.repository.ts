@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PasswordRecovery } from './passwordRecovery.entity';
+import { PasswordRecovery } from '../domain/passwordRecovery.entity';
 import { Model } from 'mongoose';
 
 @Injectable()

@@ -23,7 +23,7 @@ export class UserAuthGuard implements CanActivate {
     // if (!authorizationHeader) {
     //   throw new UnauthorizedException();
     // }
-    const token = authorizationHeader.split(' ')[0];
+    const token = authorizationHeader?.split(' ')[0];
     if (token !== 'Basic') {
       throw new UnauthorizedException();
     }

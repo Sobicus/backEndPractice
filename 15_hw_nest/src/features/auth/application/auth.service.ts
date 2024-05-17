@@ -8,8 +8,8 @@ import {
 import { UsersRepository } from 'src/features/users/infrastructure/users.repository';
 import { EmailService } from '../../../base/mail/email-server.service';
 import { ObjectClassResult, statusType } from '../../../base/oject-result';
-import { PasswordRecoveryRepository } from '../../users/infrastructure/accountData/passwordRecoveryRepository';
-import { PasswordRecovery } from '../../users/infrastructure/accountData/passwordRecovery.entity';
+import { PasswordRecoveryRepository } from '../../users/infrastructure/passwordRecovery.repository';
+import { PasswordRecovery } from '../../users/domain/passwordRecovery.entity';
 import { UsersDocument } from '../../users/domain/users.entity';
 import bcrypt from 'bcrypt';
 

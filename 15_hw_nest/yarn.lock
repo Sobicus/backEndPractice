@@ -20,7 +20,7 @@ __metadata:
     "@nestjs-modules/mailer": "npm:^1.11.2"
     "@nestjs/cli": "npm:^10.0.0"
     "@nestjs/common": "npm:^10.0.0"
-    "@nestjs/config": "npm:^3.2.1"
+    "@nestjs/config": "npm:^3.2.2"
     "@nestjs/core": "npm:^10.0.0"
     "@nestjs/jwt": "npm:^10.2.0"
     "@nestjs/mongoose": "npm:^10.0.4"
@@ -1178,7 +1178,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/config@npm:^3.2.1":
+"@nestjs/config@npm:^3.2.2":
   version: 3.2.2
   resolution: "@nestjs/config@npm:3.2.2"
   dependencies:

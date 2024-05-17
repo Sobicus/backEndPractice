@@ -11,13 +11,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
-import { UsersQueryRepository } from '../infrastructure/users.query-repository';
 import { UserInputModelType } from './models/input/create-users.input.model';
 import {
   PaginationUsersInputModelType,
   usersPagination,
 } from '../../../base/helpers/pagination-users-helper';
-import { UserAuthGuard } from '../../../base/guards/authLocal.guard';
+import { UserAuthGuard } from '../../../base/guards/basic.guard';
+import { UsersQueryRepository } from '../infrastructure/users-query.repository';
 
 @Controller('users')
 export class UsersController {

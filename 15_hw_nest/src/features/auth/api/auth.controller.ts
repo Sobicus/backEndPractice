@@ -21,7 +21,7 @@ import { AuthService } from '../application/auth.service';
 import { JWTService } from 'src/base/application/jwt.service';
 import { UserAgent } from '../../../base/decorators/userAgent';
 import { CurrentUserId } from 'src/base/decorators/currentUserId';
-import { SessionService } from '../../users/infrastructure/sessionsData/session.service';
+import { SessionService } from '../application/session.service';
 import { randomUUID } from 'crypto';
 import { LoginGuard } from '../../../base/guards/login.guard';
 import { JwtAuthGuard } from '../../../base/guards/jwt-refreash.guard';

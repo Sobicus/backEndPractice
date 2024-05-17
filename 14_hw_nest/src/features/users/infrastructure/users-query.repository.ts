@@ -4,6 +4,7 @@ import { Users } from '../domain/users.entity';
 import { Model, Types } from 'mongoose';
 
 import {
+  UserAuthMeDTO,
   UserOutputDTO,
   UsersOutputDTO,
 } from '../api/models/output/users.output.module';
@@ -57,6 +58,21 @@ export class UsersQueryRepository {
       login: user.login,
       email: user.email,
       createdAt: user.createdAt,
+    };
+  }
+
+  async getUserByIdForAuthMe(userId: string): Promise<null | UserAuthMeDTO> {
+    console.log(userId);
+    const user = await this.UsersModel.findOne({
+      _id: new Types.ObjectId(userId),
+    }).exec();
+    if (!user) {
+      return null;
+    }
+    return {
+      email: user.email,
+      login: user.login,
+      userId: user._id.toString(),
     };
   }
 }

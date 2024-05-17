@@ -6,7 +6,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../../users/infrastructure/users.repository';
+import { UsersRepository } from '../../features/users/infrastructure/users.repository';
 
 export function ConfirmationCodeIsValid(
   property?: string,
@@ -44,6 +44,7 @@ export class ConfirmationCodeIsValidConstraint
     }
     return true;
   }
+
   defaultMessage(validationArguments?: ValidationArguments): string {
     return 'Code is not valid';
   }

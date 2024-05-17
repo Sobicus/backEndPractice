@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Ip,
   Post,
@@ -26,16 +27,20 @@ import { randomUUID } from 'crypto';
 import { LoginGuard } from '../../../base/guards/login.guard';
 import { JwtAuthGuard } from '../../../base/guards/jwt-refreash.guard';
 import { RefreshPayload } from 'src/base/decorators/refreshPayload';
+import { JwtAccessAuthGuard } from '../../../base/guards/jwt-access.guard';
+import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
+import { UsersQueryRepository } from '../../users/infrastructure/users-query.repository';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private userService: UsersService,
     private authService: AuthService,
     private jwtService: JWTService,
     private sessionService: SessionService,
+    private userQueryRepository: UsersQueryRepository,
   ) {}
 
+  @HttpCode(200)
   @UseGuards(LoginGuard)
   @Post('login')
   async signIn(
@@ -136,5 +141,11 @@ export class AuthController {
       secure: true,
     });
     return { accessToken: tokensPair.accessToken };
+  }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Get('me')
+  async authMe(@TakeUserId() { userId }: { userId: string }) {
+    return this.userQueryRepository.getUserByIdForAuthMe(userId);
   }
 }

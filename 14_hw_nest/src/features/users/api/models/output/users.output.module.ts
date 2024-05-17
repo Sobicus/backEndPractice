@@ -11,3 +11,4 @@ export type UsersOutputDTO = {
   totalCount: number;
   items: UserOutputDTO[];
 };
+export type UserAuthMeDTO = { email: string; login: string; userId: string };

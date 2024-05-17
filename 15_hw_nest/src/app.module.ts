@@ -19,7 +19,6 @@ import { CommentsController } from './features/comments/api/comments.controller'
 import { Users, UsersSchema } from './features/users/domain/users.entity';
 import { UsersController } from './features/users/api/users.controller';
 import { UsersRepository } from './features/users/infrastructure/users.repository';
-import { UsersQueryRepository } from './features/users/infrastructure/users.query-repository';
 import { UsersService } from './features/users/application/users.service';
 import { ConfigModule } from '@nestjs/config';
 import { TestingAllDataController } from './features/dropAll/api/testing-all-data.controller';
@@ -31,23 +30,24 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { EmailService } from './base/mail/email-server.service';
 import { join } from 'path';
-import { ConfirmationCodeIsValidConstraint } from './features/auth/infrastructure/validate';
-import { PasswordRecoveryRepository } from './features/users/infrastructure/accountData/passwordRecoveryRepository';
+import { ConfirmationCodeIsValidConstraint } from './base/decorators/validate';
+import { PasswordRecoveryRepository } from './features/users/infrastructure/passwordRecovery.repository';
 import {
   PasswordRecovery,
   PasswordRecoverySchema,
-} from './features/users/infrastructure/accountData/passwordRecovery.entity';
+} from './features/users/domain/passwordRecovery.entity';
 import { LocalStrategy } from './base/guards/strategy/local/local.strategy';
 import { PassportModule } from '@nestjs/passport';
 import {
   Sessions,
   SessionsSchema,
-} from './features/users/infrastructure/sessionsData/sessions.entity';
-import { SessionService } from './features/users/infrastructure/sessionsData/session.service';
-import { SessionsRepository } from './features/users/infrastructure/sessionsData/sessions.repository';
+} from './features/auth/domain/sessions.entity';
+import { SessionService } from './features/auth/application/session.service';
+import { SessionsRepository } from './features/auth/infrastructure/sessions.repository';
 import { LoginGuard } from './base/guards/login.guard';
 import { JwtAuthGuard } from './base/guards/jwt-refreash.guard';
-import { JwtStrategy } from './base/guards/strategy/jwt/jwt-cokie.strategy';
+import { UsersQueryRepository } from './features/users/infrastructure/users-query.repository';
+import { JwtStrategy } from './base/guards/strategy/jwt/jwt-cookie.strategy';
 
 const repositories = [
   BlogsRepository,

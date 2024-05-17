@@ -1,5 +1,5 @@
 import { IsString, Length, Matches } from 'class-validator';
-import { ConfirmationCodeIsValid } from '../../../infrastructure/validate';
+import { ConfirmationCodeIsValid } from '../../../../../base/decorators/validate';
 
 export class LoginInputModelType {
   @IsString()
@@ -7,6 +7,7 @@ export class LoginInputModelType {
   @IsString()
   password: string;
 }
+
 export class RegistrationUserModelType {
   @IsString()
   @Length(3, 10)
@@ -19,16 +20,19 @@ export class RegistrationUserModelType {
   @Matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
   email: string;
 }
+
 export class InputCodeModel {
   @IsString()
   @ConfirmationCodeIsValid()
   code: string;
 }
+
 export class InputEmailModel {
   @IsString()
   @Matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
   email: string;
 }
+
 export class InputNewPasswordModel {
   @IsString()
   @Length(6, 20)

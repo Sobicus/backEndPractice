@@ -23,7 +23,7 @@
     "-": "^0.0.1",
     "@nestjs-modules/mailer": "^1.11.2",
     "@nestjs/common": "^10.0.0",
-    "@nestjs/config": "^3.2.1",
+    "@nestjs/config": "^3.2.2",
     "@nestjs/core": "^10.0.0",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/mongoose": "^10.0.4",
