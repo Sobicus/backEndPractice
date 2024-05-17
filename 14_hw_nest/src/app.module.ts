@@ -54,6 +54,7 @@ import {
   IsUserAlreadyExist,
   IsUserAlreadyExistConstraint,
 } from './base/guards/emailOrLoginAlreadyExist.guard';
+import { IsNotEmailExistConstraint } from './base/guards/emailIsNotExist.guard';
 
 const repositories = [
   BlogsRepository,
@@ -136,6 +137,7 @@ const service = [
     JwtAccessStrategy,
     JwtAccessAuthGuard,
     IsUserAlreadyExistConstraint,
+    IsNotEmailExistConstraint,
   ],
 })
 export class AppModule {}

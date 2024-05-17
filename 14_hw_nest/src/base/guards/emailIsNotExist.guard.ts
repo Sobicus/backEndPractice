@@ -8,29 +8,26 @@ import {
 import { UsersRepository } from '../../features/users/infrastructure/users.repository';
 
 @ValidatorConstraint({ async: true })
-export class IsUserAlreadyExistConstraint
-  implements ValidatorConstraintInterface
-{
+export class IsNotEmailExistConstraint implements ValidatorConstraintInterface {
   constructor(private usersRepository: UsersRepository) {}
 
-  async validate(loginOrEmail: string, args: ValidationArguments) {
-    const result =
-      await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
-    if (result) {
-      return false;
+  async validate(email: string, args: ValidationArguments) {
+    const result = await this.usersRepository.findUserByEmail(email);
+    if (!result) {
+      return true;
     }
-    return true;
+    return false;
   }
 }
 
-export function IsUserAlreadyExist(validationOptions?: ValidationOptions) {
+export function IsNotEmailExist(validationOptions?: ValidationOptions) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
       constraints: [],
-      validator: IsUserAlreadyExistConstraint,
+      validator: IsNotEmailExistConstraint,
     });
   };
 }

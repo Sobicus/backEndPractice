@@ -1,6 +1,7 @@
 import { IsString, Length, Matches } from 'class-validator';
 import { ConfirmationCodeIsValid } from '../../../infrastructure/validate';
 import { IsUserAlreadyExist } from '../../../../../base/guards/emailOrLoginAlreadyExist.guard';
+import { IsNotEmailExist } from '../../../../../base/guards/emailIsNotExist.guard';
 
 export class LoginInputModelType {
   @IsString()
@@ -30,6 +31,7 @@ export class InputCodeModel {
 export class InputEmailModel {
   @IsString()
   @Matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+  @IsNotEmailExist()
   email: string;
 }
 export class InputNewPasswordModel {
