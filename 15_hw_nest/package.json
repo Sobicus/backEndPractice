@@ -18,7 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "start:nokey": "ssh -R 80:localhost:3000 nokey@localhost.run",
+    "start:serveo": "ssh -R 80:localhost:3000 nokey@localhost.run",
     "start:dev:serveo": "concurrently \"nest start --watch\" \"ssh -R 80:localhost:3000 serveo.net\""
   },
   "dependencies": {
