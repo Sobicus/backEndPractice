@@ -9,7 +9,7 @@ import { PostsRepository } from './features/posts/infrastructure/posts.repositor
 import { PostsService } from './features/posts/application/posts.service';
 import { PostsController } from './features/posts/api/models/posts.controller';
 import { Posts, PostsSchema } from './features/posts/domain/posts.entity';
-import { PostsQueryRepository } from './features/posts/infrastructure/posts.query-repository';
+import { PostsQueryRepository } from './features/posts/infrastructure/posts-query.repository';
 import {
   Comments,
   CommentsSchema,
@@ -50,11 +50,10 @@ import { UsersQueryRepository } from './features/users/infrastructure/users-quer
 import { JwtStrategy } from './base/guards/strategy/jwt/jwt-cookie.strategy';
 import { JwtAccessStrategy } from './base/guards/strategy/jwt/jwt-header.strategy';
 import { JwtAccessAuthGuard } from './base/guards/jwt-access.guard';
-import {
-  IsUserAlreadyExist,
-  IsUserAlreadyExistConstraint,
-} from './base/guards/emailOrLoginAlreadyExist.guard';
+import { IsUserAlreadyExistConstraint } from './base/guards/emailOrLoginAlreadyExist.guard';
 import { IsNotEmailExistConstraint } from './base/guards/emailIsNotExist.guard';
+import { CommentsRepository } from './features/comments/infrastructure/comments.repository';
+import { CommentsService } from './features/comments/application/comments.service';
 
 const repositories = [
   BlogsRepository,
@@ -66,6 +65,7 @@ const repositories = [
   UsersQueryRepository,
   PasswordRecoveryRepository,
   SessionsRepository,
+  CommentsRepository,
 ];
 const service = [
   BlogsService,
@@ -75,6 +75,7 @@ const service = [
   JWTService,
   EmailService,
   SessionService,
+  CommentsService,
 ];
 
 @Module({

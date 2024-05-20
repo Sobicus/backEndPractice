@@ -16,7 +16,6 @@ import {
   LoginInputModelType,
   RegistrationUserModelType,
 } from './models/input/auth-.input.model';
-import { UsersService } from '../../users/application/users.service';
 import { Response } from 'express';
 import { AuthService } from '../application/auth.service';
 import { JWTService } from 'src/base/application/jwt.service';

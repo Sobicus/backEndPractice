@@ -25,12 +25,14 @@ export class UsersController {
     private usersService: UsersService,
     private usersQueryRepository: UsersQueryRepository,
   ) {}
+
   @UseGuards(UserAuthGuard)
   @Get()
   async getAllUsers(@Query() query: PaginationUsersInputModelType) {
     const pagination = usersPagination(query);
     return this.usersQueryRepository.getAllUsers(pagination);
   }
+
   @UseGuards(UserAuthGuard)
   @Post()
   async CreateUser(@Body() inputModel: UserInputModelType) {
@@ -38,6 +40,7 @@ export class UsersController {
     const user = await this.usersQueryRepository.getUserById(userId);
     if (user) return user;
   }
+
   @UseGuards(UserAuthGuard)
   @Delete(':id')
   @HttpCode(204)

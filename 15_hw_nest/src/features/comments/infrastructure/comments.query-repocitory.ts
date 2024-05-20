@@ -9,6 +9,7 @@ export class CommentsQueryRepository {
   constructor(
     @InjectModel(Comments.name) private CommentsModel: Model<Comments>,
   ) {}
+
   async getCommentsById(
     commentsId: string,
   ): Promise<CommentsOutputModels | null> {

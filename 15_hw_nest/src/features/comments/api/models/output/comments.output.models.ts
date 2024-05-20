@@ -1,3 +1,5 @@
+import { IsString, Length } from 'class-validator';
+
 export type CommentsOutputModels = {
   id: string;
   content: string;
@@ -12,3 +14,8 @@ export type CommentsOutputModels = {
     myStatus: string;
   };
 };
+export class InputUpdateCommentModel {
+  @IsString()
+  @Length(20, 300)
+  content: string;
+}

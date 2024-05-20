@@ -19,3 +19,13 @@ export class PostInputModelBlogControllerType {
   shortDescription: string;
   content: string;
 }
+
+//TODO check type
+export type postCreateDTO = {
+  title: string;
+  shortDescription: string;
+  content: string;
+  blogId: string;
+  blogName: string;
+  createdAt: string;
+};

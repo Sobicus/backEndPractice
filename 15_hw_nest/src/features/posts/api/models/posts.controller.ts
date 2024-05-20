@@ -11,7 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { PostsService } from '../../application/posts.service';
-import { PostsQueryRepository } from '../../infrastructure/posts.query-repository';
+import { PostsQueryRepository } from '../../infrastructure/posts-query.repository';
 import { PostInputModelType } from './input/create-post.input.model';
 import {
   PaginationPostsInputModelType,
@@ -30,6 +30,7 @@ export class PostsController {
     const query = postPagination(pagination);
     return await this.postsQueryRepository.getAllPosts(query);
   }
+
   @Get(':id')
   async getPostById(@Param('id') postId: string) {
     const post = await this.postsQueryRepository.getPostById(postId);
@@ -70,4 +71,8 @@ export class PostsController {
       throw new NotFoundException();
     }
   }
+
+  @Get(':id/comments')
+  async getComments(@Param('id') postId: string,
+                    @Query()) {}
 }

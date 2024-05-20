@@ -19,7 +19,7 @@ import {
   paginationBlogsInputModelType,
 } from '../../../base/helpers/pagination-blogs-helper';
 import { PostsService } from '../../posts/application/posts.service';
-import { PostsQueryRepository } from '../../posts/infrastructure/posts.query-repository';
+import { PostsQueryRepository } from '../../posts/infrastructure/posts-query.repository';
 import {
   PaginationPostsInputModelType,
   postPagination,
