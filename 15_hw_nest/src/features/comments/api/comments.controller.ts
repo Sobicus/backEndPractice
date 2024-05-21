@@ -14,7 +14,7 @@ import { CommentsQueryRepository } from '../infrastructure/comments-query.reposi
 import { CommentsService } from '../application/comments.service';
 import { JwtAccessAuthGuard } from 'src/base/guards/jwt-access.guard';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
-import { InputUpdateCommentModel } from './models/output/comments.output.models';
+import { InputUpdateCommentModel } from './models/output/comments.output.model';
 
 @Controller('comments')
 export class CommentsController {

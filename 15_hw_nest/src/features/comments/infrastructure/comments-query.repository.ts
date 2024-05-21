@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Comments } from '../domain/comments.entity';
+
+import { PaginationCommentsOutputModelType } from '../../../base/helpers/pagination-comments-helpers';
 import {
   CommentOutputModel,
   CommentsOutputModel,
-} from '../api/models/output/comments.output.models';
-import { PaginationCommentsOutputModelType } from '../../../base/helpers/pagination-comments-helpers';
+} from '../api/models/input/comments.input.model';
 
 @Injectable()
 export class CommentsQueryRepository {

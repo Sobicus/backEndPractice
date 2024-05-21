@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from '../../application/posts.service';
 import { PostsQueryRepository } from '../../infrastructure/posts-query.repository';
@@ -22,6 +23,10 @@ import {
   PaginationCommentsInputModelType,
 } from '../../../../base/helpers/pagination-comments-helpers';
 import { CommentsQueryRepository } from '../../../comments/infrastructure/comments-query.repository';
+import { JwtAccessAuthGuard } from '../../../../base/guards/jwt-access.guard';
+import { TakeUserId } from '../../../../base/decorators/authMeTakeIserId';
+import { InputUpdateCommentModel } from '../../../comments/api/models/input/comments.input.model';
+import { CommentsService } from '../../../comments/application/comments.service';
 
 @Controller('posts')
 export class PostsController {
@@ -29,6 +34,7 @@ export class PostsController {
     private postsService: PostsService,
     private postsQueryRepository: PostsQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
+    private commentsService: CommentsService,
   ) {}
 
   @Get()
@@ -87,6 +93,26 @@ export class PostsController {
     return await this.commentsQueryRepository.getCommentsByPostId(
       postId,
       query,
+    );
+  }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Post(':id/comments')
+  async createdComment(
+    @Param('id') postId: string,
+    @Body() content: InputUpdateCommentModel,
+    @TakeUserId() { userId }: { userId: string },
+  ) {
+    const res = await this.commentsService.createComment(
+      postId,
+      content.content,
+      userId,
+    );
+    if (res.status === 'NotFound') {
+      throw new NotFoundException();
+    }
+    return await this.commentsQueryRepository.getCommentById(
+      res.data as string,
     );
   }
 }

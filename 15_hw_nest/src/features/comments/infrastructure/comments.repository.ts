@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comments, CommentsDocument } from '../domain/comments.entity';
 import { Model, Types } from 'mongoose';
+import { InputCreateCommentModel } from '../api/models/input/comments.input.model';
 
 @Injectable()
 export class CommentsRepository {
@@ -22,5 +23,10 @@ export class CommentsRepository {
       { _id: new Types.ObjectId(commentId) },
       { content },
     );
+  }
+
+  async createComment(newComment: InputCreateCommentModel): Promise<string> {
+    const comment = await this.CommentsModel.create(newComment);
+    return comment._id.toString();
   }
 }

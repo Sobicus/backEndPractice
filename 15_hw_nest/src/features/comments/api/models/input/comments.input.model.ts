@@ -21,8 +21,17 @@ export type CommentsOutputModel = {
   totalCount: number;
   items: CommentOutputModel[];
 };
+
 export class InputUpdateCommentModel {
   @IsString()
   @Length(20, 300)
   content: string;
+}
+
+export class InputCreateCommentModel {
+  content: string;
+  userId: string;
+  userLogin: string;
+  createdAt: string;
+  postId: string;
 }
