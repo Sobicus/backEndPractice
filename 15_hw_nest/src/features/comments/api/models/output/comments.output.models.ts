@@ -1,6 +1,6 @@
 import { IsString, Length } from 'class-validator';
 
-export type CommentsOutputModels = {
+export type CommentOutputModel = {
   id: string;
   content: string;
   commentatorInfo: {
@@ -13,6 +13,13 @@ export type CommentsOutputModels = {
     dislikesCount: number;
     myStatus: string;
   };
+};
+export type CommentsOutputModel = {
+  pagesCount: number;
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  items: CommentOutputModel[];
 };
 export class InputUpdateCommentModel {
   @IsString()

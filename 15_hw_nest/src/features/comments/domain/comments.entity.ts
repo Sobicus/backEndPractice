@@ -13,6 +13,8 @@ export class Comments {
   userLogin: string;
   @Prop({ type: String, required: true })
   createdAt: string;
+  @Prop({ type: String, required: true })
+  postId: string;
   // update({ title, shortDescription, content, blogId }: PostInputModelType) {
   //   this.title = title;
   //   this.shortDescription = shortDescription;

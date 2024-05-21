@@ -1,4 +1,4 @@
-import { IsString, Length, MAX, MaxLength } from 'class-validator';
+import { IsString, Length, MaxLength } from 'class-validator';
 
 export class PostInputModelType {
   @IsString()

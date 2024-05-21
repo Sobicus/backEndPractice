@@ -4,7 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Blogs, BlogsSchema } from './features/blogs/domain/blogs.entity';
 import { BlogsService } from './features/blogs/application/blogs.service';
 import { BlogsRepository } from './features/blogs/infrastructure/blogs.repository';
-import { BlogsQueryRepository } from './features/blogs/infrastructure/blogs.query-repository';
+import { BlogsQueryRepository } from './features/blogs/infrastructure/blogs-query.repository';
 import { PostsRepository } from './features/posts/infrastructure/posts.repository';
 import { PostsService } from './features/posts/application/posts.service';
 import { PostsController } from './features/posts/api/models/posts.controller';
@@ -14,7 +14,7 @@ import {
   Comments,
   CommentsSchema,
 } from './features/comments/domain/comments.entity';
-import { CommentsQueryRepository } from './features/comments/infrastructure/comments.query-repocitory';
+import { CommentsQueryRepository } from './features/comments/infrastructure/comments-query.repository';
 import { CommentsController } from './features/comments/api/comments.controller';
 import { Users, UsersSchema } from './features/users/domain/users.entity';
 import { UsersController } from './features/users/api/users.controller';

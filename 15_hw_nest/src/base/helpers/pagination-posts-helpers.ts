@@ -1,4 +1,4 @@
-export const postPagination = (
+export const postsPagination = (
   query: PaginationPostsInputModelType,
 ): PaginationPostsOutputModelType => {
   const defaultValues = {

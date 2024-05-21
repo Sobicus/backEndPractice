@@ -10,7 +10,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { CommentsQueryRepository } from '../infrastructure/comments.query-repocitory';
+import { CommentsQueryRepository } from '../infrastructure/comments-query.repository';
 import { CommentsService } from '../application/comments.service';
 import { JwtAccessAuthGuard } from 'src/base/guards/jwt-access.guard';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
@@ -25,7 +25,7 @@ export class CommentsController {
 
   @Get(':id')
   async getCommentById(@Param('id') commentId: string) {
-    const comment = this.commentsQueryRepository.getCommentsById(commentId);
+    const comment = this.commentsQueryRepository.getCommentById(commentId);
     if (!comment) {
       throw new NotFoundException();
     }

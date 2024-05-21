@@ -1,6 +1,6 @@
-export const postPagination = (
-  query: PaginationPostsInputModelType,
-): PaginationPostsOutputModelType => {
+export const commentsPagination = (
+  query: PaginationCommentsInputModelType,
+): PaginationCommentsOutputModelType => {
   const defaultValues = {
     pageNumber: 1,
     pageSize: 10,
@@ -32,7 +32,7 @@ export const postPagination = (
   return defaultValues;
 };
 
-export type PaginationPostsInputModelType = {
+export type PaginationCommentsInputModelType = {
   pageNumber: number;
   pageSize: number;
   sortBy: string;
@@ -48,7 +48,7 @@ enum Description {
   asc = 1,
   desc = -1,
 }
-export type PaginationPostsOutputModelType = {
+export type PaginationCommentsOutputModelType = {
   pageNumber: number;
   pageSize: number;
   sortBy: string;

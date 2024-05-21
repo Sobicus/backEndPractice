@@ -12,7 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
-import { BlogsQueryRepository } from '../infrastructure/blogs.query-repository';
+import { BlogsQueryRepository } from '../infrastructure/blogs-query.repository';
 import { BlogInputModelType } from './models/input/create-blog.input.model';
 import {
   blogsPagination,
@@ -22,7 +22,7 @@ import { PostsService } from '../../posts/application/posts.service';
 import { PostsQueryRepository } from '../../posts/infrastructure/posts-query.repository';
 import {
   PaginationPostsInputModelType,
-  postPagination,
+  postsPagination,
 } from '../../../base/helpers/pagination-posts-helpers';
 import { PostInputModelBlogControllerType } from '../../posts/api/models/input/create-post.input.model';
 
@@ -86,7 +86,7 @@ export class BlogsController {
     if (!res) {
       throw new NotFoundException();
     }
-    const pagination = postPagination(query);
+    const pagination = postsPagination(query);
     return this.postQueryRepository.getPostByBlogId(blogId, pagination);
   }
   @Post(':id/posts')

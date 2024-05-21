@@ -15,19 +15,25 @@ import { PostsQueryRepository } from '../../infrastructure/posts-query.repositor
 import { PostInputModelType } from './input/create-post.input.model';
 import {
   PaginationPostsInputModelType,
-  postPagination,
+  postsPagination,
 } from '../../../../base/helpers/pagination-posts-helpers';
+import {
+  commentsPagination,
+  PaginationCommentsInputModelType,
+} from '../../../../base/helpers/pagination-comments-helpers';
+import { CommentsQueryRepository } from '../../../comments/infrastructure/comments-query.repository';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private postsService: PostsService,
     private postsQueryRepository: PostsQueryRepository,
+    private commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
   @Get()
   async getAllPosts(@Query() pagination: PaginationPostsInputModelType) {
-    const query = postPagination(pagination);
+    const query = postsPagination(pagination);
     return await this.postsQueryRepository.getAllPosts(query);
   }
 
@@ -73,6 +79,14 @@ export class PostsController {
   }
 
   @Get(':id/comments')
-  async getComments(@Param('id') postId: string,
-                    @Query()) {}
+  async getComments(
+    @Param('id') postId: string,
+    @Query() pagination: PaginationCommentsInputModelType,
+  ) {
+    const query = commentsPagination(pagination);
+    return await this.commentsQueryRepository.getCommentsByPostId(
+      postId,
+      query,
+    );
+  }
 }
