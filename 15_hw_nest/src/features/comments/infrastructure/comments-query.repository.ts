@@ -8,32 +8,56 @@ import {
   CommentOutputModel,
   CommentsOutputModel,
 } from '../api/models/input/comments.input.model';
+import { CommentsLikesInfoRepository } from '../../likesInfo/comments-likesInfo/infrastructure/comments-likesInfo.repository';
+import { LikesStatus } from '../../likesInfo/comments-likesInfo/api/models/input/comments-likesInfo.input.model';
 
 @Injectable()
 export class CommentsQueryRepository {
   constructor(
     @InjectModel(Comments.name) private CommentsModel: Model<Comments>,
+    private commentsLikesInfoRepository: CommentsLikesInfoRepository,
   ) {}
 
-  async getCommentById(commentsId: string): Promise<CommentOutputModel | null> {
-    const post = await this.CommentsModel.findOne({
+  async getCommentById(
+    commentsId: string,
+    userId?: string,
+  ): Promise<CommentOutputModel | null> {
+    const comment = await this.CommentsModel.findOne({
       _id: new Types.ObjectId(commentsId),
     });
-    if (!post) {
+    if (!comment) {
       return null;
     }
+
+    let myStatus = LikesStatus.None;
+    if (userId) {
+      const reaction =
+        await this.commentsLikesInfoRepository.findLikeInfoByCommentIdUserId(
+          commentsId,
+          userId,
+        );
+      myStatus = reaction ? reaction.myStatus : myStatus;
+    }
+    const likesCount = await this.commentsLikesInfoRepository.countDocuments(
+      commentsId,
+      LikesStatus.Like,
+    );
+    const dislikesCount = await this.commentsLikesInfoRepository.countDocuments(
+      commentsId,
+      LikesStatus.Dislike,
+    );
     return {
-      id: post._id.toString(),
-      content: post.content,
+      id: comment._id.toString(),
+      content: comment.content,
       commentatorInfo: {
-        userId: post.userId,
-        userLogin: post.userLogin,
+        userId: comment.userId,
+        userLogin: comment.userLogin,
       },
-      createdAt: post.createdAt,
+      createdAt: comment.createdAt,
       likesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'test',
+        likesCount: likesCount,
+        dislikesCount: dislikesCount,
+        myStatus: myStatus,
       },
     };
   }
@@ -41,28 +65,50 @@ export class CommentsQueryRepository {
   async getCommentsByPostId(
     postId: string,
     pagination: PaginationCommentsOutputModelType,
+    userId?: string,
   ): Promise<CommentsOutputModel> {
     const comments = await this.CommentsModel.find({ postId })
       .sort(pagination.sortBy)
       .limit(pagination.pageSize)
       .skip(pagination.skip)
       .lean();
-    const allComments = comments.map((comment) => {
-      return {
-        id: comment._id.toString(),
-        content: comment.content,
-        commentatorInfo: {
-          userId: comment.userId,
-          userLogin: comment.userLogin,
-        },
-        createdAt: comment.createdAt,
-        likesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'test',
-        },
-      };
-    });
+    const allComments = await Promise.all(
+      comments.map(async (comment) => {
+        let myStatus = LikesStatus.None;
+        if (userId) {
+          const reaction =
+            await this.commentsLikesInfoRepository.findLikeInfoByCommentIdUserId(
+              comment._id.toString(),
+              userId,
+            );
+          myStatus = reaction ? reaction.myStatus : myStatus;
+        }
+        const likesCount =
+          await this.commentsLikesInfoRepository.countDocuments(
+            comment._id.toString(),
+            LikesStatus.Like,
+          );
+        const dislikesCount =
+          await this.commentsLikesInfoRepository.countDocuments(
+            comment._id.toString(),
+            LikesStatus.Dislike,
+          );
+        return {
+          id: comment._id.toString(),
+          content: comment.content,
+          commentatorInfo: {
+            userId: comment.userId,
+            userLogin: comment.userLogin,
+          },
+          createdAt: comment.createdAt,
+          likesInfo: {
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
+            myStatus: myStatus,
+          },
+        };
+      }),
+    );
     const totalCount = await this.CommentsModel.countDocuments({ postId });
     const pagesCount = Math.ceil(totalCount / pagination.pageSize);
     return {

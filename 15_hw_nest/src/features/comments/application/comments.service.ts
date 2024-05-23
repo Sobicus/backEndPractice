@@ -38,7 +38,12 @@ export class CommentsService {
       data: null,
     };
   }
-  async updateComment(commentId: string, content: string, userId: string) {
+
+  async updateComment(
+    commentId: string,
+    content: string,
+    userId: string,
+  ): Promise<ObjectClassResult> {
     const comment = await this.commentsRepository.getComment(commentId);
     if (!comment) {
       return {

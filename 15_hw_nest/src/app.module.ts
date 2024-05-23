@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { BlogsController } from './features/blogs/api/blogs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blogs, BlogsSchema } from './features/blogs/domain/blogs.entity';
@@ -54,6 +59,13 @@ import { IsUserAlreadyExistConstraint } from './base/guards/emailOrLoginAlreadyE
 import { IsNotEmailExistConstraint } from './base/guards/emailIsNotExist.guard';
 import { CommentsRepository } from './features/comments/infrastructure/comments.repository';
 import { CommentsService } from './features/comments/application/comments.service';
+import {
+  CommentsLikesInfo,
+  CommentsLikesInfoSchema,
+} from './features/likesInfo/comments-likesInfo/domain/comments-likesInfo.entity';
+import { CommentsLikesInfoRepository } from './features/likesInfo/comments-likesInfo/infrastructure/comments-likesInfo.repository';
+import { CommentsLikesInfoService } from './features/likesInfo/comments-likesInfo/application/comments-likesInfo.service';
+import { JwtSoftAccessMiddleware } from './base/middleware/jwt-soft-access.middleware';
 
 const repositories = [
   BlogsRepository,
@@ -66,6 +78,7 @@ const repositories = [
   PasswordRecoveryRepository,
   SessionsRepository,
   CommentsRepository,
+  CommentsLikesInfoRepository,
 ];
 const service = [
   BlogsService,
@@ -76,6 +89,7 @@ const service = [
   EmailService,
   SessionService,
   CommentsService,
+  CommentsLikesInfoService,
 ];
 
 @Module({
@@ -117,6 +131,7 @@ const service = [
       { name: Users.name, schema: UsersSchema },
       { name: PasswordRecovery.name, schema: PasswordRecoverySchema },
       { name: Sessions.name, schema: SessionsSchema },
+      { name: CommentsLikesInfo.name, schema: CommentsLikesInfoSchema },
     ]),
   ],
   controllers: [
@@ -141,4 +156,13 @@ const service = [
     IsNotEmailExistConstraint,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(JwtSoftAccessMiddleware)
+      .forRoutes(
+        { path: 'comments/:id', method: RequestMethod.GET },
+        { path: 'posts/:id/comments', method: RequestMethod.GET },
+      );
+  }
+}

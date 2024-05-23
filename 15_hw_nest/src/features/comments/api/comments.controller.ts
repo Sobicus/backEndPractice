@@ -14,18 +14,27 @@ import { CommentsQueryRepository } from '../infrastructure/comments-query.reposi
 import { CommentsService } from '../application/comments.service';
 import { JwtAccessAuthGuard } from 'src/base/guards/jwt-access.guard';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
-import { InputUpdateCommentModel } from './models/output/comments.output.model';
+import { InputUpdateCommentModel } from './models/input/comments.input.model';
+import { InputUpdtLikesModel } from '../../likesInfo/comments-likesInfo/api/models/input/comments-likesInfo.input.model';
+import { CommentsLikesInfoService } from '../../likesInfo/comments-likesInfo/application/comments-likesInfo.service';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
     private commentsQueryRepository: CommentsQueryRepository,
     private commentsService: CommentsService,
+    private commentsLikesInfoService: CommentsLikesInfoService,
   ) {}
 
   @Get(':id')
-  async getCommentById(@Param('id') commentId: string) {
-    const comment = this.commentsQueryRepository.getCommentById(commentId);
+  async getCommentById(
+    @Param('id') commentId: string,
+    @TakeUserId() { userId }: { userId: string },
+  ) {
+    const comment = this.commentsQueryRepository.getCommentById(
+      commentId,
+      userId,
+    );
     if (!comment) {
       throw new NotFoundException();
     }
@@ -67,5 +76,19 @@ export class CommentsController {
     if (res.status === 'Forbidden') {
       throw new ForbiddenException();
     }
+  }
+
+  @UseGuards(JwtAccessAuthGuard)
+  @Put(':id/like-status')
+  async updateCommentLikeStatus(
+    @Param('id') commentId: string,
+    @Body() likeStatus: InputUpdtLikesModel,
+    @TakeUserId() { userId }: { userId: string },
+  ) {
+    await this.commentsLikesInfoService.likeCommentUpdate(
+      commentId,
+      likeStatus.likeStatus,
+      userId,
+    );
   }
 }
