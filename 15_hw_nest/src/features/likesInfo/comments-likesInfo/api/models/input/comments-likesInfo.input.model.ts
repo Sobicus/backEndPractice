@@ -1,6 +1,6 @@
 import { IsEnum } from 'class-validator';
 
-export enum LikesStatus {
+export enum LikesStatusComments {
   None = 'None',
   Like = 'Like',
   Dislike = 'Dislike',
@@ -10,10 +10,10 @@ export class CommentsLikesInfoInputModel {
   postId: string;
   userId: string;
   createdAt: string;
-  myStatus: LikesStatus;
+  myStatus: LikesStatusComments;
 }
 
-export class InputUpdtLikesModel {
-  @IsEnum(LikesStatus)
-  likeStatus: LikesStatus;
+export class InputUpdateCommentLikesModel {
+  @IsEnum(LikesStatusComments)
+  likeStatus: LikesStatusComments;
 }

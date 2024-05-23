@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { LikesStatus } from '../api/models/input/comments-likesInfo.input.model';
+import { LikesStatusComments } from '../api/models/input/comments-likesInfo.input.model';
 import { HydratedDocument } from 'mongoose';
 
 @Schema()
@@ -10,8 +10,8 @@ export class CommentsLikesInfo {
   userId: string;
   @Prop({ type: String, required: true })
   createdAt: string;
-  @Prop({ type: String, enum: LikesStatus, required: true })
-  myStatus: LikesStatus;
+  @Prop({ type: String, enum: LikesStatusComments, required: true })
+  myStatus: LikesStatusComments;
 }
 
 export type CommentsLikesInfoDocument = HydratedDocument<CommentsLikesInfo>;

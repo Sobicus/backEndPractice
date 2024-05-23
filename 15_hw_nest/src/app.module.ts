@@ -66,6 +66,9 @@ import {
 import { CommentsLikesInfoRepository } from './features/likesInfo/comments-likesInfo/infrastructure/comments-likesInfo.repository';
 import { CommentsLikesInfoService } from './features/likesInfo/comments-likesInfo/application/comments-likesInfo.service';
 import { JwtSoftAccessMiddleware } from './base/middleware/jwt-soft-access.middleware';
+import { PostsLikesInfo } from './features/likesInfo/posts-likeInfo/domain/posts-likesInfo.entity';
+import { PostsLikesInfoService } from './features/likesInfo/posts-likeInfo/application/posts-likesInfo.service';
+import { PostsLikesInfoRepository } from './features/likesInfo/posts-likeInfo/infrastructure/posts-likesInfo.repository';
 
 const repositories = [
   BlogsRepository,
@@ -79,6 +82,7 @@ const repositories = [
   SessionsRepository,
   CommentsRepository,
   CommentsLikesInfoRepository,
+  PostsLikesInfoRepository,
 ];
 const service = [
   BlogsService,
@@ -90,6 +94,7 @@ const service = [
   SessionService,
   CommentsService,
   CommentsLikesInfoService,
+  PostsLikesInfoService,
 ];
 
 @Module({
@@ -132,6 +137,7 @@ const service = [
       { name: PasswordRecovery.name, schema: PasswordRecoverySchema },
       { name: Sessions.name, schema: SessionsSchema },
       { name: CommentsLikesInfo.name, schema: CommentsLikesInfoSchema },
+      { name: PostsLikesInfo.name, schema: CommentsLikesInfoSchema },
     ]),
   ],
   controllers: [

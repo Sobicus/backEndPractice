@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CommentsLikesInfoRepository } from '../infrastructure/comments-likesInfo.repository';
-import { LikesStatus } from '../api/models/input/comments-likesInfo.input.model';
+import { LikesStatusComments } from '../api/models/input/comments-likesInfo.input.model';
 import { CommentsRepository } from '../../../comments/infrastructure/comments.repository';
 import { ObjectClassResult, statusType } from '../../../../base/oject-result';
 
@@ -13,7 +13,7 @@ export class CommentsLikesInfoService {
 
   async likeCommentUpdate(
     commentId: string,
-    likeStatus: LikesStatus,
+    likeStatus: LikesStatusComments,
     userId: string,
   ): Promise<ObjectClassResult> {
     const comment = await this.commentsRepository.getComment(commentId);

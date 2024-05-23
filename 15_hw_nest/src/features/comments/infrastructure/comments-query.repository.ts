@@ -9,7 +9,7 @@ import {
   CommentsOutputModel,
 } from '../api/models/input/comments.input.model';
 import { CommentsLikesInfoRepository } from '../../likesInfo/comments-likesInfo/infrastructure/comments-likesInfo.repository';
-import { LikesStatus } from '../../likesInfo/comments-likesInfo/api/models/input/comments-likesInfo.input.model';
+import { LikesStatusComments } from '../../likesInfo/comments-likesInfo/api/models/input/comments-likesInfo.input.model';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -29,7 +29,7 @@ export class CommentsQueryRepository {
       return null;
     }
 
-    let myStatus = LikesStatus.None;
+    let myStatus = LikesStatusComments.None;
     if (userId) {
       const reaction =
         await this.commentsLikesInfoRepository.findLikeInfoByCommentIdUserId(
@@ -40,11 +40,11 @@ export class CommentsQueryRepository {
     }
     const likesCount = await this.commentsLikesInfoRepository.countDocuments(
       commentsId,
-      LikesStatus.Like,
+      LikesStatusComments.Like,
     );
     const dislikesCount = await this.commentsLikesInfoRepository.countDocuments(
       commentsId,
-      LikesStatus.Dislike,
+      LikesStatusComments.Dislike,
     );
     return {
       id: comment._id.toString(),
@@ -74,7 +74,7 @@ export class CommentsQueryRepository {
       .lean();
     const allComments = await Promise.all(
       comments.map(async (comment) => {
-        let myStatus = LikesStatus.None;
+        let myStatus = LikesStatusComments.None;
         if (userId) {
           const reaction =
             await this.commentsLikesInfoRepository.findLikeInfoByCommentIdUserId(
@@ -86,12 +86,12 @@ export class CommentsQueryRepository {
         const likesCount =
           await this.commentsLikesInfoRepository.countDocuments(
             comment._id.toString(),
-            LikesStatus.Like,
+            LikesStatusComments.Like,
           );
         const dislikesCount =
           await this.commentsLikesInfoRepository.countDocuments(
             comment._id.toString(),
-            LikesStatus.Dislike,
+            LikesStatusComments.Dislike,
           );
         return {
           id: comment._id.toString(),

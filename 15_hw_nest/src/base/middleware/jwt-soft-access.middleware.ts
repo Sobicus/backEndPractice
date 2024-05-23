@@ -13,12 +13,9 @@ export class JwtSoftAccessMiddleware implements NestMiddleware {
     const token = req.headers.authorization.split(' ')[1];
 
     try {
-      const payload = await this.jwtService.verifyAsync<{ userId: string }>(
-        token,
-        {
-          secret: process.env.JWT_SECRET,
-        },
-      );
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET,
+      });
       //.catch((e) => next());
       if (payload) {
         console.log(payload);

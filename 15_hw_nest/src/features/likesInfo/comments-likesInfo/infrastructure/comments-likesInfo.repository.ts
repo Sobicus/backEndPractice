@@ -7,7 +7,7 @@ import {
 import { Model } from 'mongoose';
 import {
   CommentsLikesInfoInputModel,
-  LikesStatus,
+  LikesStatusComments,
 } from '../api/models/input/comments-likesInfo.input.model';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class CommentsLikesInfoRepository {
   }
   async updateLikeInfoComment(
     commentId: string,
-    likeStatus: LikesStatus,
+    likeStatus: LikesStatusComments,
     userId: string,
   ) {
     await this.CommentsLikesInfoModel.updateOne(

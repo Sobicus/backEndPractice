@@ -27,6 +27,8 @@ import { JwtAccessAuthGuard } from '../../../../base/guards/jwt-access.guard';
 import { TakeUserId } from '../../../../base/decorators/authMeTakeIserId';
 import { InputUpdateCommentModel } from '../../../comments/api/models/input/comments.input.model';
 import { CommentsService } from '../../../comments/application/comments.service';
+import { InputUpdatePostLikesModel } from '../../../likesInfo/posts-likeInfo/api/models/input/posts-likesInfo.input.model';
+import { PostsLikesInfoService } from '../../../likesInfo/posts-likeInfo/application/posts-likesInfo.service';
 
 @Controller('posts')
 export class PostsController {
@@ -35,6 +37,7 @@ export class PostsController {
     private postsQueryRepository: PostsQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
     private commentsService: CommentsService,
+    private postsLikesInfoService: PostsLikesInfoService,
   ) {}
 
   @Get()
@@ -116,5 +119,23 @@ export class PostsController {
     return await this.commentsQueryRepository.getCommentById(
       res.data as string,
     );
+  }
+
+  @HttpCode(204)
+  @UseGuards(JwtAccessAuthGuard)
+  @Put(':id/like-status')
+  async updatePostLikeStatus(
+    @Param('id') postId: string,
+    @Body() likeStatus: InputUpdatePostLikesModel,
+    @TakeUserId() { userId }: { userId: string },
+  ) {
+    const res = await this.postsLikesInfoService.updatePostLikeInfo(
+      postId,
+      likeStatus.likeStatus,
+      userId,
+    );
+    if (res.status === 'NotFound') {
+      throw new NotFoundException();
+    }
   }
 }

@@ -15,7 +15,7 @@ import { CommentsService } from '../application/comments.service';
 import { JwtAccessAuthGuard } from 'src/base/guards/jwt-access.guard';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
 import { InputUpdateCommentModel } from './models/input/comments.input.model';
-import { InputUpdtLikesModel } from '../../likesInfo/comments-likesInfo/api/models/input/comments-likesInfo.input.model';
+import { InputUpdateCommentLikesModel } from '../../likesInfo/comments-likesInfo/api/models/input/comments-likesInfo.input.model';
 import { CommentsLikesInfoService } from '../../likesInfo/comments-likesInfo/application/comments-likesInfo.service';
 
 @Controller('comments')
@@ -78,17 +78,21 @@ export class CommentsController {
     }
   }
 
+  @HttpCode(204)
   @UseGuards(JwtAccessAuthGuard)
   @Put(':id/like-status')
   async updateCommentLikeStatus(
     @Param('id') commentId: string,
-    @Body() likeStatus: InputUpdtLikesModel,
+    @Body() likeStatus: InputUpdateCommentLikesModel,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    await this.commentsLikesInfoService.likeCommentUpdate(
+    const res = await this.commentsLikesInfoService.likeCommentUpdate(
       commentId,
       likeStatus.likeStatus,
       userId,
     );
+    if (res.status === 'NotFound') {
+      throw new NotFoundException();
+    }
   }
 }
