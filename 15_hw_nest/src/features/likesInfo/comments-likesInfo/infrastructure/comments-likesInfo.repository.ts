@@ -44,7 +44,7 @@ export class CommentsLikesInfoRepository {
   ): Promise<number> {
     return this.CommentsLikesInfoModel.countDocuments({
       commentId,
-      likeStatus,
+      myStatus: likeStatus,
     });
   }
 }

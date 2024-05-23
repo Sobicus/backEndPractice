@@ -20,7 +20,6 @@ export class PostsQueryRepository {
         const totalCount = await PostsModel.countDocuments()
         const pagesCount = Math.ceil(totalCount / postsPagination.pageSize)
 
-
         const allPosts = await Promise.all(posts.map(async p => {
             let myStatus = LikesStatus.None
             if (userId) {

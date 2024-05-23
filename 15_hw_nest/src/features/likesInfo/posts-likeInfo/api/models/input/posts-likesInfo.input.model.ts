@@ -9,3 +9,10 @@ export class InputUpdatePostLikesModel {
   @IsEnum(LikesStatusPosts)
   likeStatus: LikesStatusPosts;
 }
+export class PostLikesInfoInputModel {
+  postId: string;
+  userId: string;
+  login: string;
+  createdAt: string;
+  myStatus: LikesStatusPosts;
+}

@@ -9,39 +9,74 @@ import {
   PaginationPostsType,
   PostOutputModelType,
 } from '../api/models/output/post.output.model';
+import { PostsLikesInfoRepository } from '../../likesInfo/posts-likeInfo/infrastructure/posts-likesInfo.repository';
+import { LikesStatusPosts } from '../../likesInfo/posts-likeInfo/api/models/input/posts-likesInfo.input.model';
 
 @Injectable()
 export class PostsQueryRepository {
-  constructor(@InjectModel(Posts.name) private PostsModel: Model<Posts>) {}
+  constructor(
+    @InjectModel(Posts.name) private PostsModel: Model<Posts>,
+    private postsLikesInfoRepository: PostsLikesInfoRepository,
+  ) {}
+
   async getAllPosts(
     pagination: PaginationPostsOutputModelType,
+    userId?: string,
   ): Promise<PaginationPostsType> {
     const posts = await this.PostsModel.find()
       .sort({ [pagination.sortBy]: pagination.sortDirection })
       .limit(pagination.pageSize)
       .skip(pagination.skip)
       .lean();
-    const allPosts = posts.map((p) => ({
-      id: p._id.toString(),
-      title: p.title,
-      shortDescription: p.shortDescription,
-      content: p.content,
-      blogId: p.blogId,
-      blogName: p.blogName,
-      createdAt: p.createdAt,
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-        newestLikes: [
-          {
-            addedAt: '2024-03-29T00:09:59.478Z',
-            userId: 'string',
-            login: 'string',
+    const allPosts = await Promise.all(
+      posts.map(async (p) => {
+        let myStatus = LikesStatusPosts.None;
+        if (userId) {
+          const reaction =
+            await this.postsLikesInfoRepository.findLikeInfoByPostIdUserId(
+              p._id.toString(),
+              userId,
+            );
+          myStatus = reaction ? reaction.myStatus : myStatus;
+        }
+        const likesCount = await this.postsLikesInfoRepository.countDocuments(
+          p._id.toString(),
+          LikesStatusPosts.Like,
+        );
+        const dislikesCount =
+          await this.postsLikesInfoRepository.countDocuments(
+            p._id.toString(),
+            LikesStatusPosts.Dislike,
+          );
+        const newestLikes =
+          await this.postsLikesInfoRepository.findLastThreeLikes(
+            p._id.toString(),
+            LikesStatusPosts.Like,
+          );
+        const newestLikesViewModel = newestLikes.map((like) => {
+          return {
+            addedAt: like.createdAt,
+            userId: like.userId,
+            login: like.login,
+          };
+        });
+        return {
+          id: p._id.toString(),
+          title: p.title,
+          shortDescription: p.shortDescription,
+          content: p.content,
+          blogId: p.blogId,
+          blogName: p.blogName,
+          createdAt: p.createdAt,
+          extendedLikesInfo: {
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
+            myStatus: myStatus,
+            newestLikes: newestLikesViewModel,
           },
-        ],
-      },
-    }));
+        };
+      }),
+    );
     const totalCount = await this.PostsModel.countDocuments();
     const pagesCount = Math.ceil(totalCount / pagination.pageSize);
     return {
@@ -52,13 +87,46 @@ export class PostsQueryRepository {
       items: allPosts,
     };
   }
-  async getPostById(postId: string): Promise<PostOutputModelType | null> {
+
+  async getPostById(
+    postId: string,
+    userId?: string,
+  ): Promise<PostOutputModelType | null> {
     const post = await this.PostsModel.findOne({
       _id: new Types.ObjectId(postId),
     });
     if (!post) {
       return null;
     }
+
+    let myStatus = LikesStatusPosts.None;
+    if (userId) {
+      const reaction =
+        await this.postsLikesInfoRepository.findLikeInfoByPostIdUserId(
+          postId,
+          userId,
+        );
+      myStatus = reaction ? reaction.myStatus : myStatus;
+    }
+    const likesCount = await this.postsLikesInfoRepository.countDocuments(
+      postId,
+      LikesStatusPosts.Like,
+    );
+    const dislikesCount = await this.postsLikesInfoRepository.countDocuments(
+      postId,
+      LikesStatusPosts.Dislike,
+    );
+    const newestLikes = await this.postsLikesInfoRepository.findLastThreeLikes(
+      postId,
+      LikesStatusPosts.Like,
+    );
+    const newestLikesViewModel = newestLikes.map((like) => {
+      return {
+        addedAt: like.createdAt,
+        userId: like.userId,
+        login: like.login,
+      };
+    });
     return {
       id: post._id.toString(),
       title: post.title,
@@ -68,49 +136,73 @@ export class PostsQueryRepository {
       blogName: post.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-        newestLikes: [
-          {
-            addedAt: '2024-03-29T00:09:59.478Z',
-            userId: 'string',
-            login: 'string',
-          },
-        ],
+        likesCount: likesCount,
+        dislikesCount: dislikesCount,
+        myStatus: myStatus,
+        newestLikes: newestLikesViewModel,
       },
     };
   }
+
   async getPostByBlogId(
     blogId: string,
     pagination: PaginationPostsOutputModelType,
+    userId?: string,
   ): Promise<PaginationPostsType | null> {
     const posts = await this.PostsModel.find({ blogId: blogId })
       .sort({ [pagination.sortBy]: pagination.sortDirection })
       .limit(pagination.pageSize)
       .skip(pagination.skip)
       .lean();
-    const allPosts = posts.map((p) => ({
-      id: p._id.toString(),
-      title: p.title,
-      shortDescription: p.shortDescription,
-      content: p.content,
-      blogId: p.blogId,
-      blogName: p.blogName,
-      createdAt: p.createdAt,
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-        newestLikes: [
-          {
-            addedAt: '2024-03-29T00:09:59.478Z',
-            userId: 'string',
-            login: 'string',
+    const allPosts = await Promise.all(
+      posts.map(async (p) => {
+        let myStatus = LikesStatusPosts.None;
+        if (userId) {
+          const reaction =
+            await this.postsLikesInfoRepository.findLikeInfoByPostIdUserId(
+              p._id.toString(),
+              userId,
+            );
+          myStatus = reaction ? reaction.myStatus : myStatus;
+        }
+        const likesCount = await this.postsLikesInfoRepository.countDocuments(
+          p._id.toString(),
+          LikesStatusPosts.Like,
+        );
+        const dislikesCount =
+          await this.postsLikesInfoRepository.countDocuments(
+            p._id.toString(),
+            LikesStatusPosts.Dislike,
+          );
+        const newestLikes =
+          await this.postsLikesInfoRepository.findLastThreeLikes(
+            p._id.toString(),
+            LikesStatusPosts.Like,
+          );
+        const newestLikesViewModel = newestLikes.map((like) => {
+          return {
+            addedAt: like.createdAt,
+            userId: like.userId,
+            login: like.login,
+          };
+        });
+        return {
+          id: p._id.toString(),
+          title: p.title,
+          shortDescription: p.shortDescription,
+          content: p.content,
+          blogId: p.blogId,
+          blogName: p.blogName,
+          createdAt: p.createdAt,
+          extendedLikesInfo: {
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
+            myStatus: myStatus,
+            newestLikes: newestLikesViewModel,
           },
-        ],
-      },
-    }));
+        };
+      }),
+    );
     const totalCount = await this.PostsModel.countDocuments({ blogId: blogId });
     const pagesCount = Math.ceil(totalCount / pagination.pageSize);
     return {

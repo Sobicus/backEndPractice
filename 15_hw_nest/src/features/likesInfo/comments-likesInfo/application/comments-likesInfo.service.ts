@@ -20,7 +20,7 @@ export class CommentsLikesInfoService {
     if (!comment) {
       return {
         status: statusType.NotFound,
-        statusMessages: 'Post doesn`t exists',
+        statusMessages: 'comment doesn`t exists',
         data: null,
       };
     }

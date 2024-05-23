@@ -16,7 +16,7 @@ export class PostsLikesInfo {
   myStatus: LikesStatusPosts;
 }
 
-export type CommentsLikesInfoDocument = HydratedDocument<PostsLikesInfo>;
+export type PostsLikesInfoDocument = HydratedDocument<PostsLikesInfo>;
 
-export const CommentsLikesInfoSchema =
+export const PostsLikesInfoSchema =
   SchemaFactory.createForClass(PostsLikesInfo);

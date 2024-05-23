@@ -10,11 +10,7 @@ export type PostOutputModelType = {
     likesCount: number;
     dislikesCount: number;
     myStatus: string;
-    newestLikes: {
-      addedAt: string;
-      userId: string;
-      login: string;
-    }[];
+    newestLikes: NewestLikesType[];
   };
 };
 export type PaginationPostsType = {
@@ -23,4 +19,9 @@ export type PaginationPostsType = {
   pageSize: number;
   totalCount: number;
   items: PostOutputModelType[];
+};
+export type NewestLikesType = {
+  addedAt: string;
+  userId: string;
+  login: string;
 };

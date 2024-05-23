@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
 import { BlogsQueryRepository } from '../infrastructure/blogs-query.repository';
@@ -25,6 +26,8 @@ import {
   postsPagination,
 } from '../../../base/helpers/pagination-posts-helpers';
 import { PostInputModelBlogControllerType } from '../../posts/api/models/input/create-post.input.model';
+import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
+import { UserAuthGuard } from '../../../base/guards/basic.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -43,7 +46,7 @@ export class BlogsController {
 
   @Get(':id')
   //@HttpCode(201)
-  async getBlogById(@Param('id', ParseIntPipe) userId: string) {
+  async getBlogById(@Param('id' /*ParseIntPipe*/) userId: string) {
     const res = await this.blogsQueryRepository.getBlogById(userId);
     if (!res) {
       throw new NotFoundException();
@@ -51,12 +54,13 @@ export class BlogsController {
     return res;
   }
 
+  @UseGuards(UserAuthGuard)
   @Post()
   async createBlog(@Body() inputModel: BlogInputModelType) {
     const newBlogId = await this.blogsService.createBlog(inputModel);
     return this.blogsQueryRepository.getBlogById(newBlogId);
   }
-
+  @UseGuards(UserAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updateBlog(
@@ -68,6 +72,7 @@ export class BlogsController {
       throw new NotFoundException();
     }
   }
+  @UseGuards(UserAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteBlog(@Param('id') blogId: string) {
@@ -81,23 +86,29 @@ export class BlogsController {
   async getPostsByBlogId(
     @Param('id') blogId: string,
     @Query() query: PaginationPostsInputModelType,
+    @TakeUserId() { userId }: { userId: string },
   ) {
     const res = await this.blogsService.getBlogById(blogId);
     if (!res) {
       throw new NotFoundException();
     }
     const pagination = postsPagination(query);
-    return this.postQueryRepository.getPostByBlogId(blogId, pagination);
+    return this.postQueryRepository.getPostByBlogId(blogId, pagination, userId);
   }
+  @UseGuards(UserAuthGuard)
   @Post(':id/posts')
   async createPostByBlogId(
     @Param('id') blogId: string,
     @Body() inputModel: PostInputModelBlogControllerType,
+    @TakeUserId() { userId }: { userId: string },
   ) {
     const post = await this.postService.createPost({ ...inputModel, blogId });
     if (post.status === 'NotFound') {
       throw new NotFoundException();
     }
-    return await this.postQueryRepository.getPostById(post.data as string);
+    return await this.postQueryRepository.getPostById(
+      post.data as string,
+      userId,
+    );
   }
 }

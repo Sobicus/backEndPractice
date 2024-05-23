@@ -29,6 +29,7 @@ import { InputUpdateCommentModel } from '../../../comments/api/models/input/comm
 import { CommentsService } from '../../../comments/application/comments.service';
 import { InputUpdatePostLikesModel } from '../../../likesInfo/posts-likeInfo/api/models/input/posts-likesInfo.input.model';
 import { PostsLikesInfoService } from '../../../likesInfo/posts-likeInfo/application/posts-likesInfo.service';
+import { UserAuthGuard } from '../../../../base/guards/basic.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -41,31 +42,40 @@ export class PostsController {
   ) {}
 
   @Get()
-  async getAllPosts(@Query() pagination: PaginationPostsInputModelType) {
+  async getAllPosts(
+    @Query() pagination: PaginationPostsInputModelType,
+    @TakeUserId() { userId }: { userId: string },
+  ) {
     const query = postsPagination(pagination);
-    return await this.postsQueryRepository.getAllPosts(query);
+    return await this.postsQueryRepository.getAllPosts(query, userId);
   }
 
   @Get(':id')
-  async getPostById(@Param('id') postId: string) {
-    const post = await this.postsQueryRepository.getPostById(postId);
+  async getPostById(
+    @Param('id') postId: string,
+    @TakeUserId() { userId }: { userId: string },
+  ) {
+    const post = await this.postsQueryRepository.getPostById(postId, userId);
     if (!post) {
       throw new NotFoundException();
     }
     return post;
   }
-
+  @UseGuards(UserAuthGuard)
   @Post()
-  async createPost(@Body() inputModel: PostInputModelType) {
+  async createPost(
+    @Body() inputModel: PostInputModelType,
+    @TakeUserId() { userId }: { userId: string },
+  ) {
     const res = await this.postsService.createPost(inputModel);
     if (res.status === 'NotFound') {
       throw new NotFoundException();
     }
     if (res.status === 'Created') {
-      return this.postsQueryRepository.getPostById(res.data as string);
+      return this.postsQueryRepository.getPostById(res.data as string, userId);
     }
   }
-
+  @UseGuards(UserAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updatePost(
@@ -77,7 +87,7 @@ export class PostsController {
       throw new NotFoundException();
     }
   }
-
+  @UseGuards(UserAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deletePost(@Param('id') postId: string) {

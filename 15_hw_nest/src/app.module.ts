@@ -66,7 +66,10 @@ import {
 import { CommentsLikesInfoRepository } from './features/likesInfo/comments-likesInfo/infrastructure/comments-likesInfo.repository';
 import { CommentsLikesInfoService } from './features/likesInfo/comments-likesInfo/application/comments-likesInfo.service';
 import { JwtSoftAccessMiddleware } from './base/middleware/jwt-soft-access.middleware';
-import { PostsLikesInfo } from './features/likesInfo/posts-likeInfo/domain/posts-likesInfo.entity';
+import {
+  PostsLikesInfo,
+  PostsLikesInfoSchema,
+} from './features/likesInfo/posts-likeInfo/domain/posts-likesInfo.entity';
 import { PostsLikesInfoService } from './features/likesInfo/posts-likeInfo/application/posts-likesInfo.service';
 import { PostsLikesInfoRepository } from './features/likesInfo/posts-likeInfo/infrastructure/posts-likesInfo.repository';
 
@@ -137,7 +140,7 @@ const service = [
       { name: PasswordRecovery.name, schema: PasswordRecoverySchema },
       { name: Sessions.name, schema: SessionsSchema },
       { name: CommentsLikesInfo.name, schema: CommentsLikesInfoSchema },
-      { name: PostsLikesInfo.name, schema: CommentsLikesInfoSchema },
+      { name: PostsLikesInfo.name, schema: PostsLikesInfoSchema },
     ]),
   ],
   controllers: [
@@ -169,6 +172,11 @@ export class AppModule implements NestModule {
       .forRoutes(
         { path: 'comments/:id', method: RequestMethod.GET },
         { path: 'posts/:id/comments', method: RequestMethod.GET },
+        { path: 'posts', method: RequestMethod.GET },
+        { path: 'posts/:id', method: RequestMethod.GET },
+        { path: 'posts', method: RequestMethod.POST },
+        { path: 'blogs/:id/posts', method: RequestMethod.GET },
+        { path: 'blogs/:id/posts', method: RequestMethod.POST },
       );
   }
 }
