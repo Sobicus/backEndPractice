@@ -6,7 +6,6 @@ import {
   HttpCode,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -60,6 +59,7 @@ export class BlogsController {
     const newBlogId = await this.blogsService.createBlog(inputModel);
     return this.blogsQueryRepository.getBlogById(newBlogId);
   }
+
   @UseGuards(UserAuthGuard)
   @Put(':id')
   @HttpCode(204)
@@ -72,6 +72,7 @@ export class BlogsController {
       throw new NotFoundException();
     }
   }
+
   @UseGuards(UserAuthGuard)
   @Delete(':id')
   @HttpCode(204)
@@ -82,6 +83,7 @@ export class BlogsController {
     }
     return;
   }
+
   @Get(':id/posts')
   async getPostsByBlogId(
     @Param('id') blogId: string,
@@ -100,15 +102,11 @@ export class BlogsController {
   async createPostByBlogId(
     @Param('id') blogId: string,
     @Body() inputModel: PostInputModelBlogControllerType,
-    @TakeUserId() { userId }: { userId: string },
   ) {
     const post = await this.postService.createPost({ ...inputModel, blogId });
     if (post.status === 'NotFound') {
       throw new NotFoundException();
     }
-    return await this.postQueryRepository.getPostById(
-      post.data as string,
-      userId,
-    );
+    return await this.postQueryRepository.getPostById(post.data as string);
   }
 }

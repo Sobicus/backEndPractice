@@ -19,4 +19,7 @@ export class PasswordRecoveryRepository {
   ): Promise<null | PasswordRecovery> {
     return this.PasswordRecoveryModel.findOne({ recoveryCode });
   }
+  async deleteALl() {
+    await this.PasswordRecoveryModel.deleteMany();
+  }
 }

@@ -90,7 +90,7 @@ export class PostsQueryRepository {
 
   async getPostById(
     postId: string,
-    userId?: string,
+    userId?: string | null,
   ): Promise<PostOutputModelType | null> {
     const post = await this.PostsModel.findOne({
       _id: new Types.ObjectId(postId),
@@ -98,7 +98,8 @@ export class PostsQueryRepository {
     if (!post) {
       return null;
     }
-
+    console.log('getPostById post ', post);
+    console.log('userId', userId);
     let myStatus = LikesStatusPosts.None;
     if (userId) {
       const reaction =
@@ -106,6 +107,7 @@ export class PostsQueryRepository {
           postId,
           userId,
         );
+      console.log('reaction ', reaction);
       myStatus = reaction ? reaction.myStatus : myStatus;
     }
     const likesCount = await this.postsLikesInfoRepository.countDocuments(

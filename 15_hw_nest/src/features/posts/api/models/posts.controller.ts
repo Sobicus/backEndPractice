@@ -53,7 +53,7 @@ export class PostsController {
   @Get(':id')
   async getPostById(
     @Param('id') postId: string,
-    @TakeUserId() { userId }: { userId: string },
+    @TakeUserId() { userId }: { userId: string | null },
   ) {
     const post = await this.postsQueryRepository.getPostById(postId, userId);
     if (!post) {
@@ -63,16 +63,13 @@ export class PostsController {
   }
   @UseGuards(UserAuthGuard)
   @Post()
-  async createPost(
-    @Body() inputModel: PostInputModelType,
-    @TakeUserId() { userId }: { userId: string },
-  ) {
+  async createPost(@Body() inputModel: PostInputModelType) {
     const res = await this.postsService.createPost(inputModel);
     if (res.status === 'NotFound') {
       throw new NotFoundException();
     }
     if (res.status === 'Created') {
-      return this.postsQueryRepository.getPostById(res.data as string, userId);
+      return this.postsQueryRepository.getPostById(res.data as string);
     }
   }
   @UseGuards(UserAuthGuard)

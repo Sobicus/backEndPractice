@@ -47,4 +47,7 @@ export class CommentsLikesInfoRepository {
       myStatus: likeStatus,
     });
   }
+  async deleteALl() {
+    await this.CommentsLikesInfoModel.deleteMany();
+  }
 }

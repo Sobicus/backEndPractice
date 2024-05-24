@@ -16,7 +16,10 @@ export class CommentsLikesInfoService {
     likeStatus: LikesStatusComments,
     userId: string,
   ): Promise<ObjectClassResult> {
+    console.log('likeCommentUpdate ', commentId);
     const comment = await this.commentsRepository.getComment(commentId);
+    console.log('likeCommentUpdate ', comment);
+
     if (!comment) {
       return {
         status: statusType.NotFound,
@@ -31,7 +34,7 @@ export class CommentsLikesInfoService {
       );
     if (!existingReaction) {
       const newCommentLikeInfo = {
-        postId: commentId,
+        commentId: commentId,
         userId: userId,
         createdAt: new Date().toISOString(),
         myStatus: likeStatus,

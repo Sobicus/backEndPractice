@@ -32,4 +32,7 @@ export class SessionsRepository {
     );
     return res.acknowledged;
   }
+  async deleteALl() {
+    await this.SessionsModel.deleteMany();
+  }
 }

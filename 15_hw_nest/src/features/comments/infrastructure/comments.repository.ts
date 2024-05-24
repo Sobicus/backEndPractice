@@ -29,4 +29,7 @@ export class CommentsRepository {
     const comment = await this.CommentsModel.create(newComment);
     return comment._id.toString();
   }
+  async deleteALl() {
+    await this.CommentsModel.deleteMany();
+  }
 }

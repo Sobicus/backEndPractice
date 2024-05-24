@@ -7,7 +7,7 @@ export enum LikesStatusComments {
 }
 
 export class CommentsLikesInfoInputModel {
-  postId: string;
+  commentId: string;
   userId: string;
   createdAt: string;
   myStatus: LikesStatusComments;
