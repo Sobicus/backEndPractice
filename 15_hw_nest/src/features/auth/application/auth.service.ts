@@ -123,9 +123,6 @@ export class AuthService {
         data: null,
       };
     }
-    console.log(recoveryDTO.recoveryCodeExpireDate);
-    console.log(new Date());
-    console.log(recoveryDTO.recoveryCodeExpireDate < new Date());
     if (recoveryDTO.alreadyChangePassword) {
       return {
         status: statusType.TooManyRequests,

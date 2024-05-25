@@ -18,7 +18,6 @@ export class JwtSoftAccessMiddleware implements NestMiddleware {
       });
       //.catch((e) => next());
       if (payload) {
-        console.log('JwtSoftAccessMiddleware ', payload);
         req.user = { userId: payload.userId };
       }
       return next();

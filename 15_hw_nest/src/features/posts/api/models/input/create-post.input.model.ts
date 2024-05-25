@@ -1,9 +1,12 @@
 import { IsString, Length, MaxLength } from 'class-validator';
+import { Trim } from '../../../../../base/decorators/trim';
 
 export class PostInputModelType {
   @IsString()
+  @Trim()
   @Length(1, 30)
   title: string;
+  @Trim()
   @IsString()
   @Length(1, 100)
   shortDescription: string;

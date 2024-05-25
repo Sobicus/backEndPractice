@@ -47,10 +47,13 @@ export class PostsLikesInfoRepository {
     });
   }
   async findLastThreeLikes(postId: string, likeStatus: LikesStatusPosts.Like) {
-    return this.PostsLikesInfoModel.find({ postId, myStatus: 'Like' })
-      .sort({ createAt: -1 })
+    return this.PostsLikesInfoModel.find({
+      postId: postId,
+      myStatus: likeStatus,
+    })
+      .sort({ createdAt: -1 })
       .limit(3)
-      .exec();
+      .lean();
   }
   async deleteALl() {
     await this.PostsLikesInfoModel.deleteMany();

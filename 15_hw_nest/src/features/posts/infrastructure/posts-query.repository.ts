@@ -122,6 +122,7 @@ export class PostsQueryRepository {
       postId,
       LikesStatusPosts.Like,
     );
+    console.log('newestLikes ', newestLikes);
     const newestLikesViewModel = newestLikes.map((like) => {
       return {
         addedAt: like.createdAt,
