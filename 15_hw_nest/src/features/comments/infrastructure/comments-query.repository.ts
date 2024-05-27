@@ -70,7 +70,7 @@ export class CommentsQueryRepository {
     userId?: string,
   ): Promise<CommentsOutputModel> {
     const comments = await this.CommentsModel.find({ postId })
-      .sort(pagination.sortBy)
+      .sort({ [pagination.sortBy]: pagination.sortDirection })
       .limit(pagination.pageSize)
       .skip(pagination.skip)
       .lean();

@@ -94,12 +94,29 @@ export class PostsController {
     }
   }
 
+  // @Get(':id/comments')
+  // async getComments(
+  //   @Param('id') postId: string,
+  //   @Query() pagination: PaginationCommentsInputModelType,
+  //   @TakeUserId() { userId }: { userId: string },
+  // ) {
+  //   const query = commentsPagination(pagination);
+  //   return await this.commentsQueryRepository.getCommentsByPostId(
+  //     postId,
+  //     query,
+  //     userId,
+  //   );
+  // }
   @Get(':id/comments')
   async getComments(
     @Param('id') postId: string,
     @Query() pagination: PaginationCommentsInputModelType,
     @TakeUserId() { userId }: { userId: string },
   ) {
+    const post = await this.postsQueryRepository.getPostById(postId);
+    if (!post) {
+      throw new NotFoundException();
+    }
     const query = commentsPagination(pagination);
     return await this.commentsQueryRepository.getCommentsByPostId(
       postId,
