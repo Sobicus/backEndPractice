@@ -72,6 +72,8 @@ import {
 } from './features/likesInfo/posts-likeInfo/domain/posts-likesInfo.entity';
 import { PostsLikesInfoService } from './features/likesInfo/posts-likeInfo/application/posts-likesInfo.service';
 import { PostsLikesInfoRepository } from './features/likesInfo/posts-likeInfo/infrastructure/posts-likesInfo.repository';
+import { IsNotBlogExistConstraint } from './base/guards/blogIsNotExist.guard';
+import { IsNotBlogExistInBodyConstraint } from './base/guards/blogIsNotExistInBody.guard';
 
 const repositories = [
   BlogsRepository,
@@ -163,6 +165,8 @@ const service = [
     JwtAccessAuthGuard,
     IsUserAlreadyExistConstraint,
     IsNotEmailExistConstraint,
+    IsNotBlogExistConstraint,
+    IsNotBlogExistInBodyConstraint,
   ],
 })
 export class AppModule implements NestModule {

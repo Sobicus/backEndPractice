@@ -31,7 +31,7 @@ export class CommentsController {
     @Param('id') commentId: string,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    const comment = this.commentsQueryRepository.getCommentById(
+    const comment = await this.commentsQueryRepository.getCommentById(
       commentId,
       userId,
     );

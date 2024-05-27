@@ -24,7 +24,10 @@ import {
   PaginationPostsInputModelType,
   postsPagination,
 } from '../../../base/helpers/pagination-posts-helpers';
-import { PostInputModelBlogControllerType } from '../../posts/api/models/input/create-post.input.model';
+import {
+  BlogExistModel,
+  PostInputModelBlogControllerType,
+} from '../../posts/api/models/input/create-post.input.model';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
 import { UserAuthGuard } from '../../../base/guards/basic.guard';
 
@@ -98,12 +101,17 @@ export class BlogsController {
     return this.postQueryRepository.getPostByBlogId(blogId, pagination, userId);
   }
   @UseGuards(UserAuthGuard)
-  @Post(':id/posts')
+  @Post(':blogId/posts')
   async createPostByBlogId(
-    @Param('id') blogId: string,
+    //@Param('id') blogId: string,
+    @Param() { blogId }: BlogExistModel,
     @Body() inputModel: PostInputModelBlogControllerType,
   ) {
-    const post = await this.postService.createPost({ ...inputModel, blogId });
+    //const post = await this.postService.createPost({ ...inputModel, blogId });
+    const post = await this.postService.createPost({
+      ...inputModel,
+      blogId,
+    });
     if (post.status === 'NotFound') {
       throw new NotFoundException();
     }

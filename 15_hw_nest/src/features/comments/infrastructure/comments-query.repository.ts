@@ -22,9 +22,11 @@ export class CommentsQueryRepository {
     commentsId: string,
     userId?: string,
   ): Promise<CommentOutputModel | null> {
+    console.log('commentsId ', commentsId);
     const comment = await this.CommentsModel.findOne({
       _id: new Types.ObjectId(commentsId),
     });
+    console.log('comment ', comment);
     if (!comment) {
       return null;
     }

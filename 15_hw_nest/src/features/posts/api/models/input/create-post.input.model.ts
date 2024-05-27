@@ -1,5 +1,7 @@
-import { IsString, Length, MaxLength } from 'class-validator';
+import { IsString, Length } from 'class-validator';
 import { Trim } from '../../../../../base/decorators/trim';
+import { IsNotBlogExist } from '../../../../../base/guards/blogIsNotExist.guard';
+import { IsNotBlogExistInBody } from '../../../../../base/guards/blogIsNotExistInBody.guard';
 
 export class PostInputModelType {
   @IsString()
@@ -10,19 +12,30 @@ export class PostInputModelType {
   @IsString()
   @Length(1, 100)
   shortDescription: string;
+  @Trim()
   @IsString()
-  @MaxLength(1000)
-  // @Length(1000)
+  // @MaxLength(1000)
+  @Length(1, 1000)
   content: string;
   @IsString()
+  @IsNotBlogExistInBody()
   blogId: string;
 }
 export class PostInputModelBlogControllerType {
+  @Trim()
+  @Length(1, 30)
   title: string;
+  @Trim()
+  @Length(1, 100)
   shortDescription: string;
+  @Trim()
+  @Length(1, 1000)
   content: string;
 }
-
+export class BlogExistModel {
+  @IsNotBlogExist()
+  blogId: string;
+}
 //TODO check type
 export type postCreateDTO = {
   title: string;

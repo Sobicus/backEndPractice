@@ -9,7 +9,7 @@ export class BlogsRepository {
   constructor(@InjectModel(Blogs.name) private BlogsModel: Model<Blogs>) {}
 
   async getBlogByBlogId(blogId: string): Promise<BlogsDocument | null> {
-    return this.BlogsModel.findOne({ _id: new Types.ObjectId(blogId) });
+    return this.BlogsModel.findOne({ _id: new Types.ObjectId(blogId) }).exec();
   }
 
   async createBlogs(createBlogsDto: CreateBlogDto): Promise<string> {
