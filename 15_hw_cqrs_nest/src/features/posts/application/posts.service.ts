@@ -11,29 +11,29 @@ export class PostsService {
     private blogRepository: BlogsRepository,
   ) {}
 
-  async createPost(
-    post: PostInputModelType,
-  ): Promise<ObjectClassResult<string | null>> {
-    const blog = await this.blogRepository.getBlogByBlogId(post.blogId);
-    if (!blog) {
-      return {
-        status: statusType.NotFound,
-        statusMessages: 'Blog has not found',
-        data: null,
-      };
-    }
-    const createdAt = new Date().toISOString();
-    const postId = await this.postRepository.createPost({
-      ...post,
-      blogName: blog.name,
-      createdAt,
-    });
-    return {
-      status: statusType.Created,
-      statusMessages: 'Post has been created',
-      data: postId,
-    };
-  }
+  // async createPost(
+  //   post: PostInputModelType,
+  // ): Promise<ObjectClassResult<string | null>> {
+  //   const blog = await this.blogRepository.getBlogByBlogId(post.blogId);
+  //   if (!blog) {
+  //     return {
+  //       status: statusType.NotFound,
+  //       statusMessages: 'Blog has not found',
+  //       data: null,
+  //     };
+  //   }
+  //   const createdAt = new Date().toISOString();
+  //   const postId = await this.postRepository.createPost({
+  //     ...post,
+  //     blogName: blog.name,
+  //     createdAt,
+  //   });
+  //   return {
+  //     status: statusType.Created,
+  //     statusMessages: 'Post has been created',
+  //     data: postId,
+  //   };
+  // }
 
   async updatePost(
     postId: string,

@@ -30,6 +30,9 @@ import { CommentsService } from '../../../comments/application/comments.service'
 import { InputUpdatePostLikesModel } from '../../../likesInfo/posts-likeInfo/api/models/input/posts-likesInfo.input.model';
 import { PostsLikesInfoService } from '../../../likesInfo/posts-likeInfo/application/posts-likesInfo.service';
 import { UserAuthGuard } from '../../../../base/guards/basic.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreatePostCommand } from '../../application/command/createPost.command';
+import { UpdatePostCommand } from '../../application/command/updatePost.command';
 
 @Controller('posts')
 export class PostsController {
@@ -39,6 +42,7 @@ export class PostsController {
     private commentsQueryRepository: CommentsQueryRepository,
     private commentsService: CommentsService,
     private postsLikesInfoService: PostsLikesInfoService,
+    private commandBus: CommandBus,
   ) {}
 
   @Get()
@@ -64,7 +68,9 @@ export class PostsController {
   @UseGuards(UserAuthGuard)
   @Post()
   async createPost(@Body() inputModel: PostInputModelType) {
-    const res = await this.postsService.createPost(inputModel);
+    const res = await this.commandBus.execute(
+      new CreatePostCommand(inputModel),
+    );
     if (res.status === 'NotFound') {
       throw new NotFoundException();
     }
@@ -79,7 +85,9 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() inputModel: PostInputModelType,
   ) {
-    const res = await this.postsService.updatePost(postId, inputModel);
+    const res = await this.commandBus.execute(
+      new UpdatePostCommand(postId, inputModel),
+    );
     if (res.status === 'NotFound') {
       throw new NotFoundException();
     }

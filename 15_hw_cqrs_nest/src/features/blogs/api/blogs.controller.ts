@@ -33,6 +33,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreateBlogCommand } from '../application/command/createBlog.command';
 import { updateBlogCommand } from '../application/command/updateBlog.command';
 import { DeleteBlogCommand } from '../application/command/deleteBlog.command';
+import { CreatePostCommand } from '../../posts/application/command/createPost.command';
 
 @Controller('blogs')
 export class BlogsController {
@@ -113,10 +114,9 @@ export class BlogsController {
     @Param() { blogId }: BlogExistModel,
     @Body() inputModel: PostInputModelBlogControllerType,
   ) {
-    const post = await this.postService.createPost({
-      ...inputModel,
-      blogId,
-    });
+    const post = await this.commandBus.execute(
+      new CreatePostCommand({ ...inputModel, blogId }),
+    );
     if (post.status === 'NotFound') {
       throw new NotFoundException();
     }

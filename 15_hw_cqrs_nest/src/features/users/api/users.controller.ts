@@ -18,12 +18,14 @@ import {
 } from '../../../base/helpers/pagination-users-helper';
 import { UserAuthGuard } from '../../../base/guards/basic.guard';
 import { UsersQueryRepository } from '../infrastructure/users-query.repository';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private usersService: UsersService,
     private usersQueryRepository: UsersQueryRepository,
+    private commandBus: CommandBus,
   ) {}
 
   @UseGuards(UserAuthGuard)

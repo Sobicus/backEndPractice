@@ -88,6 +88,8 @@ import { UpdateSessionHandler } from './features/users/infrastructure/sessionsDa
 import { CreateDeviceSessionHandler } from './features/users/infrastructure/sessionsData/command/createDeviceSession.command';
 import { DeleteCommentHandler } from './features/comments/application/command/deleteComment.command';
 import { CommentsLikesHandler } from './features/likesInfo/comments-likesInfo/application/command/likeCommentUpdate.command';
+import { CreatePostHandler } from './features/posts/application/command/createPost.command';
+import { updatePostHandler } from './features/posts/application/command/updatePost.command';
 
 const repositories = [
   BlogsRepository,
@@ -129,6 +131,8 @@ const commands = [
   CreateDeviceSessionHandler,
   DeleteCommentHandler,
   CommentsLikesHandler,
+  CreatePostHandler,
+  updatePostHandler,
 ];
 @Module({
   imports: [

@@ -15,28 +15,7 @@ export class UsersService {
 
   async createUser(inputModel: UserInputModelType): Promise<string> {
     const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await this._generateHash(
-      inputModel.password,
-      passwordSalt,
-    );
-    // const createdAt = new Date().toISOString();
-    // const newUser = {
-    //   login: inputModel.login,
-    //   email: inputModel.email,
-    //   passwordSalt,
-    //   passwordHash,
-    //   createdAt,
-    //   emailConfirmation: {
-    //     confirmationCode: randomUUID(),
-    //     expirationDate: add(new Date(), {
-    //       days: 1,
-    //       hours: 1,
-    //       minutes: 1,
-    //       seconds: 1,
-    //     }),
-    //     isConfirmed: false,
-    //   },
-    // };
+    const passwordHash = await bcrypt.hash(inputModel.password, passwordSalt);
     const user = new Users(inputModel, passwordSalt, passwordHash);
     return this.usersRepository.saveUser(user);
   }
@@ -58,9 +37,9 @@ export class UsersService {
     };
   }
 
-  async _generateHash(password: string, salt: string) {
-    return bcrypt.hashSync(password, salt);
-  }
+  // async _generateHash(password: string, salt: string) {
+  //   return bcrypt.hashSync(password, salt);
+  // }
   // Give this logic to authService in Passport local strategic
 
   // async checkCredentials(
@@ -94,13 +73,13 @@ export class UsersService {
   //     data: user,
   //   };
   // }
-  async changePassword(userId: string, newPassword: string) {
-    const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await this._generateHash(newPassword, passwordSalt);
-    await this.usersRepository.changePassword(
-      userId,
-      passwordSalt,
-      passwordHash,
-    );
-  }
+  // async changePassword(userId: string, newPassword: string) {
+  //   const passwordSalt = await bcrypt.genSalt(10);
+  //   const passwordHash = await this._generateHash(newPassword, passwordSalt);
+  //   await this.usersRepository.changePassword(
+  //     userId,
+  //     passwordSalt,
+  //     passwordHash,
+  //   );
+  //}
 }
