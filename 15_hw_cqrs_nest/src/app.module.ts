@@ -7,7 +7,6 @@ import {
 import { BlogsController } from './features/blogs/api/blogs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blogs, BlogsSchema } from './features/blogs/domain/blogs.entity';
-import { BlogsService } from './features/blogs/application/blogs.service';
 import { BlogsRepository } from './features/blogs/infrastructure/blogs.repository';
 import { BlogsQueryRepository } from './features/blogs/infrastructure/blogs-query.repository';
 import { PostsRepository } from './features/posts/infrastructure/posts.repository';
@@ -74,6 +73,21 @@ import { PostsLikesInfoService } from './features/likesInfo/posts-likeInfo/appli
 import { PostsLikesInfoRepository } from './features/likesInfo/posts-likeInfo/infrastructure/posts-likesInfo.repository';
 import { IsNotBlogExistConstraint } from './base/guards/blogIsNotExist.guard';
 import { IsNotBlogExistInBodyConstraint } from './base/guards/blogIsNotExistInBody.guard';
+import { CreateBlogHandler } from './features/blogs/application/command/createBlog.command';
+import { CqrsModule } from '@nestjs/cqrs';
+import { UpdateBlogHandler } from './features/blogs/application/command/updateBlog.command';
+import { DeleteBlogHandler } from './features/blogs/application/command/deleteBlog.command';
+import { RegistrationUserHandler } from './features/auth/application/command/registrationUser.command';
+import { RegistrationConfirmationHandler } from './features/auth/application/command/registrationConfirmation.command';
+import { RegistrationEmailResendingHandler } from './features/auth/application/command/registrationEmailResending.command';
+import { PasswordRecoveryHandler } from './features/auth/application/command/passwordRecovery.command';
+import { NewPasswordHandler } from './features/auth/application/command/newPassword.command';
+import { FindSessionByUserAndDeviceIdsHandler } from './features/users/infrastructure/sessionsData/command/findSessionByUserAndDeviceIds.command';
+import { DeleteSessionHandler } from './features/users/infrastructure/sessionsData/command/deleteSession.command';
+import { UpdateSessionHandler } from './features/users/infrastructure/sessionsData/command/updateSession.command';
+import { CreateDeviceSessionHandler } from './features/users/infrastructure/sessionsData/command/createDeviceSession.command';
+import { DeleteCommentHandler } from './features/comments/application/command/deleteComment.command';
+import { CommentsLikesHandler } from './features/likesInfo/comments-likesInfo/application/command/likeCommentUpdate.command';
 
 const repositories = [
   BlogsRepository,
@@ -90,7 +104,6 @@ const repositories = [
   PostsLikesInfoRepository,
 ];
 const service = [
-  BlogsService,
   PostsService,
   UsersService,
   AuthService,
@@ -101,7 +114,22 @@ const service = [
   CommentsLikesInfoService,
   PostsLikesInfoService,
 ];
-
+const commands = [
+  CreateBlogHandler,
+  UpdateBlogHandler,
+  DeleteBlogHandler,
+  RegistrationUserHandler,
+  RegistrationConfirmationHandler,
+  RegistrationEmailResendingHandler,
+  PasswordRecoveryHandler,
+  NewPasswordHandler,
+  FindSessionByUserAndDeviceIdsHandler,
+  DeleteSessionHandler,
+  UpdateSessionHandler,
+  CreateDeviceSessionHandler,
+  DeleteCommentHandler,
+  CommentsLikesHandler,
+];
 @Module({
   imports: [
     PassportModule,
@@ -144,6 +172,7 @@ const service = [
       { name: CommentsLikesInfo.name, schema: CommentsLikesInfoSchema },
       { name: PostsLikesInfo.name, schema: PostsLikesInfoSchema },
     ]),
+    CqrsModule,
   ],
   controllers: [
     BlogsController,
@@ -154,6 +183,7 @@ const service = [
     TestingAllDataController,
   ],
   providers: [
+    ...commands,
     ...repositories,
     ...service,
     ConfirmationCodeIsValidConstraint,

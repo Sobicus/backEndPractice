@@ -11,7 +11,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsService } from '../application/blogs.service';
 import { BlogsQueryRepository } from '../infrastructure/blogs-query.repository';
 import { BlogInputModelType } from './models/input/create-blog.input.model';
 import {
@@ -30,14 +29,18 @@ import {
 } from '../../posts/api/models/input/create-post.input.model';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
 import { UserAuthGuard } from '../../../base/guards/basic.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateBlogCommand } from '../application/command/createBlog.command';
+import { updateBlogCommand } from '../application/command/updateBlog.command';
+import { DeleteBlogCommand } from '../application/command/deleteBlog.command';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private blogsService: BlogsService,
     private blogsQueryRepository: BlogsQueryRepository,
     private postService: PostsService,
     private postQueryRepository: PostsQueryRepository,
+    private commandBus: CommandBus,
   ) {}
 
   @Get()
@@ -59,7 +62,9 @@ export class BlogsController {
   @UseGuards(UserAuthGuard)
   @Post()
   async createBlog(@Body() inputModel: BlogInputModelType) {
-    const newBlogId = await this.blogsService.createBlog(inputModel);
+    const newBlogId = await this.commandBus.execute(
+      new CreateBlogCommand(inputModel),
+    );
     return this.blogsQueryRepository.getBlogById(newBlogId);
   }
 
@@ -70,7 +75,9 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Body() inputModel: BlogInputModelType,
   ) {
-    const res = await this.blogsService.updateBlog(blogId, inputModel);
+    const res = await this.commandBus.execute(
+      new updateBlogCommand(blogId, inputModel),
+    );
     if (res.status === 'NotFound') {
       throw new NotFoundException();
     }
@@ -80,7 +87,7 @@ export class BlogsController {
   @Delete(':id')
   @HttpCode(204)
   async deleteBlog(@Param('id') blogId: string) {
-    const res = await this.blogsService.deleteBlog(blogId);
+    const res = await this.commandBus.execute(new DeleteBlogCommand(blogId));
     if (res.status === 'NotFound') {
       throw new NotFoundException();
     }
@@ -93,7 +100,7 @@ export class BlogsController {
     @Query() query: PaginationPostsInputModelType,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    const res = await this.blogsService.getBlogById(blogId);
+    const res = await this.blogsQueryRepository.getBlogById(blogId);
     if (!res) {
       throw new NotFoundException();
     }
@@ -103,11 +110,9 @@ export class BlogsController {
   @UseGuards(UserAuthGuard)
   @Post(':blogId/posts')
   async createPostByBlogId(
-    //@Param('id') blogId: string,
     @Param() { blogId }: BlogExistModel,
     @Body() inputModel: PostInputModelBlogControllerType,
   ) {
-    //const post = await this.postService.createPost({ ...inputModel, blogId });
     const post = await this.postService.createPost({
       ...inputModel,
       blogId,

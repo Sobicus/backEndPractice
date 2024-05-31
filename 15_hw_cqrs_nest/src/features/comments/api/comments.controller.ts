@@ -17,6 +17,10 @@ import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
 import { InputUpdateCommentModel } from './models/input/comments.input.model';
 import { InputUpdateCommentLikesModel } from '../../likesInfo/comments-likesInfo/api/models/input/comments-likesInfo.input.model';
 import { CommentsLikesInfoService } from '../../likesInfo/comments-likesInfo/application/comments-likesInfo.service';
+import { CommandBus } from '@nestjs/cqrs';
+import { DeleteCommentCommand } from '../application/command/deleteComment.command';
+import { UpdateCommentCommand } from '../application/command/updateComment.command';
+import { CommentsLikesCommand } from '../../likesInfo/comments-likesInfo/application/command/likeCommentUpdate.command';
 
 @Controller('comments')
 export class CommentsController {
@@ -24,6 +28,7 @@ export class CommentsController {
     private commentsQueryRepository: CommentsQueryRepository,
     private commentsService: CommentsService,
     private commentsLikesInfoService: CommentsLikesInfoService,
+    private commandBus: CommandBus,
   ) {}
 
   @Get(':id')
@@ -48,7 +53,9 @@ export class CommentsController {
     @Param('id') commentId: string,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    const res = await this.commentsService.deleteComment(commentId, userId);
+    const res = await this.commandBus.execute(
+      new DeleteCommentCommand(commentId, userId),
+    );
     if (res.status === 'NotFound') {
       throw new NotFoundException();
     }
@@ -65,10 +72,8 @@ export class CommentsController {
     @TakeUserId() { userId }: { userId: string },
     @Body() content: InputUpdateCommentModel,
   ) {
-    const res = await this.commentsService.updateComment(
-      commentId,
-      content.content,
-      userId,
+    const res = await this.commandBus.execute(
+      new UpdateCommentCommand(commentId, content.content, userId),
     );
     if (res.status === 'NotFound') {
       throw new NotFoundException();
@@ -86,10 +91,8 @@ export class CommentsController {
     @Body() likeStatus: InputUpdateCommentLikesModel,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    const res = await this.commentsLikesInfoService.likeCommentUpdate(
-      commentId,
-      likeStatus.likeStatus,
-      userId,
+    const res = await this.commandBus.execute(
+      new CommentsLikesCommand(commentId, likeStatus.likeStatus, userId),
     );
     if (res.status === 'NotFound') {
       throw new NotFoundException();

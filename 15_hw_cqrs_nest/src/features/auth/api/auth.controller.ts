@@ -29,6 +29,16 @@ import { RefreshPayload } from 'src/base/decorators/refreshPayload';
 import { JwtAccessAuthGuard } from '../../../base/guards/jwt-access.guard';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
 import { UsersQueryRepository } from '../../users/infrastructure/users-query.repository';
+import { CommandBus } from '@nestjs/cqrs';
+import { RegistrationUserCommand } from '../application/command/registrationUser.command';
+import { RegistrationConfirmationCommand } from '../application/command/registrationConfirmation.command';
+import { RegistrationEmailResendingCommand } from '../application/command/registrationEmailResending.command';
+import { PasswordRecoveryCommand } from '../application/command/passwordRecovery.command';
+import { NewPasswordCommand } from '../application/command/newPassword.command';
+import { FindSessionByUserAndDeviceIdsCommand } from '../../users/infrastructure/sessionsData/command/findSessionByUserAndDeviceIds.command';
+import { DeleteSessionCommand } from '../../users/infrastructure/sessionsData/command/deleteSession.command';
+import { UpdateSessionCommand } from '../../users/infrastructure/sessionsData/command/updateSession.command';
+import { CreateDeviceSessionCommand } from '../../users/infrastructure/sessionsData/command/createDeviceSession.command';
 
 @Controller('auth')
 export class AuthController {
@@ -37,6 +47,7 @@ export class AuthController {
     private jwtService: JWTService,
     private sessionService: SessionService,
     private userQueryRepository: UsersQueryRepository,
+    private commandBus: CommandBus,
   ) {}
 
   @HttpCode(200)
@@ -57,10 +68,13 @@ export class AuthController {
     // }
     const deviceId = randomUUID();
     const tokensPair = await this.jwtService.createJWT(userId, deviceId);
-    await this.sessionService.createDeviceSession(
-      tokensPair.refreshToken,
-      deviceName,
-      ip,
+    // await this.sessionService.createDeviceSession(
+    //   tokensPair.refreshToken,
+    //   deviceName,
+    //   ip,
+    // );
+    await this.commandBus.execute(
+      new CreateDeviceSessionCommand(tokensPair.refreshToken, deviceName, ip),
     );
     res.cookie('refreshToken', tokensPair.refreshToken, {
       httpOnly: true,
@@ -72,33 +86,36 @@ export class AuthController {
   @HttpCode(204)
   @Post('registration')
   async registration(@Body() registrationDTO: RegistrationUserModelType) {
-    console.log(registrationDTO);
-    await this.authService.registrationUsers(registrationDTO);
+    await this.commandBus.execute(new RegistrationUserCommand(registrationDTO));
   }
 
   @HttpCode(204)
   @Post('registration-confirmation')
   async registrationConfirmation(@Body() confirmationCode: InputCodeModel) {
     console.log('confirmationCode ', confirmationCode);
-    await this.authService.registrationConfirmation(confirmationCode.code);
+    await this.commandBus.execute(
+      new RegistrationConfirmationCommand(confirmationCode.code),
+    );
   }
 
   @HttpCode(204)
   @Post('registration-email-resending')
   async registrationEmailresending(@Body() email: InputEmailModel) {
-    await this.authService.registrationEmailResending(email.email);
+    await this.commandBus.execute(
+      new RegistrationEmailResendingCommand(email.email),
+    );
   }
 
   @HttpCode(204)
   @Post('password-recovery')
   async passwordRecovery(@Body() email: InputEmailModel) {
-    await this.authService.passwordRecovery(email.email);
+    await this.commandBus.execute(new PasswordRecoveryCommand(email.email));
   }
 
   @HttpCode(204)
   @Post('new-password')
   async newPassword(@Body() newPasswordModel: InputNewPasswordModel) {
-    await this.authService.newPassword(newPasswordModel);
+    await this.commandBus.execute(new NewPasswordCommand(newPasswordModel));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -108,14 +125,13 @@ export class AuthController {
     @RefreshPayload()
     { userId, deviceId }: { userId: string; deviceId: string },
   ) {
-    const session = await this.sessionService.findSessionByUserIdAndDeviceId(
-      userId,
-      deviceId,
+    const session = await this.commandBus.execute(
+      new FindSessionByUserAndDeviceIdsCommand(userId, deviceId),
     );
     if (!session) {
       throw new UnauthorizedException();
     }
-    await this.sessionService.deleteSession(deviceId, userId);
+    await this.commandBus.execute(new DeleteSessionCommand(userId, deviceId));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -127,10 +143,8 @@ export class AuthController {
     res: Response,
   ) {
     const tokensPair = await this.jwtService.createJWT(userId, deviceId);
-    const result = await this.sessionService.updateSession(
-      userId,
-      deviceId,
-      tokensPair.refreshToken,
+    const result = await this.commandBus.execute(
+      new UpdateSessionCommand(userId, deviceId, tokensPair.refreshToken),
     );
     if (!result) {
       throw new UnauthorizedException();
