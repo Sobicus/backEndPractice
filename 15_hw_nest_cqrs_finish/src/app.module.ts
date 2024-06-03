@@ -7,11 +7,9 @@ import {
 import { BlogsController } from './features/blogs/api/blogs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blogs, BlogsSchema } from './features/blogs/domain/blogs.entity';
-import { BlogsService } from './features/blogs/application/blogs.service';
 import { BlogsRepository } from './features/blogs/infrastructure/blogs.repository';
 import { BlogsQueryRepository } from './features/blogs/infrastructure/blogs-query.repository';
 import { PostsRepository } from './features/posts/infrastructure/posts.repository';
-import { PostsService } from './features/posts/application/posts.service';
 import { PostsController } from './features/posts/api/models/posts.controller';
 import { Posts, PostsSchema } from './features/posts/domain/posts.entity';
 import { PostsQueryRepository } from './features/posts/infrastructure/posts-query.repository';
@@ -36,19 +34,18 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { EmailService } from './base/mail/email-server.service';
 import { join } from 'path';
 import { ConfirmationCodeIsValidConstraint } from './features/auth/infrastructure/validate';
-import { PasswordRecoveryRepository } from './features/users/infrastructure/accountData/passwordRecoveryRepository';
+import { PasswordRecoveryRepository } from './features/auth/infrastructure/passwordRecovery.repository';
 import {
   PasswordRecovery,
   PasswordRecoverySchema,
-} from './features/users/infrastructure/accountData/passwordRecovery.entity';
+} from './features/auth/domain/passwordRecovery.entity';
 import { LocalStrategy } from './base/guards/strategy/local/local.strategy';
 import { PassportModule } from '@nestjs/passport';
 import {
   Sessions,
   SessionsSchema,
-} from './features/users/infrastructure/sessionsData/sessions.entity';
-import { SessionService } from './features/users/infrastructure/sessionsData/session.service';
-import { SessionsRepository } from './features/users/infrastructure/sessionsData/sessions.repository';
+} from './features/auth/domain/sessions.entity';
+import { SessionsRepository } from './features/auth/infrastructure/sessions.repository';
 import { LoginGuard } from './base/guards/login.guard';
 import { JwtAuthGuard } from './base/guards/jwt-refreash.guard';
 import { UsersQueryRepository } from './features/users/infrastructure/users-query.repository';
@@ -58,19 +55,16 @@ import { JwtAccessAuthGuard } from './base/guards/jwt-access.guard';
 import { IsUserAlreadyExistConstraint } from './base/guards/emailOrLoginAlreadyExist.guard';
 import { IsNotEmailExistConstraint } from './base/guards/emailIsNotExist.guard';
 import { CommentsRepository } from './features/comments/infrastructure/comments.repository';
-import { CommentsService } from './features/comments/application/comments.service';
 import {
   CommentsLikesInfo,
   CommentsLikesInfoSchema,
 } from './features/comments/domain/comments-likesInfo.entity';
 import { CommentsLikesInfoRepository } from './features/comments/infrastructure/comments-likesInfo.repository';
-import { CommentsLikesInfoService } from './features/comments/application/comments-likesInfo.service';
 import { JwtSoftAccessMiddleware } from './base/middleware/jwt-soft-access.middleware';
 import {
   PostsLikesInfo,
   PostsLikesInfoSchema,
 } from './features/posts/domain/posts-likesInfo.entity';
-import { PostsLikesInfoService } from './features/posts/application/posts-likesInfo.service';
 import { PostsLikesInfoRepository } from './features/posts/infrastructure/posts-likesInfo.repository';
 import { IsNotBlogExistConstraint } from './base/guards/blogIsNotExist.guard';
 import { IsNotBlogExistInBodyConstraint } from './base/guards/blogIsNotExistInBody.guard';
@@ -93,6 +87,10 @@ import { PasswordRecoveryHandler } from './features/auth/application/command/pas
 import { NewPasswordHandler } from './features/auth/application/command/newPassword.command';
 import { CreateUserHandler } from './features/users/application/command/createUser.command';
 import { DeleteUserHandler } from './features/users/application/command/deleteUser.command';
+import { CreateDeviceSessionHandler } from './features/auth/application/command/createDeviceSession.command';
+import { FindSessionByUserIdAndDeviceIdHandler } from './features/auth/application/command/findSessionByUserIdAndDeviceId.command';
+import { DeleteSessionHandler } from './features/auth/application/command/deleteSession.command';
+import { UpdateSessionHandler } from './features/auth/application/command/updateSession.command';
 
 const repositories = [
   BlogsRepository,
@@ -108,18 +106,7 @@ const repositories = [
   CommentsLikesInfoRepository,
   PostsLikesInfoRepository,
 ];
-const service = [
-  BlogsService,
-  PostsService,
-  UsersService,
-  AuthService,
-  JWTService,
-  EmailService,
-  SessionService,
-  CommentsService,
-  CommentsLikesInfoService,
-  PostsLikesInfoService,
-];
+const service = [UsersService, AuthService, JWTService, EmailService];
 const commands = [
   CreateBlogHandler,
   UpdateBlogHandler,
@@ -139,6 +126,10 @@ const commands = [
   NewPasswordHandler,
   CreateUserHandler,
   DeleteUserHandler,
+  CreateDeviceSessionHandler,
+  FindSessionByUserIdAndDeviceIdHandler,
+  DeleteSessionHandler,
+  UpdateSessionHandler,
 ];
 @Module({
   imports: [
