@@ -5,7 +5,7 @@ import { PostsRepository } from '../../posts/infrastructure/posts.repository';
 import { CommentsRepository } from '../../comments/infrastructure/comments.repository';
 import { CommentsLikesInfoRepository } from '../../comments/infrastructure/comments-likesInfo.repository';
 import { PostsLikesInfoRepository } from '../../posts/infrastructure/posts-likesInfo.repository';
-import { SessionsRepository } from '../../auth/infrastructure/sessions.repository';
+import { SessionsRepository } from '../../SecurityDevices/infrastructure/sessions.repository';
 import { PasswordRecoveryRepository } from '../../auth/infrastructure/passwordRecovery.repository';
 
 @Controller('/testing/all-data')

@@ -44,8 +44,8 @@ import { PassportModule } from '@nestjs/passport';
 import {
   Sessions,
   SessionsSchema,
-} from './features/auth/domain/sessions.entity';
-import { SessionsRepository } from './features/auth/infrastructure/sessions.repository';
+} from './features/SecurityDevices/domain/sessions.entity';
+import { SessionsRepository } from './features/SecurityDevices/infrastructure/sessions.repository';
 import { LoginGuard } from './base/guards/login.guard';
 import { JwtAuthGuard } from './base/guards/jwt-refreash.guard';
 import { UsersQueryRepository } from './features/users/infrastructure/users-query.repository';
@@ -87,10 +87,13 @@ import { PasswordRecoveryHandler } from './features/auth/application/command/pas
 import { NewPasswordHandler } from './features/auth/application/command/newPassword.command';
 import { CreateUserHandler } from './features/users/application/command/createUser.command';
 import { DeleteUserHandler } from './features/users/application/command/deleteUser.command';
-import { CreateDeviceSessionHandler } from './features/auth/application/command/createDeviceSession.command';
-import { FindSessionByUserIdAndDeviceIdHandler } from './features/auth/application/command/findSessionByUserIdAndDeviceId.command';
-import { DeleteSessionHandler } from './features/auth/application/command/deleteSession.command';
-import { UpdateSessionHandler } from './features/auth/application/command/updateSession.command';
+import { CreateDeviceSessionHandler } from './features/SecurityDevices/application/command/createDeviceSession.command';
+import { FindSessionByUserIdAndDeviceIdHandler } from './features/SecurityDevices/application/command/findSessionByUserIdAndDeviceId.command';
+import { DeleteSessionHandler } from './features/SecurityDevices/application/command/deleteSession.command';
+import { UpdateSessionHandler } from './features/SecurityDevices/application/command/updateSession.command';
+import { FindActiveSessionHandler } from './features/SecurityDevices/application/command/getAllActiveSessions.command';
+import { DeleteSessionExceptThisHandler } from './features/SecurityDevices/application/command/deleteSessionsDevicesExceptThis.command';
+import { DeleteDeviceSessionHandler } from './features/SecurityDevices/application/command/deleteSessionDevice.command';
 
 const repositories = [
   BlogsRepository,
@@ -130,6 +133,9 @@ const commands = [
   FindSessionByUserIdAndDeviceIdHandler,
   DeleteSessionHandler,
   UpdateSessionHandler,
+  FindActiveSessionHandler,
+  DeleteSessionExceptThisHandler,
+  DeleteDeviceSessionHandler,
 ];
 @Module({
   imports: [

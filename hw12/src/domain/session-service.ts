@@ -17,7 +17,6 @@ export class SessionsService {
         const deviceId: string = decodeJwtRefreshToken['deviceId'];
         const iat: number = decodeJwtRefreshToken['iat']
         const issuedAt = new Date(iat * 1000).toISOString()
-        console.log('issuedAt session-service', issuedAt)
         return this.sessionsRepo.createDeviceSession(issuedAt, deviceId, ip, deviceName, userId)
     }
 

@@ -34,10 +34,10 @@ import { RegistrationConfirmationCommand } from '../application/command/registra
 import { RegistrationEmailResendingCommand } from '../application/command/registrationEmailResending.command';
 import { PasswordRecoveryCommand } from '../application/command/passwordRecovery.command';
 import { NewPasswordCommand } from '../application/command/newPassword.command';
-import { CreateDeviceSessionCommand } from '../application/command/createDeviceSession.command';
-import { FindSessionByUserIdAndDeviceIdCommand } from '../application/command/findSessionByUserIdAndDeviceId.command';
-import { DeleteSessionCommand } from '../application/command/deleteSession.command';
-import { UpdateSessionCommand } from '../application/command/updateSession.command';
+import { CreateDeviceSessionCommand } from '../../SecurityDevices/application/command/createDeviceSession.command';
+import { FindSessionByUserIdAndDeviceIdCommand } from '../../SecurityDevices/application/command/findSessionByUserIdAndDeviceId.command';
+import { DeleteSessionCommand } from '../../SecurityDevices/application/command/deleteSession.command';
+import { UpdateSessionCommand } from '../../SecurityDevices/application/command/updateSession.command';
 
 @Controller('auth')
 export class AuthController {
