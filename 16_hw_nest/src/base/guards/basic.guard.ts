@@ -15,14 +15,6 @@ export class UserAuthGuard implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
     const authorizationHeader = context.switchToHttp().getRequest()
       .headers.authorization;
-
-    console.log(request.headers.authorization);
-    console.log(request.headers);
-    console.log(authorizationHeader);
-
-    // if (!authorizationHeader) {
-    //   throw new UnauthorizedException();
-    // }
     const token = authorizationHeader?.split(' ')[0];
     if (token !== 'Basic') {
       throw new UnauthorizedException();

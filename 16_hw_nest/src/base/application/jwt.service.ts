@@ -1,26 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as process from 'node:process';
+import { config } from 'dotenv';
+import { ConfigService } from '@nestjs/config';
+import { ConfigurationType } from '../../config/configuration';
+config();
 
 @Injectable()
 export class JWTService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService<ConfigurationType, true>,
+  ) {}
 
   async createJWT(userId: string, deviceId: string) {
-    // const payload = { userId };
+    const secretKey = this.configService.get('JwtSettings.JWT_SECRET', {
+      infer: true,
+    });
+    if (!secretKey) {
+      throw new Error('Invalid JWT_SECRET');
+    }
     return {
       accessToken: await this.jwtService.signAsync(
         { userId },
         {
-          secret: process.env.JWT_SECRET || '123',
-          expiresIn: '60m',
+          secret: secretKey,
+          expiresIn: '10s',
         },
       ),
       refreshToken: await this.jwtService.signAsync(
         { userId, deviceId },
         {
           secret: process.env.JWT_SECRET || '123',
-          expiresIn: '60m',
+          expiresIn: '20s',
         },
       ),
     };

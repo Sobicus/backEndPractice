@@ -107,7 +107,6 @@ export class PostsQueryRepository {
           postId,
           userId,
         );
-      console.log('reaction ', reaction);
       myStatus = reaction ? reaction.myStatus : myStatus;
     }
     const likesCount = await this.postsLikesInfoRepository.countDocuments(
@@ -122,7 +121,6 @@ export class PostsQueryRepository {
       postId,
       LikesStatusPosts.Like,
     );
-    console.log('newestLikes ', newestLikes);
     const newestLikesViewModel = newestLikes.map((like) => {
       return {
         addedAt: like.createdAt,

@@ -71,4 +71,12 @@ export class SessionsRepository {
   async findSessionByDeviceId(deviceId: string): Promise<Sessions | null> {
     return this.SessionsModel.findOne({ deviceId }).lean();
   }
+
+  async findSessionForCheckCokkie(
+    userId: string,
+    deviceId: string,
+    issuedAt: string,
+  ): Promise<null | SessionsDocument> {
+    return this.SessionsModel.findOne({ userId, deviceId, issuedAt }).exec();
+  }
 }

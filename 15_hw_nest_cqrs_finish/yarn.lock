@@ -29,6 +29,7 @@ __metadata:
     "@nestjs/platform-express": "npm:^10.0.0"
     "@nestjs/schematics": "npm:^10.0.0"
     "@nestjs/testing": "npm:^10.0.0"
+    "@nestjs/throttler": "npm:^5.1.2"
     "@types/bcrypt": "npm:^5.0.2"
     "@types/express": "npm:^4.17.17"
     "@types/jest": "npm:^29.5.12"
@@ -1327,6 +1328,17 @@ __metadata:
     "@nestjs/platform-express":
       optional: true
   checksum: 10c0/c08052ae0c3f55c4504e5912705f8530c403b9d4de046a370ac0644a307213e2866e159f578a6fa6c6a6a032941c8e065d89b49fc003107f6575e467d18b71d7
+  languageName: node
+  linkType: hard
+
+"@nestjs/throttler@npm:^5.1.2":
+  version: 5.1.2
+  resolution: "@nestjs/throttler@npm:5.1.2"
+  peerDependencies:
+    "@nestjs/common": ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+    "@nestjs/core": ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+    reflect-metadata: ^0.1.13 || ^0.2.0
+  checksum: 10c0/73b3566e02c432d045ff53dc183d9f7c3824a7871eabfd55b313ad7540e27fd460d4a0cdfed33cd077345af8404cc6530b110fa41442b1f49d1ce7472b952c4b
   languageName: node
   linkType: hard
 

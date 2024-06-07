@@ -47,7 +47,6 @@ import {
 } from './features/SecurityDevices/domain/sessions.entity';
 import { SessionsRepository } from './features/SecurityDevices/infrastructure/sessions.repository';
 import { LoginGuard } from './base/guards/login.guard';
-import { JwtAuthGuard } from './base/guards/jwt-refreash.guard';
 import { UsersQueryRepository } from './features/users/infrastructure/users-query.repository';
 import { JwtStrategy } from './base/guards/strategy/jwt/jwt-cookie.strategy';
 import { JwtAccessStrategy } from './base/guards/strategy/jwt/jwt-header.strategy';
@@ -94,6 +93,9 @@ import { UpdateSessionHandler } from './features/SecurityDevices/application/com
 import { FindActiveSessionHandler } from './features/SecurityDevices/application/command/getAllActiveSessions.command';
 import { DeleteSessionExceptThisHandler } from './features/SecurityDevices/application/command/deleteSessionsDevicesExceptThis.command';
 import { DeleteDeviceSessionHandler } from './features/SecurityDevices/application/command/deleteSessionDevice.command';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { SecurityDevicesController } from './features/SecurityDevices/api/securityDevices.controller';
+import configuration from './config/configuration';
 
 const repositories = [
   BlogsRepository,
@@ -137,8 +139,19 @@ const commands = [
   DeleteSessionExceptThisHandler,
   DeleteDeviceSessionHandler,
 ];
+
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      load: [configuration],
+      isGlobal: true,
+    }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10000,
+        limit: 5,
+      },
+    ]),
     PassportModule,
     ConfigModule.forRoot(),
     JwtModule.register({
@@ -188,6 +201,7 @@ const commands = [
     UsersController,
     AuthController,
     TestingAllDataController,
+    SecurityDevicesController,
   ],
   providers: [
     ...commands,
@@ -197,7 +211,7 @@ const commands = [
     LocalStrategy,
     JwtStrategy,
     LoginGuard,
-    JwtAuthGuard,
+
     JwtAccessStrategy,
     JwtAccessAuthGuard,
     IsUserAlreadyExistConstraint,

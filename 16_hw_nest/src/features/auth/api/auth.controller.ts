@@ -23,7 +23,7 @@ import { UserAgent } from '../../../base/decorators/userAgent';
 import { CurrentUserId } from 'src/base/decorators/currentUserId';
 import { randomUUID } from 'crypto';
 import { LoginGuard } from '../../../base/guards/login.guard';
-import { JwtAuthGuard } from '../../../base/guards/jwt-refreash.guard';
+
 import { RefreshPayload } from 'src/base/decorators/refreshPayload';
 import { JwtAccessAuthGuard } from '../../../base/guards/jwt-access.guard';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
@@ -38,7 +38,10 @@ import { CreateDeviceSessionCommand } from '../../SecurityDevices/application/co
 import { FindSessionByUserIdAndDeviceIdCommand } from '../../SecurityDevices/application/command/findSessionByUserIdAndDeviceId.command';
 import { DeleteSessionCommand } from '../../SecurityDevices/application/command/deleteSession.command';
 import { UpdateSessionCommand } from '../../SecurityDevices/application/command/updateSession.command';
+import { JwtRefreshAuthGuard } from '../../../base/guards/jwt-refreash.guard';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
+@UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -105,7 +108,7 @@ export class AuthController {
     await this.commandBus.execute(new NewPasswordCommand(newPasswordModel));
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtRefreshAuthGuard)
   @HttpCode(204)
   @Post('logout')
   async logout(
@@ -118,10 +121,11 @@ export class AuthController {
     if (!session) {
       throw new UnauthorizedException();
     }
-    await this.commandBus.execute(new DeleteSessionCommand(deviceId, userId));
+    await this.commandBus.execute(new DeleteSessionCommand(userId, deviceId));
   }
 
-  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @UseGuards(JwtRefreshAuthGuard)
   @Post('refresh-token')
   async refreshTokens(
     @RefreshPayload()

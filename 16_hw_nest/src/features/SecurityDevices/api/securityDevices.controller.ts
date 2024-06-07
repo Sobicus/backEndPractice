@@ -3,23 +3,25 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { JwtAuthGuard } from '../../../base/guards/jwt-refreash.guard';
+
 import { RefreshPayload } from '../../../base/decorators/refreshPayload';
 import { FindActiveSessionCommand } from '../application/command/getAllActiveSessions.command';
 import { DeleteSessionExceptThisCommand } from '../application/command/deleteSessionsDevicesExceptThis.command';
 import { DeleteDeviceSessionCommand } from '../application/command/deleteSessionDevice.command';
+import { JwtRefreshAuthGuard } from '../../../base/guards/jwt-refreash.guard';
 
 @Controller('security')
 export class SecurityDevicesController {
   constructor(private commandBud: CommandBus) {}
 
-  @UseGuards(JwtAuthGuard)
-  @Get()
+  @UseGuards(JwtRefreshAuthGuard)
+  @Get('devices')
   async getAllDevices(
     @RefreshPayload()
     { userId }: { userId: string },
@@ -27,7 +29,8 @@ export class SecurityDevicesController {
     return await this.commandBud.execute(new FindActiveSessionCommand(userId));
   }
 
-  @UseGuards(JwtAuthGuard)
+  @HttpCode(204)
+  @UseGuards(JwtRefreshAuthGuard)
   @Delete('devices')
   async deleteDevicesExceptThis(
     @RefreshPayload()
@@ -38,7 +41,8 @@ export class SecurityDevicesController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @HttpCode(204)
+  @UseGuards(JwtRefreshAuthGuard)
   @Delete('devices/:deviceId')
   async deleteSessionDevice(
     @Param('deviceId') deviceId: string,
