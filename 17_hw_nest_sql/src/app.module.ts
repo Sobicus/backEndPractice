@@ -96,6 +96,7 @@ import { DeleteDeviceSessionHandler } from './features/SecurityDevices/applicati
 import { ThrottlerModule } from '@nestjs/throttler';
 import { SecurityDevicesController } from './features/SecurityDevices/api/securityDevices.controller';
 import configuration from './config/configuration';
+import { TypeOrmModule } from "@nestjs/typeorm";
 
 const repositories = [
   BlogsRepository,
@@ -142,6 +143,15 @@ const commands = [
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: '2456',
+      database: 'socialHM',
+      synchronize: false,
+    }),
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,
