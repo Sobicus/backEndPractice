@@ -20,19 +20,21 @@ import { UsersQueryRepository } from '../infrastructure/users-query.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../application/command/createUser.command';
 import { DeleteUserCommand } from '../application/command/deleteUser.command';
+import { usersQueryRepositorySQL } from '../infrastructure/users-querySQL.repository';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private usersQueryRepository: UsersQueryRepository,
     private commandBus: CommandBus,
+    private usersQueryRepositorySQL: usersQueryRepositorySQL,
   ) {}
 
   @UseGuards(UserAuthGuard)
   @Get()
   async getAllUsers(@Query() query: PaginationUsersInputModelType) {
     const pagination = usersPagination(query);
-    return this.usersQueryRepository.getAllUsers(pagination);
+    return this.usersQueryRepositorySQL.getAllUsers(pagination);
   }
 
   @UseGuards(UserAuthGuard)

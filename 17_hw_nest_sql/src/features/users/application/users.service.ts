@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../infrastructure/users.repository';
 import { UserInputModelType } from '../api/models/input/create-users.input.model';
 import bcrypt from 'bcrypt';
-import { Users } from '../domain/users.entity';
+import { EmailConfirmationSQL, UsersSQL } from '../domain/usersSQL.entity';
+import { UsersRepositorySQL } from '../infrastructure/usersSQL.repository';
+import { UsersRepository } from '../infrastructure/users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(
+    private usersRepositorySQL: UsersRepositorySQL,
+    private usersRepository: UsersRepository,
+  ) {}
 
   async createUser(inputModel: UserInputModelType): Promise<string> {
     const passwordSalt = await bcrypt.genSalt(10);
@@ -14,8 +18,9 @@ export class UsersService {
       inputModel.password,
       passwordSalt,
     );
-    const user = new Users(inputModel, passwordSalt, passwordHash);
-    return this.usersRepository.saveUser(user);
+    const user = new UsersSQL(inputModel, passwordSalt, passwordHash);
+    const emailConfirmation = new EmailConfirmationSQL();
+    return this.usersRepositorySQL.createUser(user, emailConfirmation);
   }
 
   async _generateHash(password: string, salt: string) {

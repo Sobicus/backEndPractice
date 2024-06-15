@@ -96,8 +96,11 @@ import { DeleteDeviceSessionHandler } from './features/SecurityDevices/applicati
 import { ThrottlerModule } from '@nestjs/throttler';
 import { SecurityDevicesController } from './features/SecurityDevices/api/securityDevices.controller';
 import configuration from './config/configuration';
-import { TypeOrmModule } from "@nestjs/typeorm";
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersRepositorySQL } from './features/users/infrastructure/usersSQL.repository';
+import { usersQueryRepositorySQL } from './features/users/infrastructure/users-querySQL.repository';
 
+const repositoriesSQL = [UsersRepositorySQL, usersQueryRepositorySQL];
 const repositories = [
   BlogsRepository,
   BlogsQueryRepository,
@@ -111,6 +114,7 @@ const repositories = [
   CommentsRepository,
   CommentsLikesInfoRepository,
   PostsLikesInfoRepository,
+  ...repositoriesSQL,
 ];
 const service = [UsersService, AuthService, JWTService, EmailService];
 const commands = [

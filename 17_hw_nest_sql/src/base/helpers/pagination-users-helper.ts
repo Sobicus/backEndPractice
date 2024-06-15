@@ -5,7 +5,7 @@ export const usersPagination = (
     searchLoginTerm: '',
     searchEmailTerm: '',
     sortBy: 'createdAt',
-    sortDirection: Description.desc,
+    sortDirection: SortDirection.desc,
     pageNumber: 1,
     pageSize: 10,
     skip: 0,
@@ -19,8 +19,8 @@ export const usersPagination = (
   if (query.sortBy) {
     defaultValues.sortBy = query.sortBy;
   }
-  if (query.sortDirection && query.sortDirection === sortDirection.asc) {
-    defaultValues.sortDirection = Description.asc;
+  if (query.sortDirection && query.sortDirection === SortDirection.asc) {
+    defaultValues.sortDirection = SortDirection.asc;
   }
   if (
     query.pageNumber &&
@@ -40,19 +40,21 @@ export const usersPagination = (
 
   return defaultValues;
 };
-enum sortDirection {
+enum SortDirection {
   asc = 'asc',
   desc = 'desc',
 }
+/*
 enum Description {
   asc = 1,
   desc = -1,
 }
+*/
 export type PaginationUsersInputModelType = {
   searchLoginTerm: string;
   searchEmailTerm: string;
   sortBy: string;
-  sortDirection: sortDirection;
+  sortDirection: SortDirection;
   pageNumber: number;
   pageSize: number;
 };
@@ -60,7 +62,7 @@ export type PaginationUsersOutModelType = {
   searchLoginTerm: string;
   searchEmailTerm: string;
   sortBy: string;
-  sortDirection: Description;
+  sortDirection: SortDirection;
   pageNumber: number;
   pageSize: number;
   skip: number;
