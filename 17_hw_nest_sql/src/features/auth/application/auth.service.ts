@@ -16,14 +16,14 @@ import { PasswordRecoveryRepository } from '../infrastructure/passwordRecovery.r
 import { PasswordRecovery } from '../domain/passwordRecovery.entity';
 import { UsersDocument } from '../../users/domain/users.entity';
 import bcrypt from 'bcrypt';
+import { UsersRepositorySQL } from '../../users/infrastructure/usersSQL.repository';
+import { UsersSQL } from '../../users/domain/usersSQL.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UsersService,
     private usersRepository: UsersRepository,
-    private emailService: EmailService,
-    private passwordRecoveryRepository: PasswordRecoveryRepository,
+    private usersRepositorySQL: UsersRepositorySQL,
   ) {}
 
   // async registrationUsers(registrationDTO: RegistrationUserModelType) {
@@ -151,8 +151,8 @@ export class AuthService {
   // NEW logic about passport local stategy------------------------------->>>>
   async checkCredentials(
     loginDTO: LoginInputModelType,
-  ): Promise<ObjectClassResult<UsersDocument | null>> {
-    const user = await this.usersRepository.findUserByLoginOrEmail(
+  ): Promise<ObjectClassResult<UsersSQL | null>> {
+    const user = await this.usersRepositorySQL.findUserByLoginOrEmail(
       loginDTO.loginOrEmail,
     );
     if (!user) {

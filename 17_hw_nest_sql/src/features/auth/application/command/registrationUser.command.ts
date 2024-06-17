@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RegistrationUserModelType } from '../../api/models/input/auth-.input.model';
 import { UsersService } from '../../../users/application/users.service';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { EmailService } from '../../../../base/mail/email-server.service';
+import { UsersRepositorySQL } from 'src/features/users/infrastructure/usersSQL.repository';
 
 export class RegistrationUserCommand {
   constructor(public readonly registrationDTO: RegistrationUserModelType) {}
@@ -14,17 +14,18 @@ export class RegistrationUserHandler
 {
   constructor(
     private userService: UsersService,
-    private usersRepository: UsersRepository,
+    private usersRepositorySQL: UsersRepositorySQL,
     private emailService: EmailService,
   ) {}
 
   async execute(command: RegistrationUserCommand) {
     const userId = await this.userService.createUser(command.registrationDTO);
-    const newUser = await this.usersRepository.getUserById(userId);
+    const confirmationCode =
+      await this.usersRepositorySQL.findConfirmationCodeByUserId(userId);
     await this.emailService.sendUserConfirmationCode(
       command.registrationDTO.email,
       command.registrationDTO.login,
-      newUser!.emailConfirmation.confirmationCode,
+      confirmationCode!,
     );
   }
 }

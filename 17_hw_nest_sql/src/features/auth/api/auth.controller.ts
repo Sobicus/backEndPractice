@@ -17,7 +17,6 @@ import {
   RegistrationUserModelType,
 } from './models/input/auth-.input.model';
 import { Response } from 'express';
-import { AuthService } from '../application/auth.service';
 import { JWTService } from 'src/base/application/jwt.service';
 import { UserAgent } from '../../../base/decorators/userAgent';
 import { CurrentUserId } from 'src/base/decorators/currentUserId';
@@ -27,7 +26,6 @@ import { LoginGuard } from '../../../base/guards/login.guard';
 import { RefreshPayload } from 'src/base/decorators/refreshPayload';
 import { JwtAccessAuthGuard } from '../../../base/guards/jwt-access.guard';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
-import { UsersQueryRepository } from '../../users/infrastructure/users-query.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegistrationUserCommand } from '../application/command/registrationUser.command';
 import { RegistrationConfirmationCommand } from '../application/command/registrationConfirmation.command';
@@ -40,14 +38,14 @@ import { DeleteSessionCommand } from '../../SecurityDevices/application/command/
 import { UpdateSessionCommand } from '../../SecurityDevices/application/command/updateSession.command';
 import { JwtRefreshAuthGuard } from '../../../base/guards/jwt-refreash.guard';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { UsersQueryRepositorySQL } from '../../users/infrastructure/users-querySQL.repository';
 
 @UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController {
   constructor(
-    private authService: AuthService,
     private jwtService: JWTService,
-    private userQueryRepository: UsersQueryRepository,
+    private usersQueryRepositorySQL: UsersQueryRepositorySQL,
     private commandBus: CommandBus,
   ) {}
 
@@ -149,7 +147,7 @@ export class AuthController {
 
   @UseGuards(JwtAccessAuthGuard)
   @Get('me')
-  async authMe(@TakeUserId() { userId }: { userId: string }) {
-    return this.userQueryRepository.getUserByIdForAuthMe(userId);
+  async authMe(@TakeUserId() { userId }: { userId: number }) {
+    return this.usersQueryRepositorySQL.getUserByIdForAuthMe(userId);
   }
 }

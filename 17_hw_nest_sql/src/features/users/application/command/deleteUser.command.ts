@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { statusType } from '../../../../base/oject-result';
 import { UsersRepository } from '../../infrastructure/users.repository';
+import { UsersRepositorySQL } from '../../infrastructure/usersSQL.repository';
 
 export class DeleteUserCommand {
   constructor(public readonly userId: string) {}
@@ -8,10 +9,10 @@ export class DeleteUserCommand {
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private UsersRepositorySQL: UsersRepositorySQL) {}
 
   async execute(command: DeleteUserCommand) {
-    const user = await this.usersRepository.getUserById(command.userId);
+    const user = await this.UsersRepositorySQL.getUserById(command.userId);
     if (!user) {
       return {
         status: statusType.NotFound,
@@ -19,7 +20,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
         data: null,
       };
     }
-    await this.usersRepository.removeUser(command.userId);
+    await this.UsersRepositorySQL.removeUser(command.userId);
     return {
       status: statusType.Success,
       statusMessages: 'User has been delete',

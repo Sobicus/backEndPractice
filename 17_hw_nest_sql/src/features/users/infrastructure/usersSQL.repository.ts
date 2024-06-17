@@ -36,28 +36,56 @@ export class UsersRepositorySQL {
       ],
     );
 
-    return userId;
+    return id;
   }
-  //
-  // async getUserById(userId: string): Promise<Users | null> {
-  //   return this.UsersModel.findOne({ _id: new Types.ObjectId(userId) });
-  // }
-  //
-  // async removeUser(userId: string) {
-  //   await this.UsersModel.deleteOne({ _id: userId });
-  // }
-  //
+
+  async getUserById(userId: string): Promise<UsersSQL | null> {
+    const user = await this.dataSource.query(
+      `SELECT *
+    FROM public."Users"
+    WHERE "id"= $1`,
+      [userId],
+    );
+    console.log(user);
+    return user[0];
+  }
+
+  async removeUser(userId: string) {
+    await this.dataSource.query(
+      `DELETE FROM public."EmailConfirmation"
+                WHERE "userId"= $1`,
+      [userId],
+    );
+    await this.dataSource.query(
+      `DELETE FROM public."Users"
+                WHERE "id"= $1`,
+      [userId],
+    );
+  }
+
   // async deleteAll() {
   //   await this.UsersModel.deleteMany();
   // }
   //
-  // async findUserByLoginOrEmail(
-  //   loginOrEmail: string,
-  // ): Promise<UsersDocument | null> {
-  //   return this.UsersModel.findOne({
-  //     $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
-  //   });
-  // }
+  async findUserByLoginOrEmail(loginOrEmail: string): Promise<UsersSQL | null> {
+    const res = await this.dataSource.query(
+      `SELECT *
+    FROM public."Users"
+    WHERE "login" = $1 or "email" = $1`,
+      [loginOrEmail],
+    );
+    return res[0];
+  }
+
+  async findConfirmationCodeByUserId(userId: string): Promise<string | null> {
+    const confirmationCode = await this.dataSource.query(
+      `SELECT "confirmationCode"
+FROM public."EmailConfirmation"
+WHERE "userId"= $1`,
+      [userId],
+    );
+    return confirmationCode[0].confirmationCode;
+  }
   //
   // async findUserByCode(code: string): Promise<UsersDocument | null> {
   //   return this.UsersModel.findOne({

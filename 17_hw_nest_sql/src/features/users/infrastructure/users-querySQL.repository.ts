@@ -1,7 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Users } from '../domain/users.entity';
-import { Model, Types } from 'mongoose';
 
 import {
   UserAuthMeDTO,
@@ -13,7 +10,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 @Injectable()
-export class usersQueryRepositorySQL {
+export class UsersQueryRepositorySQL {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
   async getAllUsers(
@@ -46,46 +43,35 @@ export class usersQueryRepositorySQL {
         WHERE "login" ILIKE $1 OR "email" ILIKE $2`,
       [`%${pagination.searchLoginTerm}%`, `%${pagination.searchEmailTerm}%`],
     );
-    console.log('totalCount ', totalCount);
-    const pagesCount = Math.ceil(totalCount[0].count / pagination.pageSize);
-    console.log('pagesCount ', pagesCount);
+
+    const formatTotalCount = totalCount[0].count;
+
+    const pagesCount = Math.ceil(formatTotalCount / pagination.pageSize);
 
     return {
       pagesCount: pagesCount,
       page: pagination.pageNumber,
       pageSize: pagination.pageSize,
-      totalCount: totalCount,
+      totalCount: formatTotalCount,
       items: users,
     };
   }
 
-  // async getUserById(userId: string): Promise<UserOutputDTO | null> {
-  //   const user = await this.UsersModel.findOne({
-  //     _id: new Types.ObjectId(userId),
-  //   });
-  //   if (!user) {
-  //     return null;
-  //   }
-  //   return {
-  //     id: user._id.toString(),
-  //     login: user.login,
-  //     email: user.email,
-  //     createdAt: user.createdAt,
-  //   };
-  // }
-  //
-  // async getUserByIdForAuthMe(userId: string): Promise<null | UserAuthMeDTO> {
-  //   console.log(userId);
-  //   const user = await this.UsersModel.findOne({
-  //     _id: new Types.ObjectId(userId),
-  //   }).exec();
-  //   if (!user) {
-  //     return null;
-  //   }
-  //   return {
-  //     email: user.email,
-  //     login: user.login,
-  //     userId: user._id.toString(),
-  //   };
-  // }
+  async getUserById(userId: number): Promise<UserOutputDTO | null> {
+    return await this.dataSource.query(
+      `SELECT u."id", u."login", u."email", u."createdAt"
+    FROM public."Users" as u
+    WHERE "id"= $1`,
+      [userId],
+    );
+  }
+
+  async getUserByIdForAuthMe(userId: number): Promise<null | UserAuthMeDTO> {
+    return await this.dataSource.query(
+      `SELECT u."id", u."login", u."email"
+    FROM public."Users" as u
+    WHERE "id"= $1`,
+      [userId],
+    );
+  }
 }

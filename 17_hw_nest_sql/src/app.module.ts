@@ -98,9 +98,14 @@ import { SecurityDevicesController } from './features/SecurityDevices/api/securi
 import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersRepositorySQL } from './features/users/infrastructure/usersSQL.repository';
-import { usersQueryRepositorySQL } from './features/users/infrastructure/users-querySQL.repository';
+import { UsersQueryRepositorySQL } from './features/users/infrastructure/users-querySQL.repository';
+import { SessionsRepositorySQL } from './features/SecurityDevices/infrastructure/sessionsSQL.repository';
 
-const repositoriesSQL = [UsersRepositorySQL, usersQueryRepositorySQL];
+const repositoriesSQL = [
+  UsersRepositorySQL,
+  UsersQueryRepositorySQL,
+  SessionsRepositorySQL,
+];
 const repositories = [
   BlogsRepository,
   BlogsQueryRepository,

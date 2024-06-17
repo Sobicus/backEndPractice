@@ -19,15 +19,15 @@ import { UserAuthGuard } from '../../../base/guards/basic.guard';
 import { UsersQueryRepository } from '../infrastructure/users-query.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../application/command/createUser.command';
+import { UsersQueryRepositorySQL } from '../infrastructure/users-querySQL.repository';
 import { DeleteUserCommand } from '../application/command/deleteUser.command';
-import { usersQueryRepositorySQL } from '../infrastructure/users-querySQL.repository';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private usersQueryRepository: UsersQueryRepository,
     private commandBus: CommandBus,
-    private usersQueryRepositorySQL: usersQueryRepositorySQL,
+    private usersQueryRepositorySQL: UsersQueryRepositorySQL,
   ) {}
 
   @UseGuards(UserAuthGuard)
@@ -43,7 +43,7 @@ export class UsersController {
     const userId = await this.commandBus.execute(
       new CreateUserCommand(inputModel),
     );
-    const user = await this.usersQueryRepository.getUserById(userId);
+    const user = await this.usersQueryRepositorySQL.getUserById(userId);
     if (user) return user;
   }
 
