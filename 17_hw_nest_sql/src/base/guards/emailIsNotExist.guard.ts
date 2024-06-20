@@ -5,15 +5,17 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { UsersRepository } from '../../features/users/infrastructure/users.repository';
+import { UsersRepositorySQL } from '../../features/users/infrastructure/usersSQL.repository';
 
 @ValidatorConstraint({ async: true })
 export class IsNotEmailExistConstraint implements ValidatorConstraintInterface {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private usersRepositorySQL: UsersRepositorySQL) {}
 
   async validate(email: string, args: ValidationArguments) {
-    const result = await this.usersRepository.findUserByEmail(email);
-    if (result && !result?.emailConfirmation.isConfirmed) {
+    const user = await this.usersRepositorySQL.findUserByEmail(email);
+    const emailConfirmationDTO =
+      await this.usersRepositorySQL.findEmailConfirmationByUserId(user.id);
+    if (emailConfirmationDTO && !emailConfirmationDTO?.isConfirmed) {
       return true;
     }
     return false;

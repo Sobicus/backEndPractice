@@ -17,16 +17,6 @@ export class EmailConfirmationSQL {
       })),
       (this.isConfirmed = false);
   }
-
-  updateConfirmationCode() {
-    this.confirmationCode = randomUUID();
-    this.expirationDate = add(new Date(), {
-      days: 1,
-      hours: 1,
-      minutes: 1,
-      seconds: 1,
-    });
-  }
 }
 
 export class UsersSQL {

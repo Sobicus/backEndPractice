@@ -100,11 +100,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersRepositorySQL } from './features/users/infrastructure/usersSQL.repository';
 import { UsersQueryRepositorySQL } from './features/users/infrastructure/users-querySQL.repository';
 import { SessionsRepositorySQL } from './features/SecurityDevices/infrastructure/sessionsSQL.repository';
+import { PasswordRecoveryRepositorySQL } from './features/auth/infrastructure/passwordRecoverySQL.repository';
 
 const repositoriesSQL = [
   UsersRepositorySQL,
   UsersQueryRepositorySQL,
   SessionsRepositorySQL,
+  PasswordRecoveryRepositorySQL,
 ];
 const repositories = [
   BlogsRepository,

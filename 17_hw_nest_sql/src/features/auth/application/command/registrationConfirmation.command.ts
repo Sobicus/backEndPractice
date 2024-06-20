@@ -1,8 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersService } from '../../../users/application/users.service';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { EmailService } from '../../../../base/mail/email-server.service';
 import { statusType } from '../../../../base/oject-result';
+import { UsersRepositorySQL } from '../../../users/infrastructure/usersSQL.repository';
 
 export class RegistrationConfirmationCommand {
   constructor(public readonly code: string) {}
@@ -12,20 +10,26 @@ export class RegistrationConfirmationCommand {
 export class RegistrationConfirmationHandler
   implements ICommandHandler<RegistrationConfirmationCommand>
 {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private usersRepositorySQL: UsersRepositorySQL) {}
 
   async execute(command: RegistrationConfirmationCommand) {
-    const user = await this.usersRepository.findUserByCode(command.code);
-    if (!user) {
+    const emailConfirmationDTO =
+      await this.usersRepositorySQL.findEmailConfirmationByCode(command.code);
+    if (!emailConfirmationDTO) {
       return {
         status: statusType.NotFound,
         statusMessages: 'user has`n found',
         data: null,
       };
     }
-    user.emailConfirmation.confirmationCode = 'null';
-    user.emailConfirmation.isConfirmed = true;
-    await this.usersRepository.saveUser(user);
+    const changeEmailConfirmationStatus = {
+      code: command.code,
+      emailConfirmationCode: 'null',
+      isConfirmed: true,
+    };
+    await this.usersRepositorySQL.changeEmailConfirmationStatus(
+      changeEmailConfirmationStatus,
+    );
     return {
       status: statusType.Success,
       statusMessages: 'user has been confirmed',

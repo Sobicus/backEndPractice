@@ -6,7 +6,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { UsersRepositorySQL } from 'src/features/users/infrastructure/usersSQL.repository';
 
 export function ConfirmationCodeIsValid(
   property?: string,
@@ -28,17 +28,18 @@ export function ConfirmationCodeIsValid(
 export class ConfirmationCodeIsValidConstraint
   implements ValidatorConstraintInterface
 {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly usersRepositorySQL: UsersRepositorySQL) {}
 
   async validate(value: any, validationArguments?: ValidationArguments) {
-    const user = await this.usersRepository.findUserByCode(value);
-    if (!user) {
+    const emailConfirmationDTO =
+      await this.usersRepositorySQL.findEmailConfirmationByCode(value);
+    if (!emailConfirmationDTO) {
       return false;
     }
-    if (user.emailConfirmation.expirationDate < new Date()) {
+    if (emailConfirmationDTO.expirationDate < new Date()) {
       return false;
     }
-    if (user.emailConfirmation.isConfirmed) {
+    if (emailConfirmationDTO.isConfirmed) {
       return false;
     }
     return true;

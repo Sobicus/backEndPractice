@@ -77,26 +77,82 @@ export class UsersRepositorySQL {
     return res[0];
   }
 
-  async findConfirmationCodeByUserId(userId: string): Promise<string | null> {
-    const confirmationCode = await this.dataSource.query(
-      `SELECT "confirmationCode"
+  async findEmailConfirmationByUserId(
+    userId: string,
+  ): Promise<EmailConfirmationSQL | null> {
+    const emailConfirmationDTO = await this.dataSource.query(
+      `SELECT *
 FROM public."EmailConfirmation"
 WHERE "userId"= $1`,
       [userId],
     );
-    return confirmationCode[0].confirmationCode;
+    //return confirmationCode[0].confirmationCode;
+    return emailConfirmationDTO[0];
   }
-  //
-  // async findUserByCode(code: string): Promise<UsersDocument | null> {
-  //   return this.UsersModel.findOne({
-  //     'emailConfirmation.confirmationCode': code,
-  //   });
-  // }
-  //
-  // async findUserByEmail(email: string): Promise<UsersDocument | null> {
-  //   return this.UsersModel.findOne({ email });
-  // }
-  //
+
+  async findEmailConfirmationByCode(
+    code: string,
+  ): Promise<EmailConfirmationSQL | null> {
+    const emailConfirmationDTO = await this.dataSource.query(
+      `SELECT *
+    FROM public."EmailConfirmation"
+WHERE "confirmationCode"=$1`,
+      [code],
+    );
+    return emailConfirmationDTO[0];
+  }
+
+  async changeEmailConfirmationStatus(data: {
+    code: string;
+    emailConfirmationCode: string;
+    isConfirmed: boolean;
+  }): Promise<void> {
+    await this.dataSource.query(
+      `UPDATE public."EmailConfirmation"
+SET "confirmationCode"=$2,  "isConfirmed"=$3
+WHERE "confirmationCode"=$1`,
+      [data.code, data.emailConfirmationCode, data.isConfirmed],
+    );
+  }
+
+  async findUserByEmail(email: string) {
+    const user = await this.dataSource
+      .query(
+        `SELECT *
+FROM public."Users"
+WHERE "email" = $1`,
+        [email],
+      )
+      .then((res) => res[0]);
+    return user;
+  }
+
+  async findUserAndEmailConfirmationByEmail(email: string) {
+    const result = await this.dataSource.query(
+      `SELECT u.*, ec.*
+FROM public."Users" as u
+LEFT JOIN public."EmailConfirmation" as ec
+ON u."id" = ec."userId"
+WHERE u."email" = $1`,
+      [email],
+    );
+    return result[0];
+  }
+
+  async updateConfirmationCode(updateConfirmationCode: {
+    confirmationCode: string;
+    expirationDate: Date;
+  }) {
+    await this.dataSource.query(
+      `UPDATE public."EmailConfirmation"
+SET "confirmationCode"=$1, "expirationDate"=$2
+WHERE "userId"=30;`,
+      [
+        updateConfirmationCode.confirmationCode,
+        updateConfirmationCode.expirationDate,
+      ],
+    );
+  }
   // async changePassword(
   //   userId: string,
   //   passwordSalt: string,
