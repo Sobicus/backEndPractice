@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SessionsRepository } from '../../infrastructure/sessions.repository';
 import { JwtService } from '@nestjs/jwt';
+import { SessionsRepositorySQL } from '../../infrastructure/sessionsSQL.repository';
 
 export class UpdateSessionCommand {
   constructor(
@@ -15,7 +15,7 @@ export class UpdateSessionHandler
   implements ICommandHandler<UpdateSessionCommand>
 {
   constructor(
-    private sessionRepository: SessionsRepository,
+    private sessionRepositorySQL: SessionsRepositorySQL,
     private jwtService: JwtService,
   ) {}
 
@@ -25,7 +25,7 @@ export class UpdateSessionHandler
     );
     const iat = decodeJwtRefreshToken['iat'];
     const issuedAt = new Date(iat * 1000).toISOString();
-    return await this.sessionRepository.updateSession(
+    await this.sessionRepositorySQL.updateSession(
       command.userId,
       command.deviceId,
       issuedAt,

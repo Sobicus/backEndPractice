@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { statusType } from '../../../../base/oject-result';
 import { InputNewPasswordModel } from '../../api/models/input/auth-.input.model';
-import { PasswordRecoveryRepository } from '../../infrastructure/passwordRecovery.repository';
 import bcrypt from 'bcrypt';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { PasswordRecoveryRepositorySQL } from '../../infrastructure/passwordRecoverySQL.repository';
+import { UsersRepositorySQL } from '../../../users/infrastructure/usersSQL.repository';
 
 export class NewPasswordCommand {
   constructor(public readonly newPasswordModel: InputNewPasswordModel) {}
@@ -12,13 +12,13 @@ export class NewPasswordCommand {
 @CommandHandler(NewPasswordCommand)
 export class NewPasswordHandler implements ICommandHandler<NewPasswordCommand> {
   constructor(
-    private passwordRecoveryRepository: PasswordRecoveryRepository,
-    private usersRepository: UsersRepository,
+    private passwordRecoveryRepositorySQL: PasswordRecoveryRepositorySQL,
+    private usersRepositorySQL: UsersRepositorySQL,
   ) {}
 
   async execute(command: NewPasswordCommand) {
     const recoveryDTO =
-      await this.passwordRecoveryRepository.findRecoveryCodeByCode(
+      await this.passwordRecoveryRepositorySQL.findRecoveryCodeByCode(
         command.newPasswordModel.recoveryCode,
       );
     if (!recoveryDTO) {
@@ -55,7 +55,7 @@ export class NewPasswordHandler implements ICommandHandler<NewPasswordCommand> {
   private async changePassword(userId: string, newPassword: string) {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(newPassword, passwordSalt);
-    await this.usersRepository.changePassword(
+    await this.usersRepositorySQL.changePassword(
       userId,
       passwordSalt,
       passwordHash,

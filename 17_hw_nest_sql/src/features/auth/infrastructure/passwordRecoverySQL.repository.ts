@@ -32,11 +32,19 @@ export class PasswordRecoveryRepositorySQL {
 
   async findRecoveryCodeByCode(
     recoveryCode: string,
-  ): Promise<null | PasswordRecovery> {
-    return this.PasswordRecoveryModel.findOne({ recoveryCode });
+  ): Promise<null | PasswordRecoverySQL> {
+    const passwordRecoveryDTO = await this.dataSource.query(
+      `
+SELECT *
+FROM public."PasswordRecovery"
+WHERE "recoveryCode"= $1`,
+      [recoveryCode],
+    );
+    return passwordRecoveryDTO[0];
   }
 
-  async deleteALl() {
-    await this.PasswordRecoveryModel.deleteMany();
+  //----------------------------------------------------------------------
+  async deleteAll() {
+    await this.dataSource.query(`DELETE FROM public."PasswordRecovery"`);
   }
 }

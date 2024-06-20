@@ -32,29 +32,36 @@ export class SessionsRepositorySQL {
   async findSessionByUserIdAndDeviceId(
     userId: string,
     deviceId: string,
-  ): Promise<null | SessionsDocument> {
-    return this.SessionsModel.findOne({ userId, deviceId }).exec();
+  ): Promise<null | SessionsSQL> {
+    const session = await this.dataSource.query(
+      `SELECT *
+FROM public."Sessions"
+WHERE "userId"=$1 and "deviceId"=$2`,
+      [userId, deviceId],
+    );
+    return session[0];
   }
 
   async deleteSession(userId: string, deviceId: string) {
-    await this.SessionsModel.deleteOne({ userId, deviceId });
+    await this.dataSource.query(
+      `DELETE FROM public."Sessions"
+WHERE "userId"=$1 and "deviceId"=$2'`,
+      [userId, deviceId],
+    );
   }
 
-  //Todo what we return???
   async updateSession(
     userId: string,
     deviceId: string,
     issuedAt: string,
-  ): Promise<boolean> {
-    const res = await this.SessionsModel.updateOne(
-      { userId, deviceId },
-      { $set: { issuedAt } },
+  ): Promise<void> {
+    await this.dataSource.query(
+      `
+UPDATE public."Sessions"
+SET "issuedAt"=$3
+WHERE "deviceId"=$2 and "userId"=$1`,
+      [userId, deviceId, issuedAt],
     );
-    return res.acknowledged;
-  }
-
-  async deleteALl() {
-    await this.SessionsModel.deleteMany();
   }
 
   async getAllActiveSessions(
@@ -93,5 +100,9 @@ export class SessionsRepositorySQL {
     issuedAt: string,
   ): Promise<null | SessionsDocument> {
     return this.SessionsModel.findOne({ userId, deviceId, issuedAt }).exec();
+  }
+  //--------------------
+  async deleteAll() {
+    await this.dataSource.query(`DELETE FROM public."Sessions"`);
   }
 }

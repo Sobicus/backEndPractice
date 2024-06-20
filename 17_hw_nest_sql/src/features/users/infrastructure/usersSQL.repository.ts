@@ -63,10 +63,6 @@ export class UsersRepositorySQL {
     );
   }
 
-  // async deleteAll() {
-  //   await this.UsersModel.deleteMany();
-  // }
-  //
   async findUserByLoginOrEmail(loginOrEmail: string): Promise<UsersSQL | null> {
     const res = await this.dataSource.query(
       `SELECT *
@@ -153,11 +149,22 @@ WHERE "userId"=30;`,
       ],
     );
   }
-  // async changePassword(
-  //   userId: string,
-  //   passwordSalt: string,
-  //   passwordHash: string,
-  // ) {
-  //   await this.UsersModel.updateOne({ userId }, { passwordSalt, passwordHash });
-  // }
+  async changePassword(
+    userId: string,
+    passwordSalt: string,
+    passwordHash: string,
+  ) {
+    await this.dataSource.query(
+      `UPDATE public."Users"
+SET "passwordSalt"=$2, "passwordHash"=$3
+WHERE "id"=$1;`,
+      [userId, passwordSalt, passwordHash],
+    );
+  }
+
+  //------------------------------------------------------
+  async deleteAll() {
+    await this.dataSource.query(`DELETE FROM public."Users"
+`);
+  }
 }

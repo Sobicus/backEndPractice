@@ -22,10 +22,9 @@ import { CreateUserCommand } from '../application/command/createUser.command';
 import { UsersQueryRepositorySQL } from '../infrastructure/users-querySQL.repository';
 import { DeleteUserCommand } from '../application/command/deleteUser.command';
 
-@Controller('users')
+@Controller('sa/users')
 export class UsersController {
   constructor(
-    private usersQueryRepository: UsersQueryRepository,
     private commandBus: CommandBus,
     private usersQueryRepositorySQL: UsersQueryRepositorySQL,
   ) {}

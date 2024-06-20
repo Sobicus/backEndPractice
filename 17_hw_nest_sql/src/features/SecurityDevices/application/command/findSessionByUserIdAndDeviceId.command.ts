@@ -1,5 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SessionsRepository } from '../../infrastructure/sessions.repository';
+import { SessionsRepositorySQL } from '../../infrastructure/sessionsSQL.repository';
 
 export class FindSessionByUserIdAndDeviceIdCommand {
   constructor(
@@ -12,10 +13,10 @@ export class FindSessionByUserIdAndDeviceIdCommand {
 export class FindSessionByUserIdAndDeviceIdHandler
   implements ICommandHandler<FindSessionByUserIdAndDeviceIdCommand>
 {
-  constructor(private sessionRepository: SessionsRepository) {}
+  constructor(private sessionRepositorySQL: SessionsRepositorySQL) {}
 
   async execute(command: FindSessionByUserIdAndDeviceIdCommand) {
-    return this.sessionRepository.findSessionByUserIdAndDeviceId(
+    return this.sessionRepositorySQL.findSessionByUserIdAndDeviceId(
       command.userId,
       command.deviceId,
     );

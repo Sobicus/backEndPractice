@@ -132,12 +132,15 @@ export class AuthController {
     res: Response,
   ) {
     const tokensPair = await this.jwtService.createJWT(userId, deviceId);
-    const result = await this.commandBus.execute(
+    // const result = await this.commandBus.execute(
+    //   new UpdateSessionCommand(userId, deviceId, tokensPair.refreshToken),
+    // );
+    // if (!result) {
+    //   throw new UnauthorizedException();
+    // }
+    await this.commandBus.execute(
       new UpdateSessionCommand(userId, deviceId, tokensPair.refreshToken),
     );
-    if (!result) {
-      throw new UnauthorizedException();
-    }
     res.cookie('refreshToken', tokensPair.refreshToken, {
       httpOnly: true,
       secure: true,

@@ -1,8 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { statusType } from '../../../../base/oject-result';
-import { PasswordRecovery } from '../../domain/passwordRecovery.entity';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { PasswordRecoveryRepository } from '../../infrastructure/passwordRecovery.repository';
 import { EmailService } from '../../../../base/mail/email-server.service';
 import { UsersRepositorySQL } from 'src/features/users/infrastructure/usersSQL.repository';
 import { PasswordRecoverySQL } from '../../domain/passwordRecoverySQL.entity';
