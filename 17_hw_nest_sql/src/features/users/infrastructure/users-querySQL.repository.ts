@@ -28,8 +28,7 @@ export class UsersQueryRepositorySQL {
     FROM public."Users" as u
     WHERE "login" ILIKE $1 OR "email" ILIKE $2
     ORDER BY ${sortBy} ${sortDirection}
-    LIMIT $3 OFFSET $4
-  `;
+    LIMIT $3 OFFSET $4`;
 
     const users = await this.dataSource.query(query, [
       `%${pagination.searchLoginTerm}%`,
@@ -37,8 +36,19 @@ export class UsersQueryRepositorySQL {
       pagination.pageSize,
       pagination.skip,
     ]);
+    //todo как мапер типизировать
+    //const usersOfMapper = userMappers(users);
+    const usersOfMapper = users.map((u) => {
+      return {
+        id: u.id.toString(),
+        login: u.login,
+        email: u.email,
+        createdAt: u.createdAt,
+      };
+    });
+
     const totalCount = await this.dataSource.query(
-      `SELECT count(*)
+      `SELECT CAST(count(*) as int)
         FROM public."Users"
         WHERE "login" ILIKE $1 OR "email" ILIKE $2`,
       [`%${pagination.searchLoginTerm}%`, `%${pagination.searchEmailTerm}%`],
@@ -53,25 +63,48 @@ export class UsersQueryRepositorySQL {
       page: pagination.pageNumber,
       pageSize: pagination.pageSize,
       totalCount: formatTotalCount,
-      items: users,
+      items: usersOfMapper,
     };
   }
 
   async getUserById(userId: number): Promise<UserOutputDTO | null> {
-    return await this.dataSource.query(
+    const user = await this.dataSource.query(
       `SELECT u."id", u."login", u."email", u."createdAt"
     FROM public."Users" as u
     WHERE "id"= $1`,
       [userId],
     );
+    const userMapped = user.map((u) => {
+      return {
+        id: u.id.toString(),
+        login: u.login,
+        email: u.email,
+        createdAt: u.createdAt,
+      };
+    });
+    return userMapped[0];
   }
 
   async getUserByIdForAuthMe(userId: number): Promise<null | UserAuthMeDTO> {
-    return await this.dataSource.query(
+    const user = await this.dataSource.query(
       `SELECT u."id", u."login", u."email"
     FROM public."Users" as u
     WHERE "id"= $1`,
       [userId],
     );
+    const userMapped = user.map((u) => {
+      return { id: u.id.toString(), login: u.login, email: u.email };
+    });
+    return userMapped[0];
   }
 }
+// const userMappers = (user: any): UserOutputDTO => {
+//   user.map((u) => {
+//     return {
+//       id: u.id.toString(),
+//       login: u.login,
+//       email: u.email,
+//       createdAt: u.createdAt,
+//     };
+//   });
+// };

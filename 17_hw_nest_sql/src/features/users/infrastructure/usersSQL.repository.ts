@@ -138,14 +138,16 @@ WHERE u."email" = $1`,
   async updateConfirmationCode(updateConfirmationCode: {
     confirmationCode: string;
     expirationDate: Date;
+    userId: number;
   }) {
     await this.dataSource.query(
       `UPDATE public."EmailConfirmation"
 SET "confirmationCode"=$1, "expirationDate"=$2
-WHERE "userId"=30;`,
+WHERE "userId"=$3;`,
       [
         updateConfirmationCode.confirmationCode,
         updateConfirmationCode.expirationDate,
+        updateConfirmationCode.userId,
       ],
     );
   }
@@ -164,7 +166,7 @@ WHERE "id"=$1;`,
 
   //------------------------------------------------------
   async deleteAll() {
-    await this.dataSource.query(`DELETE FROM public."Users"
-`);
+    await this.dataSource.query(`DELETE FROM public."EmailConfirmation"`);
+    await this.dataSource.query(`DELETE FROM public."Users"`);
   }
 }

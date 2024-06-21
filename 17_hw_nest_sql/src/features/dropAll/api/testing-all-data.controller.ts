@@ -38,8 +38,8 @@ export class TestingAllDataController {
     // await this.postsLikesInfoRepository.deleteALl();
     // await this.sessionsRepository.deleteALl();
     // await this.passwordRecoveryRepository.deleteALl();
-    await this.sessionsRepositorySQL.deleteAll();
     await this.passwordRecoveryRepositorySQL.deleteAll();
+    await this.sessionsRepositorySQL.deleteAll();
     await this.usersRepositorySQL.deleteAll();
   }
 }

@@ -16,7 +16,6 @@ import {
   usersPagination,
 } from '../../../base/helpers/pagination-users-helper';
 import { UserAuthGuard } from '../../../base/guards/basic.guard';
-import { UsersQueryRepository } from '../infrastructure/users-query.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../application/command/createUser.command';
 import { UsersQueryRepositorySQL } from '../infrastructure/users-querySQL.repository';

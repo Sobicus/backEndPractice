@@ -24,14 +24,14 @@ export class JWTService {
         { userId },
         {
           secret: secretKey,
-          expiresIn: '5m',
+          expiresIn: '10s',
         },
       ),
       refreshToken: await this.jwtService.signAsync(
         { userId, deviceId },
         {
           secret: process.env.JWT_SECRET || '123',
-          expiresIn: '5m',
+          expiresIn: '20s',
         },
       ),
     };

@@ -5,17 +5,17 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { UsersRepository } from '../../features/users/infrastructure/users.repository';
+import { UsersRepositorySQL } from '../../features/users/infrastructure/usersSQL.repository';
 
 @ValidatorConstraint({ async: true })
 export class IsUserAlreadyExistConstraint
   implements ValidatorConstraintInterface
 {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private usersRepositorySQL: UsersRepositorySQL) {}
 
   async validate(loginOrEmail: string, args: ValidationArguments) {
     const result =
-      await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
+      await this.usersRepositorySQL.findUserByLoginOrEmail(loginOrEmail);
     if (result) {
       return false;
     }

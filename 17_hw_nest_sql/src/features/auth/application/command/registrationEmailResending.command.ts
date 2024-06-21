@@ -46,14 +46,19 @@ export class RegistrationEmailResendingHandler
         minutes: 1,
         seconds: 1,
       }),
+      userId: user.id,
     };
     await this.usersRepositorySQL.updateConfirmationCode(
       updateConfirmationCode,
     );
+    console.log(
+      'updateConfirmationCode.confirmationCode',
+      updateConfirmationCode.confirmationCode,
+    );
     await this.emailService.sendUserConfirmationCode(
       user.email,
       user.login,
-      user.confirmationCode,
+      updateConfirmationCode.confirmationCode,
     );
     return {
       status: statusType.OK,

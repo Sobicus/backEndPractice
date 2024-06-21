@@ -13,8 +13,9 @@ export class IsNotEmailExistConstraint implements ValidatorConstraintInterface {
 
   async validate(email: string, args: ValidationArguments) {
     const user = await this.usersRepositorySQL.findUserByEmail(email);
+
     const emailConfirmationDTO =
-      await this.usersRepositorySQL.findEmailConfirmationByUserId(user.id);
+      await this.usersRepositorySQL.findEmailConfirmationByUserId(user?.id);
     if (emailConfirmationDTO && !emailConfirmationDTO?.isConfirmed) {
       return true;
     }
