@@ -72,7 +72,7 @@ export class SessionsRepository {
     return this.SessionsModel.findOne({ deviceId }).lean();
   }
 
-  async findSessionForCheckCokkie(
+  async findSessionForCheckCookie(
     userId: string,
     deviceId: string,
     issuedAt: string,

@@ -155,6 +155,7 @@ const commands = [
 @Module({
   imports: [
     TypeOrmModule.forRoot({
+      logging: true,
       type: 'postgres',
       host: 'localhost',
       port: 5432,

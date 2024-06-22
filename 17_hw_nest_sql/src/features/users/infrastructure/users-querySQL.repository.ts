@@ -93,7 +93,7 @@ export class UsersQueryRepositorySQL {
       [userId],
     );
     const userMapped = user.map((u) => {
-      return { id: u.id.toString(), login: u.login, email: u.email };
+      return { userId: u.id.toString(), login: u.login, email: u.email };
     });
     return userMapped[0];
   }

@@ -4,12 +4,13 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { SessionsRepository } from '../../../../features/SecurityDevices/infrastructure/sessions.repository';
 import { Request } from 'express';
 import { config } from 'dotenv';
+import { SessionsRepositorySQL } from '../../../../features/SecurityDevices/infrastructure/sessionsSQL.repository';
 
 config();
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-cookie') {
-  constructor(private readonly sessionsRepository: SessionsRepository) {
+  constructor(private readonly sessionsRepositorySQL: SessionsRepositorySQL) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
@@ -31,7 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-cookie') {
     iat: string;
   }) {
     const issuedAt = new Date(+iat * 1000).toISOString();
-    const session = await this.sessionsRepository.findSessionForCheckCokkie(
+    const session = await this.sessionsRepositorySQL.findSessionForCheckCookie(
       userId,
       deviceId,
       issuedAt,

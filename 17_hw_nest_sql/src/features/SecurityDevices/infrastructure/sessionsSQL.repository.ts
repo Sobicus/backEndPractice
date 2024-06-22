@@ -45,7 +45,7 @@ WHERE "userId"=$1 and "deviceId"=$2`,
   async deleteSession(userId: string, deviceId: string) {
     await this.dataSource.query(
       `DELETE FROM public."Sessions"
-WHERE "userId"=$1 and "deviceId"=$2'`,
+WHERE "userId"=$1 and "deviceId"=$2`,
       [userId, deviceId],
     );
   }
@@ -67,7 +67,12 @@ WHERE "deviceId"=$2 and "userId"=$1`,
   async getAllActiveSessions(
     userId: string,
   ): Promise<allActiveSessionViewType[]> {
-    const sessions = await this.SessionsModel.find({ userId }).lean();
+    const sessions = await this.dataSource.query(
+      `SELECT "issuedAt", "deviceId", "ip", "deviceName"
+FROM public."Sessions"
+WHERE "userId"=$1`,
+      [userId],
+    );
     const allSession = sessions.map((session) => {
       return {
         ip: session.ip,
@@ -79,27 +84,37 @@ WHERE "deviceId"=$2 and "userId"=$1`,
     return allSession;
   }
 
-  async deleteDevicesExceptThis(
-    userId: string,
-    deviceId: string,
-  ): Promise<boolean> {
-    const result = await this.SessionsModel.deleteMany({
-      userId,
-      deviceId: { $ne: deviceId },
-    });
-    return result.acknowledged;
+  async deleteDevicesExceptThis(userId: string, deviceId: string) {
+    await this.dataSource.query(
+      `DELETE FROM public."Sessions"
+WHERE "userId"=$1 and "deviceId"!=$2`,
+      [userId, deviceId],
+    );
   }
 
-  async findSessionByDeviceId(deviceId: string): Promise<Sessions | null> {
-    return this.SessionsModel.findOne({ deviceId }).lean();
+  async findSessionByDeviceId(deviceId: string): Promise<SessionsSQL | null> {
+    const session = await this.dataSource.query(
+      `
+SELECT *
+ FROM public."Sessions"
+WHERE "deviceId"=$1`,
+      [deviceId],
+    );
+    return session[0];
   }
 
-  async findSessionForCheckCokkie(
+  async findSessionForCheckCookie(
     userId: string,
     deviceId: string,
     issuedAt: string,
   ): Promise<null | SessionsDocument> {
-    return this.SessionsModel.findOne({ userId, deviceId, issuedAt }).exec();
+    console.log(userId, deviceId, issuedAt);
+    const result = await this.dataSource.query(
+      `SELECT *
+ FROM public."Sessions" WHERE "userId"=$1 AND "deviceId"=$2 AND  "issuedAt"=$3`,
+      [userId, deviceId, issuedAt],
+    );
+    return result[0];
   }
   //--------------------
   async deleteAll() {

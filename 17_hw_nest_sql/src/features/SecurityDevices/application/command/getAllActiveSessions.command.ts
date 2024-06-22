@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { SessionsRepository } from '../../infrastructure/sessions.repository';
+import { SessionsRepositorySQL } from '../../infrastructure/sessionsSQL.repository';
 
 export class FindActiveSessionCommand {
   constructor(public readonly userId: string) {}
@@ -9,9 +9,9 @@ export class FindActiveSessionCommand {
 export class FindActiveSessionHandler
   implements ICommandHandler<FindActiveSessionCommand>
 {
-  constructor(private sessionRepository: SessionsRepository) {}
+  constructor(private sessionRepositorySQL: SessionsRepositorySQL) {}
 
   async execute(command: FindActiveSessionCommand) {
-    return this.sessionRepository.getAllActiveSessions(command.userId);
+    return this.sessionRepositorySQL.getAllActiveSessions(command.userId);
   }
 }
