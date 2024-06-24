@@ -18,7 +18,8 @@ export class DeleteDeviceSessionHandler
   async execute(command: DeleteDeviceSessionCommand) {
     const deviceSessionByDeviceId =
       await this.sessionsRepositorySQL.findSessionByDeviceId(command.deviceId);
-
+    console.log('deviceSessionByDeviceId', deviceSessionByDeviceId);
+    console.log('!deviceSessionByDeviceId', !deviceSessionByDeviceId);
     if (!deviceSessionByDeviceId) {
       return {
         status: statusType.NotFound,
@@ -26,8 +27,16 @@ export class DeleteDeviceSessionHandler
         data: null,
       };
     }
-
-    if (Number(command.userId) != deviceSessionByDeviceId.userId) {
+    console.log(
+      'command.userId !== deviceSessionByDeviceId.userId',
+      command.userId !== deviceSessionByDeviceId.userId,
+    );
+    console.log('command.userId ', command.userId);
+    console.log(
+      'deviceSessionByDeviceId.userId',
+      deviceSessionByDeviceId.userId,
+    );
+    if (command.userId != deviceSessionByDeviceId.userId) {
       return {
         status: statusType.Forbidden,
         statusMessages: 'Is not your deviceSession',

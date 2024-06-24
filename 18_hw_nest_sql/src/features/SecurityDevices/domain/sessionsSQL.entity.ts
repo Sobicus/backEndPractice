@@ -3,5 +3,5 @@ export class SessionsSQL {
   deviceId: string;
   ip: string;
   deviceName: string;
-  userId: number;
+  userId: string;
 }
