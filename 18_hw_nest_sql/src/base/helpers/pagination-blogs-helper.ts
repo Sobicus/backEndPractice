@@ -4,7 +4,7 @@ export const blogsPagination = (
   const defaultValues = {
     searchNameTerm: '',
     sortBy: 'createdAt',
-    sortDirection: Description.desc,
+    sortDirection: sortDirection.desc,
     pageNumber: 1,
     pageSize: 10,
     skip: 0,
@@ -16,7 +16,7 @@ export const blogsPagination = (
     defaultValues.sortBy = query.sortBy;
   }
   if (query.sortDirection && query.sortDirection === sortDirection.asc) {
-    defaultValues.sortDirection = Description.asc;
+    defaultValues.sortDirection = sortDirection.asc;
   }
   if (
     query.pageNumber &&
@@ -40,10 +40,6 @@ export enum sortDirection {
   asc = 'asc',
   desc = 'desc',
 }
-enum Description {
-  asc = 1,
-  desc = -1,
-}
 export type paginationBlogsInputModelType = {
   searchNameTerm: string;
   sortBy: string;
@@ -54,7 +50,7 @@ export type paginationBlogsInputModelType = {
 export type paginationBlogsOutModelType = {
   searchNameTerm: string;
   sortBy: string;
-  sortDirection: Description;
+  sortDirection: sortDirection;
   pageNumber: number;
   pageSize: number;
   skip: number;

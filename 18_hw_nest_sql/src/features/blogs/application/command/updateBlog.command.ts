@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogInputModelType } from '../../api/models/input/create-blog.input.model';
-import { BlogsRepository } from '../../infrastructure/blogs.repository';
 import { statusType } from '../../../../base/oject-result';
+import { BlogsRepositorySQL } from '../../infrastructure/blogsSQL.repository';
 
 export class UpdateBlogCommand {
   constructor(
@@ -12,10 +12,10 @@ export class UpdateBlogCommand {
 
 @CommandHandler(UpdateBlogCommand)
 export class UpdateBlogHandler implements ICommandHandler<UpdateBlogCommand> {
-  constructor(private blogRepository: BlogsRepository) {}
+  constructor(private blogRepositorySQL: BlogsRepositorySQL) {}
 
   async execute(command: UpdateBlogCommand) {
-    const blog = await this.blogRepository.getBlogByBlogId(command.blogId);
+    const blog = await this.blogRepositorySQL.getBlogByBlogId(command.blogId);
     if (!blog) {
       return {
         status: statusType.NotFound,
@@ -23,8 +23,7 @@ export class UpdateBlogHandler implements ICommandHandler<UpdateBlogCommand> {
         data: null,
       };
     }
-    blog.update(command.inputModel);
-    await this.blogRepository.updateBlog(blog);
+    await this.blogRepositorySQL.updateBlog(command);
     return {
       status: statusType.Success,
       statusMessages: 'Blog has been update',

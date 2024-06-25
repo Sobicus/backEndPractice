@@ -5,15 +5,15 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
-import { BlogsRepository } from '../../features/blogs/infrastructure/blogs.repository';
 import { NotFoundException } from '@nestjs/common';
+import { BlogsRepositorySQL } from '../../features/blogs/infrastructure/blogsSQL.repository';
 
 @ValidatorConstraint({ async: true })
 export class IsNotBlogExistConstraint implements ValidatorConstraintInterface {
-  constructor(private blogsRepository: BlogsRepository) {}
+  constructor(private blogsRepositorySQL: BlogsRepositorySQL) {}
 
   async validate(blogId: string, args: ValidationArguments) {
-    const result = await this.blogsRepository.getBlogByBlogId(blogId);
+    const result = await this.blogsRepositorySQL.getBlogByBlogId(blogId);
     if (result) {
       return true;
     }

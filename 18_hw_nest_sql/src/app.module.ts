@@ -4,7 +4,7 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { BlogsController } from './features/blogs/api/blogs.controller';
+import { BlogsControllerSA } from './features/blogs/api/blogs_sa.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blogs, BlogsSchema } from './features/blogs/domain/blogs.entity';
 import { BlogsRepository } from './features/blogs/infrastructure/blogs.repository';
@@ -101,12 +101,21 @@ import { UsersRepositorySQL } from './features/users/infrastructure/usersSQL.rep
 import { UsersQueryRepositorySQL } from './features/users/infrastructure/users-querySQL.repository';
 import { SessionsRepositorySQL } from './features/SecurityDevices/infrastructure/sessionsSQL.repository';
 import { PasswordRecoveryRepositorySQL } from './features/auth/infrastructure/passwordRecoverySQL.repository';
+import { BlogsQueryRepositorySQL } from './features/blogs/infrastructure/blogs-querySQL.repository';
+import { BlogsRepositorySQL } from './features/blogs/infrastructure/blogsSQL.repository';
+import { BlogsController } from './features/blogs/api/blogs.controller';
+import { PostsRepositorySQL } from './features/posts/infrastructure/postsSQL.repository';
+import { PostsQueryRepositorySQL } from './features/posts/infrastructure/posts-querySQL.repository';
 
 const repositoriesSQL = [
   UsersRepositorySQL,
   UsersQueryRepositorySQL,
   SessionsRepositorySQL,
   PasswordRecoveryRepositorySQL,
+  BlogsRepositorySQL,
+  BlogsQueryRepositorySQL,
+  PostsRepositorySQL,
+  PostsQueryRepositorySQL,
 ];
 const repositories = [
   BlogsRepository,
@@ -218,6 +227,7 @@ const commands = [
   ],
   controllers: [
     BlogsController,
+    BlogsControllerSA,
     PostsController,
     CommentsController,
     UsersController,
