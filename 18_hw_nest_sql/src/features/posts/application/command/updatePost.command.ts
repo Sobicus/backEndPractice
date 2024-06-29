@@ -1,21 +1,22 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { statusType } from '../../../../base/oject-result';
-import { PostInputModelType } from '../../api/models/input/create-post.input.model';
-import { PostsRepository } from '../../infrastructure/posts.repository';
+import { PostChangeBody } from '../../api/models/input/create-post.input.model';
+import { PostsRepositorySQL } from '../../infrastructure/postsSQL.repository';
 
 export class UpdatePostCommand {
   constructor(
     public readonly postId: string,
-    public readonly postDTO: PostInputModelType,
+    public readonly postDTO: PostChangeBody,
   ) {}
 }
 
 @CommandHandler(UpdatePostCommand)
 export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
-  constructor(private postRepository: PostsRepository) {}
+  constructor(private postRepositorySQL: PostsRepositorySQL) {}
 
   async execute(command: UpdatePostCommand) {
-    const post = await this.postRepository.getPostByPostId(command.postId);
+    console.log('UpdatePostCommand', command.postId);
+    const post = await this.postRepositorySQL.getPostByPostId(command.postId);
     if (!post) {
       return {
         status: statusType.NotFound,
@@ -23,8 +24,9 @@ export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
         data: null,
       };
     }
-    post.update(command.postDTO);
-    await this.postRepository.updatePost(post);
+    console.log('getPostByPostId', post);
+    const postUpdateDTO = { postId: command.postId, ...command.postDTO };
+    await this.postRepositorySQL.updatePost(postUpdateDTO);
     return {
       status: statusType.Success,
       statusMessages: 'Post has been update',

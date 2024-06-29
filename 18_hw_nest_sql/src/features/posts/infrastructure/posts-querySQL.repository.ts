@@ -134,67 +134,49 @@ WHERE "id"=$1`,
     pagination: PaginationPostsOutputModelType,
     userId?: string,
   ): Promise<PaginationPostsType | null> {
-    const posts = await this.PostsModel.find({ blogId: blogId })
-      .sort({ [pagination.sortBy]: pagination.sortDirection })
-      .limit(pagination.pageSize)
-      .skip(pagination.skip)
-      .lean();
-    const allPosts = await Promise.all(
-      posts.map(async (p) => {
-        let myStatus = LikesStatusPosts.None;
-        if (userId) {
-          const reaction =
-            await this.postsLikesInfoRepository.findLikeInfoByPostIdUserId(
-              p._id.toString(),
-              userId,
-            );
-          myStatus = reaction ? reaction.myStatus : myStatus;
-        }
-        const likesCount = await this.postsLikesInfoRepository.countDocuments(
-          p._id.toString(),
-          LikesStatusPosts.Like,
-        );
-        const dislikesCount =
-          await this.postsLikesInfoRepository.countDocuments(
-            p._id.toString(),
-            LikesStatusPosts.Dislike,
-          );
-        const newestLikes =
-          await this.postsLikesInfoRepository.findLastThreeLikes(
-            p._id.toString(),
-            LikesStatusPosts.Like,
-          );
-        const newestLikesViewModel = newestLikes.map((like) => {
-          return {
-            addedAt: like.createdAt,
-            userId: like.userId,
-            login: like.login,
-          };
-        });
-        return {
-          id: p._id.toString(),
-          title: p.title,
-          shortDescription: p.shortDescription,
-          content: p.content,
-          blogId: p.blogId,
-          blogName: p.blogName,
-          createdAt: p.createdAt,
-          extendedLikesInfo: {
-            likesCount: likesCount,
-            dislikesCount: dislikesCount,
-            myStatus: myStatus,
-            newestLikes: newestLikesViewModel,
-          },
-        };
-      }),
+    const sortBy = `"${pagination.sortBy}"` ?? '"createdAt"';
+    const sortDirection = pagination.sortDirection === 'asc' ? 'asc' : 'desc';
+    const posts = await this.dataSource.query(
+      `Select *
+FROM public."Posts"
+WHERE "blogId"=$1
+ORDER BY ${sortBy} ${sortDirection}
+LIMIT $2 OFFSET $3`,
+      [blogId, pagination.pageSize, pagination.skip],
     );
-    const totalCount = await this.PostsModel.countDocuments({ blogId: blogId });
-    const pagesCount = Math.ceil(totalCount / pagination.pageSize);
+
+    const allPosts = posts.map((p) => {
+      return {
+        id: p.id.toString(),
+        title: p.title,
+        shortDescription: p.shortDescription,
+        content: p.content,
+        blogId: p.blogId,
+        blogName: p.blogName,
+        createdAt: p.createdAt,
+        extendedLikesInfo: {
+          likesCount: 'likesCount',
+          dislikesCount: 'dislikesCount',
+          myStatus: 'myStatus',
+          newestLikes: 'newestLikesViewModel',
+        },
+      };
+    });
+
+    const totalCount = await this.dataSource.query(
+      `SELECT CAST(count(*) as INTEGER)
+FROM public."Posts"
+WHERE "blogId"=$1`,
+      [blogId],
+    );
+    const formatTotalCount = totalCount[0].count;
+
+    const pagesCount = Math.ceil(formatTotalCount / pagination.pageSize);
     return {
       pagesCount: pagesCount,
       page: pagination.pageNumber,
       pageSize: pagination.pageSize,
-      totalCount: totalCount,
+      totalCount: formatTotalCount,
       items: allPosts,
     };
   }

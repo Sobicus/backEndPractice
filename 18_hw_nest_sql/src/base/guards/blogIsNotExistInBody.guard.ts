@@ -6,16 +6,17 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { BlogsRepository } from '../../features/blogs/infrastructure/blogs.repository';
+import { BlogsRepositorySQL } from '../../features/blogs/infrastructure/blogsSQL.repository';
 
 @ValidatorConstraint({ async: true })
 export class IsNotBlogExistInBodyConstraint
   implements ValidatorConstraintInterface
 {
-  constructor(private blogsRepository: BlogsRepository) {}
+  constructor(private blogsRepositorySQL: BlogsRepositorySQL) {}
 
   async validate(blogId: string, args: ValidationArguments) {
     console.log('blogId ', blogId);
-    const result = await this.blogsRepository.getBlogByBlogId(blogId);
+    const result = await this.blogsRepositorySQL.getBlogByBlogId(blogId);
     console.log('result ', result);
     if (result) {
       return true;

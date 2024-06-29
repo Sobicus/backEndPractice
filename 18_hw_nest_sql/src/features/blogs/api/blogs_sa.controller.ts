@@ -24,7 +24,8 @@ import {
 } from '../../../base/helpers/pagination-posts-helpers';
 import {
   BlogExistModel,
-  PostInputModelBlogControllerType,
+  PostChangeBody,
+  PostChangeParam,
 } from '../../posts/api/models/input/create-post.input.model';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
 import { UserAuthGuard } from '../../../base/guards/basic.guard';
@@ -35,6 +36,8 @@ import { DeleteBlogCommand } from '../application/command/deleteBlog.command';
 import { CreatePostCommand } from '../../posts/application/command/createPost.command';
 import { BlogsQueryRepositorySQL } from '../infrastructure/blogs-querySQL.repository';
 import { PostsQueryRepositorySQL } from '../../posts/infrastructure/posts-querySQL.repository';
+import { UpdatePostCommand } from '../../posts/application/command/updatePost.command';
+import { DeletePostCommand } from '../../posts/application/command/deletePost.command';
 
 @Controller('sa/blogs')
 export class BlogsControllerSA {
@@ -91,7 +94,7 @@ export class BlogsControllerSA {
   @Post(':blogId/posts')
   async createPostByBlogId(
     @Param() { blogId }: BlogExistModel,
-    @Body() inputModel: PostInputModelBlogControllerType,
+    @Body() inputModel: PostChangeBody,
   ) {
     const post = await this.commandBus.execute(
       new CreatePostCommand({
@@ -112,7 +115,7 @@ export class BlogsControllerSA {
     @Query() query: PaginationPostsInputModelType,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    const res = await this.blogsQueryRepository.getBlogById(blogId);
+    const res = await this.blogsQueryRepositorySQL.getBlogById(blogId);
     if (!res) {
       throw new NotFoundException();
     }
@@ -122,5 +125,38 @@ export class BlogsControllerSA {
       pagination,
       userId,
     );
+  }
+
+  @UseGuards(UserAuthGuard)
+  @Put(':blogId/posts/:postId')
+  @HttpCode(204)
+  async updatePost(
+    @Param() putModel: PostChangeParam,
+    @Body() inputModel: PostChangeBody,
+  ) {
+    const checkBlog = await this.blogsQueryRepositorySQL.getBlogById(
+      putModel.blogId,
+    );
+    if (!checkBlog) {
+      throw new NotFoundException();
+    }
+    const res = await this.commandBus.execute(
+      new UpdatePostCommand(putModel.postId, inputModel),
+    );
+    if (res.status === 'NotFound') {
+      throw new NotFoundException();
+    }
+  }
+
+  @UseGuards(UserAuthGuard)
+  @Delete(':blogId/posts/:postId')
+  @HttpCode(204)
+  async deletePost(@Param() @Param() putModel: PostChangeParam) {
+    const res = await this.commandBus.execute(
+      new DeletePostCommand(putModel.postId),
+    );
+    if (res.status === 'NotFound') {
+      throw new NotFoundException();
+    }
   }
 }

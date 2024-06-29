@@ -21,7 +21,14 @@ export class PostInputModelType {
   @IsNotBlogExistInBody()
   blogId: string;
 }
-export class PostInputModelBlogControllerType {
+export class PostChangeParam {
+  @IsString()
+  @IsNotBlogExistInBody()
+  blogId: string;
+  @IsString()
+  postId: string;
+}
+export class PostChangeBody {
   @Trim()
   @Length(1, 30)
   title: string;
@@ -45,3 +52,27 @@ export type postCreateDTO = {
   blogName: string;
   createdAt: string;
 };
+export type PostUpdateDTO = {
+  title: string;
+  shortDescription: string;
+  content: string;
+  postId: string;
+};
+// export class PostInputModelForMongoType {
+//   @IsString()
+//   @Trim()
+//   @Length(1, 30)
+//   title: string;
+//   @Trim()
+//   @IsString()
+//   @Length(1, 100)
+//   shortDescription: string;
+//   @Trim()
+//   @IsString()
+//   // @MaxLength(1000)
+//   @Length(1, 1000)
+//   content: string;
+//   @IsString()
+//   @IsNotBlogExistInBody()
+//   blogId: string;
+// }

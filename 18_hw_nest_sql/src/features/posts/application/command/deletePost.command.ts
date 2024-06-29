@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { statusType } from '../../../../base/oject-result';
 import { PostsRepository } from '../../infrastructure/posts.repository';
+import { PostsRepositorySQL } from '../../infrastructure/postsSQL.repository';
 
 export class DeletePostCommand {
   constructor(public readonly postId: string) {}
@@ -8,10 +9,10 @@ export class DeletePostCommand {
 
 @CommandHandler(DeletePostCommand)
 export class DeletePostHandler implements ICommandHandler<DeletePostCommand> {
-  constructor(private postRepository: PostsRepository) {}
+  constructor(private postsRepositorySQL: PostsRepositorySQL) {}
 
   async execute(command: DeletePostCommand) {
-    const post = await this.postRepository.getPostByPostId(command.postId);
+    const post = await this.postsRepositorySQL.getPostByPostId(command.postId);
     if (!post) {
       return {
         status: statusType.NotFound,
@@ -19,7 +20,7 @@ export class DeletePostHandler implements ICommandHandler<DeletePostCommand> {
         data: null,
       };
     }
-    await this.postRepository.deletePost(command.postId);
+    await this.postsRepositorySQL.deletePost(command.postId);
     return {
       status: statusType.Success,
       statusMessages: 'Post has been delete',

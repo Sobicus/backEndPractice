@@ -1,20 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { Posts, PostsDocument } from '../domain/posts.entity';
-import { postCreateDTO } from '../api/models/input/create-post.input.model';
+import {
+  postCreateDTO,
+  PostUpdateDTO,
+} from '../api/models/input/create-post.input.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 @Injectable()
 export class PostsRepositorySQL {
-  constructor(
-    @InjectModel(Posts.name) private PostsModel: Model<Posts>,
-    @InjectDataSource() protected dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
-  async getPostByPostId(postId: string): Promise<PostsDocument | null> {
-    return this.PostsModel.findOne({ _id: new Types.ObjectId(postId) });
+  async getPostByPostId(postId: string) {
+    const post = await this.dataSource.query(
+      `SELECT *
+    FROM public."Posts"
+      WHERE "id"=CAST($1 as INTEGER)`,
+      [postId],
+    );
+    return post[0];
   }
 
   async createPost(post: postCreateDTO) {
@@ -36,19 +39,25 @@ RETURNING "id"`,
     return postId[0].id;
   }
 
-  async updatePost(postModel: PostsDocument) {
-    await this.savePost(postModel);
+  async updatePost(postUpdateDTO: PostUpdateDTO) {
+    await this.dataSource.query(
+      `UPDATE public."Posts"
+SET "title"=$1, "shortDescription"=$2, "content"=$3
+WHERE "id"=CAST($4 as INTEGER)`,
+      [
+        postUpdateDTO.title,
+        postUpdateDTO.shortDescription,
+        postUpdateDTO.content,
+        postUpdateDTO.postId,
+      ],
+    );
   }
 
   async deletePost(postId: string) {
-    await this.PostsModel.deleteOne({ _id: new Types.ObjectId(postId) });
-  }
-
-  private async savePost(postModel: PostsDocument) {
-    await postModel.save();
-  }
-
-  async deleteALl() {
-    await this.PostsModel.deleteMany();
+    await this.dataSource.query(
+      `DELETE FROM public."Posts"
+WHERE "id"=$1`,
+      [postId],
+    );
   }
 }
