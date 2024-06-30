@@ -56,7 +56,7 @@ RETURNING "id"`,
     return blogId[0].id;
   }
 
-  // async deleteAll() {
-  //   await this.BlogsModel.deleteMany();
-  // }
+  async deleteAll() {
+    await this.dataSource.query(`DELETE FROM public."Blogs"`);
+  }
 }

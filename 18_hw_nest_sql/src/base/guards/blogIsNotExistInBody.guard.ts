@@ -7,6 +7,7 @@ import {
 } from 'class-validator';
 import { BlogsRepository } from '../../features/blogs/infrastructure/blogs.repository';
 import { BlogsRepositorySQL } from '../../features/blogs/infrastructure/blogsSQL.repository';
+import { NotFoundException } from '@nestjs/common';
 
 @ValidatorConstraint({ async: true })
 export class IsNotBlogExistInBodyConstraint
@@ -21,6 +22,7 @@ export class IsNotBlogExistInBodyConstraint
     if (result) {
       return true;
     }
+    throw new NotFoundException();
     return false;
   }
 }

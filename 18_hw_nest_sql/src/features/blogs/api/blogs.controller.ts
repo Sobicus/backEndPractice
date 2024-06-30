@@ -16,16 +16,15 @@ import {
   postsPagination,
 } from '../../../base/helpers/pagination-posts-helpers';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
-import { CommandBus } from '@nestjs/cqrs';
 import { BlogsQueryRepositorySQL } from '../infrastructure/blogs-querySQL.repository';
+import { PostsQueryRepositorySQL } from '../../posts/infrastructure/posts-querySQL.repository';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
     private blogsQueryRepositorySQL: BlogsQueryRepositorySQL,
-    private postQueryRepository: PostsQueryRepository,
-    private commandBus: CommandBus,
+    private postQueryRepositorySQL: PostsQueryRepositorySQL,
   ) {}
 
   @Get()
@@ -49,11 +48,18 @@ export class BlogsController {
     @Query() query: PaginationPostsInputModelType,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    const res = await this.blogsQueryRepository.getBlogById(blogId);
+    console.log('GET -> "/blogs/:blogId/posts": ', blogId);
+    const res = await this.blogsQueryRepositorySQL.getBlogById(blogId);
+    console.log('GET -> "/blogs/:blogId/posts": res', res);
+
     if (!res) {
       throw new NotFoundException();
     }
     const pagination = postsPagination(query);
-    return this.postQueryRepository.getPostByBlogId(blogId, pagination, userId);
+    return this.postQueryRepositorySQL.getPostByBlogId(
+      blogId,
+      pagination,
+      userId,
+    );
   }
 }

@@ -60,4 +60,7 @@ WHERE "id"=$1`,
       [postId],
     );
   }
+  async deleteAll() {
+    await this.dataSource.query(`DELETE FROM public."Posts"`);
+  }
 }

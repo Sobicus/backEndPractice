@@ -1,4 +1,4 @@
-import { IsString, Length } from 'class-validator';
+import { IsEmpty, IsNotEmpty, IsString, Length } from 'class-validator';
 import { Trim } from '../../../../../base/decorators/trim';
 import { IsNotBlogExist } from '../../../../../base/guards/blogIsNotExist.guard';
 import { IsNotBlogExistInBody } from '../../../../../base/guards/blogIsNotExistInBody.guard';

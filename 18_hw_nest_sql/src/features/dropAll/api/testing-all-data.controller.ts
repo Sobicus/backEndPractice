@@ -10,6 +10,8 @@ import { PasswordRecoveryRepository } from '../../auth/infrastructure/passwordRe
 import { UsersRepositorySQL } from '../../users/infrastructure/usersSQL.repository';
 import { SessionsRepositorySQL } from '../../SecurityDevices/infrastructure/sessionsSQL.repository';
 import { PasswordRecoveryRepositorySQL } from '../../auth/infrastructure/passwordRecoverySQL.repository';
+import { PostsRepositorySQL } from '../../posts/infrastructure/postsSQL.repository';
+import { BlogsRepositorySQL } from '../../blogs/infrastructure/blogsSQL.repository';
 
 @Controller('/testing/all-data')
 export class TestingAllDataController {
@@ -25,6 +27,8 @@ export class TestingAllDataController {
     private usersRepositorySQL: UsersRepositorySQL,
     private sessionsRepositorySQL: SessionsRepositorySQL,
     private passwordRecoveryRepositorySQL: PasswordRecoveryRepositorySQL,
+    private postsRepositorySQL: PostsRepositorySQL,
+    private blogsRepositorySQL: BlogsRepositorySQL,
   ) {}
 
   @Delete()
@@ -41,5 +45,7 @@ export class TestingAllDataController {
     await this.passwordRecoveryRepositorySQL.deleteAll();
     await this.sessionsRepositorySQL.deleteAll();
     await this.usersRepositorySQL.deleteAll();
+    await this.postsRepositorySQL.deleteAll();
+    await this.blogsRepositorySQL.deleteAll();
   }
 }

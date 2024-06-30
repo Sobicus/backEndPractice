@@ -49,6 +49,7 @@ export class BlogsControllerSA {
     private commandBus: CommandBus,
   ) {}
 
+  @UseGuards(UserAuthGuard)
   @Get()
   async getAllBlogs(@Query() pagination: paginationBlogsInputModelType) {
     const query = blogsPagination(pagination);
@@ -151,7 +152,7 @@ export class BlogsControllerSA {
   @UseGuards(UserAuthGuard)
   @Delete(':blogId/posts/:postId')
   @HttpCode(204)
-  async deletePost(@Param() @Param() putModel: PostChangeParam) {
+  async deletePost(@Param() putModel: PostChangeParam) {
     const res = await this.commandBus.execute(
       new DeletePostCommand(putModel.postId),
     );
