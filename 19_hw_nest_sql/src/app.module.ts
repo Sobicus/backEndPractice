@@ -106,6 +106,9 @@ import { BlogsRepositorySQL } from './features/blogs/infrastructure/blogsSQL.rep
 import { BlogsController } from './features/blogs/api/blogs.controller';
 import { PostsRepositorySQL } from './features/posts/infrastructure/postsSQL.repository';
 import { PostsQueryRepositorySQL } from './features/posts/infrastructure/posts-querySQL.repository';
+import { CommentsRepositorySQL } from './features/comments/infrastructure/commentsSQL.repository';
+import { CommentsQueryRepositorySQL } from './features/comments/infrastructure/comments-querySQL.repository';
+import { CommentsLikesInfoRepositorySQL } from './features/comments/infrastructure/comments-likesInfoSQL.repository';
 
 const repositoriesSQL = [
   UsersRepositorySQL,
@@ -116,6 +119,9 @@ const repositoriesSQL = [
   BlogsQueryRepositorySQL,
   PostsRepositorySQL,
   PostsQueryRepositorySQL,
+  CommentsRepositorySQL,
+  CommentsQueryRepositorySQL,
+  CommentsLikesInfoRepositorySQL,
 ];
 const repositories = [
   BlogsRepository,

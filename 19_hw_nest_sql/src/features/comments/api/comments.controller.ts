@@ -19,12 +19,13 @@ import { CommandBus } from '@nestjs/cqrs';
 import { DeleteCommentCommand } from '../application/command/deleteComment.command';
 import { UpdateCommentCommand } from '../application/command/updateComment.command';
 import { LikeCommentUpdateCommand } from '../application/command/likeCommentUpdate.command';
+import { CommentsQueryRepositorySQL } from '../infrastructure/comments-querySQL.repository';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
-    private commentsQueryRepository: CommentsQueryRepository,
     private commandBus: CommandBus,
+    private commentsQueryRepositorySQL: CommentsQueryRepositorySQL,
   ) {}
 
   @Get(':id')
@@ -32,7 +33,7 @@ export class CommentsController {
     @Param('id') commentId: string,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    const comment = await this.commentsQueryRepository.getCommentById(
+    const comment = await this.commentsQueryRepositorySQL.getCommentById(
       commentId,
       userId,
     );

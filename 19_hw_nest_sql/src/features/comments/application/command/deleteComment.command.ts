@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { statusType } from '../../../../base/oject-result';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
+import { CommentsRepositorySQL } from '../../infrastructure/commentsSQL.repository';
 
 export class DeleteCommentCommand {
   constructor(
@@ -13,10 +14,14 @@ export class DeleteCommentCommand {
 export class DeleteCommentHandler
   implements ICommandHandler<DeleteCommentCommand>
 {
-  constructor(private commentsRepository: CommentsRepository) {}
+  constructor(private commentsRepositorySQL: CommentsRepositorySQL) {}
 
   async execute(command: DeleteCommentCommand) {
-    const comment = await this.commentsRepository.getComment(command.commentId);
+    const comment = await this.commentsRepositorySQL.getCommentById(
+      command.commentId,
+    );
+    console.log('command userID', command);
+    console.log('deleted comment', comment);
     if (!comment) {
       return {
         status: statusType.NotFound,
@@ -24,14 +29,15 @@ export class DeleteCommentHandler
         data: null,
       };
     }
-    if (comment.userId !== command.userId) {
+    //todo вот тут пришлось сделать +
+    if (comment.userId !== +command.userId) {
       return {
         status: statusType.Forbidden,
         statusMessages: 'this comment does not belong for you ',
         data: null,
       };
     }
-    await this.commentsRepository.deleteComment(command.commentId);
+    await this.commentsRepositorySQL.deleteComment(command.commentId);
     return {
       status: statusType.Success,
       statusMessages: 'Comments has been deleted',

@@ -3,6 +3,9 @@ import { statusType } from '../../../../base/oject-result';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { PostsRepository } from '../../../posts/infrastructure/posts.repository';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { PostsRepositorySQL } from '../../../posts/infrastructure/postsSQL.repository';
+import { UsersRepositorySQL } from '../../../users/infrastructure/usersSQL.repository';
+import { CommentsRepositorySQL } from '../../infrastructure/commentsSQL.repository';
 
 export class CreateCommentCommand {
   constructor(
@@ -17,13 +20,13 @@ export class CreateCommentHandler
   implements ICommandHandler<CreateCommentCommand>
 {
   constructor(
-    private postsRepository: PostsRepository,
-    private usersRepository: UsersRepository,
-    private commentsRepository: CommentsRepository,
+    private postsRepositorySQL: PostsRepositorySQL,
+    private usersRepositorySQL: UsersRepositorySQL,
+    private commentsRepositorySQL: CommentsRepositorySQL,
   ) {}
 
   async execute(command: CreateCommentCommand) {
-    const post = await this.postsRepository.getPostByPostId(command.postId);
+    const post = await this.postsRepositorySQL.getPostByPostId(command.postId);
     if (!post) {
       return {
         status: statusType.NotFound,
@@ -31,16 +34,16 @@ export class CreateCommentHandler
         data: null,
       };
     }
-    const user = await this.usersRepository.getUserById(command.userId);
+    const user = await this.usersRepositorySQL.getUserById(command.userId);
     const newComment = {
       content: command.content,
       userId: command.userId,
       userLogin: user!.login,
       createdAt: new Date().toISOString(),
-      postId: post._id.toString(),
+      postId: post.id,
     };
     const newCommentId =
-      await this.commentsRepository.createComment(newComment);
+      await this.commentsRepositorySQL.createComment(newComment);
     return {
       status: statusType.Created,
       statusMessages: 'Comment has been created',

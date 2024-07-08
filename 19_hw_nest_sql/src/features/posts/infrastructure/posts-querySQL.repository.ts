@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Posts } from '../domain/posts.entity';
 import { Model } from 'mongoose';
-import { Types } from 'mongoose';
 
 import { PaginationPostsOutputModelType } from 'src/base/helpers/pagination-posts-helpers';
 import {
@@ -10,7 +9,6 @@ import {
   PostOutputModelType,
 } from '../api/models/output/post.output.model';
 import { PostsLikesInfoRepository } from './posts-likesInfo.repository';
-import { LikesStatusPosts } from '../api/models/input/posts-likesInfo.input.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 

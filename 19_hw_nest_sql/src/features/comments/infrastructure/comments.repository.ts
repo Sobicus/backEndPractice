@@ -10,7 +10,7 @@ export class CommentsRepository {
     @InjectModel(Comments.name) private CommentsModel: Model<Comments>,
   ) {}
 
-  async getComment(commentId: string): Promise<null | CommentsDocument> {
+  async getCommentById(commentId: string): Promise<null | CommentsDocument> {
     return this.CommentsModel.findOne({ _id: new Types.ObjectId(commentId) });
   }
 

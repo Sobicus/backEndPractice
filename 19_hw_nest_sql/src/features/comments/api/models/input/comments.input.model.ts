@@ -21,6 +21,27 @@ export type CommentsOutputModel = {
   totalCount: number;
   items: CommentOutputModel[];
 };
+export type CommentOutputModelSQL = {
+  id: number;
+  content: string;
+  commentatorInfo: {
+    userId: number;
+    userLogin: string;
+  };
+  createdAt: string;
+  likesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: string;
+  };
+};
+export type CommentsOutputModelSQL = {
+  pagesCount: number;
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  items: CommentOutputModelSQL[];
+};
 
 export class InputUpdateCommentModel {
   @IsString()

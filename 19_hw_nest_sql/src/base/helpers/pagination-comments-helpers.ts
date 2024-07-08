@@ -5,7 +5,7 @@ export const commentsPagination = (
     pageNumber: 1,
     pageSize: 10,
     sortBy: 'createdAt',
-    sortDirection: Description.desc,
+    sortDirection: sortDirection.desc,
     skip: 0,
   };
   if (
@@ -26,7 +26,7 @@ export const commentsPagination = (
     defaultValues.sortBy = query.sortBy;
   }
   if (query.sortDirection && query.sortDirection === sortDirection.asc) {
-    defaultValues.sortDirection = Description.asc;
+    defaultValues.sortDirection = sortDirection.asc;
   }
   defaultValues.skip = (defaultValues.pageNumber - 1) * defaultValues.pageSize;
   return defaultValues;
@@ -43,15 +43,10 @@ enum sortDirection {
   asc = 'asc',
   desc = 'desc',
 }
-
-enum Description {
-  asc = 1,
-  desc = -1,
-}
 export type PaginationCommentsOutputModelType = {
   pageNumber: number;
   pageSize: number;
   sortBy: string;
-  sortDirection: Description;
+  sortDirection: sortDirection;
   skip: number;
 };

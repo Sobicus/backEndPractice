@@ -3,6 +3,8 @@ import { statusType } from '../../../../base/oject-result';
 import { LikesStatusComments } from '../../api/models/input/comments-likesInfo.input.model';
 import { CommentsLikesInfoRepository } from '../../infrastructure/comments-likesInfo.repository';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
+import { CommentsRepositorySQL } from '../../infrastructure/commentsSQL.repository';
+import { CommentsLikesInfoRepositorySQL } from '../../infrastructure/comments-likesInfoSQL.repository';
 
 export class LikeCommentUpdateCommand {
   constructor(
@@ -17,12 +19,14 @@ export class LikeCommentUpdateHandler
   implements ICommandHandler<LikeCommentUpdateCommand>
 {
   constructor(
-    private commentsLikesInfoRepository: CommentsLikesInfoRepository,
-    private commentsRepository: CommentsRepository,
+    private commentsLikesInfoRepositorySQL: CommentsLikesInfoRepositorySQL,
+    private commentsRepositorySQL: CommentsRepositorySQL,
   ) {}
 
   async execute(command: LikeCommentUpdateCommand) {
-    const comment = await this.commentsRepository.getComment(command.commentId);
+    const comment = await this.commentsRepositorySQL.getCommentById(
+      command.commentId,
+    );
 
     if (!comment) {
       return {
@@ -32,7 +36,7 @@ export class LikeCommentUpdateHandler
       };
     }
     const existingReaction =
-      await this.commentsLikesInfoRepository.findLikeInfoByCommentIdUserId(
+      await this.commentsLikesInfoRepositorySQL.findLikeInfoByCommentIdUserId(
         command.commentId,
         command.userId,
       );
@@ -43,7 +47,7 @@ export class LikeCommentUpdateHandler
         createdAt: new Date().toISOString(),
         myStatus: command.likeStatus,
       };
-      await this.commentsLikesInfoRepository.createLikeInfoComment(
+      await this.commentsLikesInfoRepositorySQL.createLikeInfoComment(
         newCommentLikeInfo,
       );
       return {
@@ -59,7 +63,7 @@ export class LikeCommentUpdateHandler
         data: null,
       };
     } else {
-      await this.commentsLikesInfoRepository.updateLikeInfoComment(
+      await this.commentsLikesInfoRepositorySQL.updateLikeInfoComment(
         command.commentId,
         command.likeStatus,
         command.userId,
