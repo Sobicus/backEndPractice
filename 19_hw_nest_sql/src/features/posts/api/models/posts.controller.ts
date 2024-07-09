@@ -2,9 +2,11 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -23,6 +25,11 @@ import {
   PaginationCommentsInputModelType,
   commentsPagination,
 } from 'src/base/helpers/pagination-comments-helpers';
+import { UserAuthGuard } from '../../../../base/guards/basic.guard';
+import { PostInputModelType } from './input/create-post.input.model';
+import { UpdatePostCommand } from '../../application/command/updatePost.command';
+import { InputUpdatePostLikesModel } from './input/posts-likesInfo.input.model';
+import { UpdatePostLikeCommand } from '../../application/command/updatePostLike.command';
 
 @Controller('posts')
 export class PostsController {
@@ -89,23 +96,23 @@ export class PostsController {
   //   }
   // }
 
-  // @Get(':id/comments')
-  // async getComments(
-  //   @Param('id') postId: string,
-  //   @Query() pagination: PaginationCommentsInputModelType,
-  //   @TakeUserId() { userId }: { userId: string },
-  // ) {
-  //   const post = await this.postsQueryRepositorySQL.getPostById(postId);
-  //   if (!post) {
-  //     throw new NotFoundException();
-  //   }
-  //   const query = commentsPagination(pagination);
-  //   return await this.commentsQueryRepositorySQL.getCommentsByPostId(
-  //     postId,
-  //     query,
-  //     userId,
-  //   );
-  // }
+  @Get(':id/comments')
+  async getComments(
+    @Param('id') postId: string,
+    @Query() pagination: PaginationCommentsInputModelType,
+    @TakeUserId() { userId }: { userId: string },
+  ) {
+    const post = await this.postsQueryRepositorySQL.getPostById(postId);
+    if (!post) {
+      throw new NotFoundException();
+    }
+    const query = commentsPagination(pagination);
+    return await this.commentsQueryRepositorySQL.getCommentsByPostId(
+      postId,
+      query,
+      userId,
+    );
+  }
 
   @UseGuards(JwtAccessAuthGuard)
   @Post(':id/comments')
@@ -123,19 +130,19 @@ export class PostsController {
     return await this.commentsQueryRepositorySQL.getCommentById(res.data);
   }
 
-  // @HttpCode(204)
-  // @UseGuards(JwtAccessAuthGuard)
-  // @Put(':id/like-status')
-  // async updatePostLikeStatus(
-  //   @Param('id') postId: string,
-  //   @Body() likeStatus: InputUpdatePostLikesModel,
-  //   @TakeUserId() { userId }: { userId: string },
-  // ) {
-  //   const res = await this.commandBus.execute(
-  //     new UpdatePostLikeCommand(postId, likeStatus.likeStatus, userId),
-  //   );
-  //   if (res.status === 'NotFound') {
-  //     throw new NotFoundException();
-  //   }
-  // }
+  @HttpCode(204)
+  @UseGuards(JwtAccessAuthGuard)
+  @Put(':id/like-status')
+  async updatePostLikeStatus(
+    @Param('id') postId: string,
+    @Body() likeStatus: InputUpdatePostLikesModel,
+    @TakeUserId() { userId }: { userId: string },
+  ) {
+    const res = await this.commandBus.execute(
+      new UpdatePostLikeCommand(postId, likeStatus.likeStatus, userId),
+    );
+    if (res.status === 'NotFound') {
+      throw new NotFoundException();
+    }
+  }
 }

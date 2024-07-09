@@ -10,7 +10,6 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { CommentsQueryRepository } from '../infrastructure/comments-query.repository';
 import { JwtAccessAuthGuard } from 'src/base/guards/jwt-access.guard';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
 import { InputUpdateCommentModel } from './models/input/comments.input.model';

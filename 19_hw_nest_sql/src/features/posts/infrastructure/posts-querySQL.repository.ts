@@ -11,6 +11,7 @@ import {
 import { PostsLikesInfoRepository } from './posts-likesInfo.repository';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { LikesStatusComments } from '../../comments/api/models/input/comments-likesInfo.input.model';
 
 @Injectable()
 export class PostsQueryRepositorySQL {
@@ -27,30 +28,58 @@ export class PostsQueryRepositorySQL {
     const sortBy = `"${pagination.sortBy}"` ?? '"createdAt"';
     const sortDirection = pagination.sortDirection === 'asc' ? 'asc' : 'desc';
     const posts = await this.dataSource.query(
-      `SELECT *
-                FROM public."Posts"
-                ORDER BY ${sortBy} ${sortDirection}
-                LIMIT $1 OFFSET $2
-`,
+      `SELECT p.*,
+	(SELECT CAST(count(*) as INTEGER)
+	FROM public."PostsLikes" as pl
+	WHERE p."id" = pl."postId" and "myStatus"='Like') as likes_count,
+	(SELECT CAST(count(*) as INTEGER)
+	FROM public."PostsLikes" as pl
+	WHERE p."id" = pl."postId" and "myStatus"='Dislike') as dislikes_count
+FROM public."Posts" as p
+ORDER BY ${sortBy} ${sortDirection}
+LIMIT $1 OFFSET $2`,
       [pagination.pageSize, pagination.skip],
     );
-    const allPosts = posts.map((p) => {
-      return {
-        id: p.id.toString(),
-        title: p.title,
-        shortDescription: p.shortDescription,
-        content: p.content,
-        blogId: p.blogId.toString(),
-        blogName: p.blogName,
-        createdAt: p.createdAt,
-        extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'None',
-          newestLikes: [],
-        },
-      };
-    });
+    const allPosts = await Promise.all(
+      posts.map(async (p) => {
+        let myStatus = LikesStatusComments.None;
+
+        if (userId) {
+          const reaction = await this.dataSource.query(
+            `SELECT *
+        FROM public."PostsLikes"
+        WHERE "userId"=$2 and "postId"=$1`,
+            [p.id, userId],
+          );
+          myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
+        }
+
+        const threeLastLikes = await this.dataSource.query(
+          `SELECT "createdAt" as addedAt, "userId", "login"
+FROM public."PostsLikes"
+WHERE "postId"=$1
+ORDER BY "createdAt" DESC
+LIMIT 3 OFFSET 0`,
+          [p.id],
+        );
+
+        return {
+          id: p.id.toString(),
+          title: p.title,
+          shortDescription: p.shortDescription,
+          content: p.content,
+          blogId: p.blogId.toString(),
+          blogName: p.blogName,
+          createdAt: p.createdAt,
+          extendedLikesInfo: {
+            likesCount: p.likes_count,
+            dislikesCount: p.dislikes_count,
+            myStatus: myStatus,
+            newestLikes: [...threeLastLikes],
+          },
+        };
+      }),
+    );
 
     // const posts = await this.PostsModel.find()
     //   .sort({ [pagination.sortBy]: pagination.sortDirection })
@@ -125,8 +154,14 @@ FROM public."Posts"`);
     userId?: string | null,
   ): Promise<PostOutputModelType | null> {
     const post = await this.dataSource.query(
-      `Select *
-FROM public."Posts"
+      `SELECT p.*,
+(SELECT CAST(count(*) as INTEGER)
+FROM public."PostsLikes" as pl
+WHERE p."id" = pl."postId" and "myStatus"='Like'),
+(SELECT CAST(count(*) as INTEGER)
+FROM public."PostsLikes" as pl
+WHERE p."id" = pl."postId" and "myStatus"='Dislike')
+FROM public."Posts" as p
 WHERE "id"=$1`,
       [postId],
     );
@@ -134,6 +169,26 @@ WHERE "id"=$1`,
     if (!postData) {
       return null;
     }
+    let myStatus = LikesStatusComments.None;
+
+    if (userId) {
+      const reaction = await this.dataSource.query(
+        `SELECT *
+        FROM public."PostsLikes"
+        WHERE "userId"=$2 and "postId"=$1`,
+        [postId, userId],
+      );
+      myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
+    }
+    const threeLastLikes = await this.dataSource.query(
+      `SELECT "createdAt" as addedAt, "userId", "login"
+FROM public."PostsLikes"
+WHERE "postId"=$1
+ORDER BY "createdAt" DESC
+LIMIT 3 OFFSET 0
+`,
+      [postId],
+    );
 
     return {
       id: postData.id.toString(),
@@ -144,12 +199,61 @@ WHERE "id"=$1`,
       blogName: postData.blogName,
       createdAt: postData.createdAt,
       extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-        newestLikes: [],
+        likesCount: post.likesCount,
+        dislikesCount: post.dislikesCount,
+        myStatus: myStatus,
+        newestLikes: [...threeLastLikes],
       },
     };
+
+    //------------------------------------------
+    /*
+    SELECT
+    p."id",
+    p."title",
+    p."shortDescription",
+    p."content",
+    p."blogId",
+    p."blogName",
+    p."createdAt",
+    JSON_BUILD_OBJECT(
+        'likesCount', COALESCE(likes_count, 0),
+        'dislikesCount', COALESCE(dislikes_count, 0),
+        'myStatus', 'None', -- Здесь можно указать статус, если он известен
+        'newestLikes', COALESCE(newest_likes, '[]'::json)
+    ) AS "extendedLikesInfo"
+FROM
+    public."Posts" p
+LEFT JOIN (
+    SELECT
+        "postId",
+        COUNT(*) FILTER (WHERE "myStatus" = 'Like') AS likes_count,
+        COUNT(*) FILTER (WHERE "myStatus" = 'Dislike') AS dislikes_count,
+        (
+            SELECT JSON_AGG(
+                JSON_BUILD_OBJECT(
+                    'addedAt', "createdAt",
+                    'userId', "userId",
+                    'login', "login"
+                )
+            )
+            FROM (
+                SELECT "createdAt", "userId", "login"
+                FROM public."PostsLikes"
+                WHERE "postId" = pl."postId" AND "myStatus" = 'Like'
+                ORDER BY "createdAt" DESC
+                LIMIT 3
+            ) subquery
+        ) AS newest_likes
+    FROM
+        public."PostsLikes" pl
+    GROUP BY
+        "postId"
+) pl ON p."id" = pl."postId"
+WHERE
+    p."id" = 594;
+    */
+    //------------------------------------------
   }
 
   async getPostByBlogId(
@@ -159,9 +263,7 @@ WHERE "id"=$1`,
   ): Promise<PaginationPostsType | null> {
     const sortBy = `"${pagination.sortBy}"` ?? '"createdAt"';
     const sortDirection = pagination.sortDirection === 'asc' ? 'asc' : 'desc';
-    console.log('getPostByBlogId');
-    console.log('sortBy', sortBy);
-    console.log('sortDirection', sortDirection);
+
     const posts = await this.dataSource.query(
       `Select *
 FROM public."Posts"
@@ -170,7 +272,7 @@ ORDER BY ${sortBy} ${sortDirection}
 LIMIT $2 OFFSET $3`,
       [blogId, pagination.pageSize, pagination.skip],
     );
-    console.log('posts', posts);
+
     const allPosts = posts.map((p) => {
       return {
         id: p.id.toString(),
@@ -188,20 +290,17 @@ LIMIT $2 OFFSET $3`,
         },
       };
     });
-    console.log('allPosts', allPosts);
+
     const totalCount = await this.dataSource.query(
       `SELECT CAST(count(*) as INTEGER)
 FROM public."Posts"
 WHERE "blogId"=$1`,
       [blogId],
     );
-    console.log('totalCount', totalCount);
 
     const formatTotalCount = totalCount[0].count;
-    console.log('formatTotalCount', formatTotalCount);
 
     const pagesCount = Math.ceil(formatTotalCount / pagination.pageSize);
-    console.log('pagesCount', pagesCount);
 
     return {
       pagesCount: pagesCount,

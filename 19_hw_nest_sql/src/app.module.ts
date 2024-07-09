@@ -109,6 +109,7 @@ import { PostsQueryRepositorySQL } from './features/posts/infrastructure/posts-q
 import { CommentsRepositorySQL } from './features/comments/infrastructure/commentsSQL.repository';
 import { CommentsQueryRepositorySQL } from './features/comments/infrastructure/comments-querySQL.repository';
 import { CommentsLikesInfoRepositorySQL } from './features/comments/infrastructure/comments-likesInfoSQL.repository';
+import { PostsLikesInfoRepositorySQL } from './features/posts/infrastructure/posts-likesInfoSQL.repository';
 
 const repositoriesSQL = [
   UsersRepositorySQL,
@@ -122,6 +123,7 @@ const repositoriesSQL = [
   CommentsRepositorySQL,
   CommentsQueryRepositorySQL,
   CommentsLikesInfoRepositorySQL,
+  PostsLikesInfoRepositorySQL,
 ];
 const repositories = [
   BlogsRepository,

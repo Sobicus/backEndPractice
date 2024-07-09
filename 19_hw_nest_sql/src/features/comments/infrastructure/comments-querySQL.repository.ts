@@ -28,14 +28,7 @@ FROM public."Comments" as c
 WHERE "id"=$1`,
       [commentsId],
     );
-    console.log(comment);
-    // const comment = await this.dataSource.query(
-    //   `SELECT *
-    // FROM public."Comments"
-    // WHERE "id"=CAST($1 as INTEGER)`,
-    //   [commentsId],
-    // );
-    //
+
     if (!comment[0]) {
       return null;
     }
@@ -51,20 +44,6 @@ WHERE "id"=$1`,
       );
       myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
     }
-
-    // const likesCount = await this.dataSource.query(
-    //   `SELECT CAST(count(*)as INTEGER)
-    //     FROM public."CommentsLikes"
-    //     WHERE "commentId"=$1 and "myStatus" ILIKE $2`,
-    //   [commentsId, LikesStatusComments.Like],
-    // );
-    //
-    // const dislikesCount = await this.dataSource.query(
-    //   `SELECT CAST(count(*)as INTEGER)
-    //     FROM public."CommentsLikes"
-    //     WHERE "commentId"=$1 and "myStatus" ILIKE $2`,
-    //   [commentsId, LikesStatusComments.Dislike],
-    // );
 
     return {
       id: comment[0].id,
@@ -82,61 +61,73 @@ WHERE "id"=$1`,
     };
   }
 
-  // async getCommentsByPostId(
-  //   postId: string,
-  //   pagination: PaginationCommentsOutputModelType,
-  //   userId?: string,
-  // ): Promise<CommentsOutputModel> {
-  //   const comments = await this.CommentsModel.find({ postId })
-  //     .sort({ [pagination.sortBy]: pagination.sortDirection })
-  //     .limit(pagination.pageSize)
-  //     .skip(pagination.skip)
-  //     .lean();
-  //   const allComments = await Promise.all(
-  //     comments.map(async (comment) => {
-  //       let myStatus = LikesStatusComments.None;
-  //       if (userId) {
-  //         const reaction =
-  //           await this.commentsLikesInfoRepository.findLikeInfoByCommentIdUserId(
-  //             comment._id as number,
-  //             userId,
-  //           );
-  //         myStatus = reaction ? reaction.myStatus : myStatus;
-  //       }
-  //       const likesCount =
-  //         await this.commentsLikesInfoRepository.countDocuments(
-  //           comment._id,
-  //           LikesStatusComments.Like,
-  //         );
-  //       const dislikesCount =
-  //         await this.commentsLikesInfoRepository.countDocuments(
-  //           comment._id,
-  //           LikesStatusComments.Dislike,
-  //         );
-  //       return {
-  //         id: comment._id,
-  //         content: comment.content,
-  //         commentatorInfo: {
-  //           userId: comment.userId,
-  //           userLogin: comment.userLogin,
-  //         },
-  //         createdAt: comment.createdAt,
-  //         likesInfo: {
-  //           likesCount: likesCount,
-  //           dislikesCount: dislikesCount,
-  //           myStatus: myStatus,
-  //         },
-  //       };
-  //     }),
-  //   );
-  //   const totalCount = await this.CommentsModel.countDocuments({ postId });
-  //   const pagesCount = Math.ceil(totalCount / pagination.pageSize);
-  //   return {
-  //     pagesCount: pagesCount,
-  //     page: pagination.pageNumber,
-  //     pageSize: pagination.pageSize,
-  //     totalCount: totalCount,
-  //     items: allComments,
-  //   };
-  // }
+  async getCommentsByPostId(
+    postId: string,
+    pagination: PaginationCommentsOutputModelType,
+    userId?: string,
+  ): Promise<CommentsOutputModel> {
+    const sortBy = `"${pagination.sortBy}"` ?? '"createdAt"';
+    const sortDirection = pagination.sortDirection === 'asc' ? 'asc' : 'desc';
+    const comments = await this.dataSource.query(
+      `SELECT c.*,
+(SELECT CAST(count(*) as INTEGER)
+FROM public."CommentsLikes" as cl
+WHERE c."id"=cl."commentId" and cl."myStatus" ILIKE 'Like') as likes_count,
+(SELECT CAST(count(*) as INTEGER)
+FROM public."CommentsLikes" as cl
+WHERE c."id"=cl."commentId" and cl."myStatus" ILIKE 'Dislike') as dislikes_count
+FROM public."Comments" as c
+WHERE "postId"=$1
+ORDER BY ${sortBy} ${sortDirection}
+LIMIT $2 OFFSET $3`,
+      [postId, pagination.pageSize, pagination.skip],
+    );
+    const allComments = await Promise.all(
+      comments.map(async (comment) => {
+        let myStatus = LikesStatusComments.None;
+
+        if (userId) {
+          const reaction = await this.dataSource.query(
+            `SELECT *
+        FROM public."CommentsLikes"
+        WHERE "commentId"=${comment.id} and "userId"=$1`,
+            [userId],
+          );
+          myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
+        }
+
+        return {
+          id: comment.id,
+          content: comment.content,
+          commentatorInfo: {
+            userId: comment.userId,
+            userLogin: comment.userLogin,
+          },
+          createdAt: comment.createdAt,
+          likesInfo: {
+            likesCount: comment.likes_count,
+            dislikesCount: comment.dislikes_count,
+            myStatus: myStatus,
+          },
+        };
+      }),
+    );
+
+    const totalCount = await this.dataSource.query(
+      `SELECT CAST(count(*) as INTEGER)
+      FROM public."Comments"
+            WHERE "postId"=$1`,
+      [postId],
+    );
+    const formatTotalCount = totalCount[0].count;
+
+    const pagesCount = Math.ceil(formatTotalCount / pagination.pageSize);
+    return {
+      pagesCount: pagesCount,
+      page: pagination.pageNumber,
+      pageSize: pagination.pageSize,
+      totalCount: formatTotalCount,
+      items: allComments,
+    };
+  }
 }
