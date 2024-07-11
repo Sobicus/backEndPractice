@@ -93,7 +93,6 @@ import { UpdateSessionHandler } from './features/SecurityDevices/application/com
 import { FindActiveSessionHandler } from './features/SecurityDevices/application/command/getAllActiveSessions.command';
 import { DeleteSessionExceptThisHandler } from './features/SecurityDevices/application/command/deleteSessionsDevicesExceptThis.command';
 import { DeleteDeviceSessionHandler } from './features/SecurityDevices/application/command/deleteSessionDevice.command';
-import { ThrottlerModule } from '@nestjs/throttler';
 import { SecurityDevicesController } from './features/SecurityDevices/api/securityDevices.controller';
 import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -110,6 +109,7 @@ import { CommentsRepositorySQL } from './features/comments/infrastructure/commen
 import { CommentsQueryRepositorySQL } from './features/comments/infrastructure/comments-querySQL.repository';
 import { CommentsLikesInfoRepositorySQL } from './features/comments/infrastructure/comments-likesInfoSQL.repository';
 import { PostsLikesInfoRepositorySQL } from './features/posts/infrastructure/posts-likesInfoSQL.repository';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 const repositoriesSQL = [
   UsersRepositorySQL,
@@ -188,7 +188,7 @@ const commands = [
     ThrottlerModule.forRoot([
       {
         ttl: 10000,
-        limit: 5,
+        limit: 5000,
       },
     ]),
     PassportModule,

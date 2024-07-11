@@ -19,6 +19,7 @@ export class PostsLikesInfoRepositorySQL {
     private PostsLikesInfoModel: Model<PostsLikesInfo>,
     @InjectDataSource() protected dataSource: DataSource,
   ) {}
+
   async findLikeInfoByPostIdUserId(postId: string, userId: string) {
     const likeInfo = await this.dataSource.query(
       `SELECT *
@@ -66,6 +67,7 @@ WHERE "postId"=$1 and "userId"=$2`,
       myStatus: likeStatus,
     });
   }
+
   async findLastThreeLikes(postId: string, likeStatus: LikesStatusPosts.Like) {
     return this.PostsLikesInfoModel.find({
       postId: postId,
@@ -75,7 +77,8 @@ WHERE "postId"=$1 and "userId"=$2`,
       .limit(3)
       .lean();
   }
-  async deleteALl() {
-    await this.PostsLikesInfoModel.deleteMany();
+
+  async deleteAll() {
+    await this.dataSource.query(`DELETE FROM public."PostsLikes"`);
   }
 }

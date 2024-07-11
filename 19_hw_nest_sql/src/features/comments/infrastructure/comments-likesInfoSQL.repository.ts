@@ -72,7 +72,7 @@ WHERE "commentId"=$1 and "userId"=$3`,
     });
   }
 
-  async deleteALl() {
-    await this.CommentsLikesInfoModel.deleteMany();
+  async deleteAll() {
+    await this.dataSource.query(`DELETE FROM public."CommentsLikes"`);
   }
 }

@@ -46,10 +46,10 @@ WHERE "id"=$1`,
     }
 
     return {
-      id: comment[0].id,
+      id: comment[0].id.toString(),
       content: comment[0].content,
       commentatorInfo: {
-        userId: comment[0].userId,
+        userId: comment[0].userId.toString(),
         userLogin: comment[0].userLogin,
       },
       createdAt: comment[0].createdAt,
@@ -97,10 +97,10 @@ LIMIT $2 OFFSET $3`,
         }
 
         return {
-          id: comment.id,
+          id: comment.id.toString(),
           content: comment.content,
           commentatorInfo: {
-            userId: comment.userId,
+            userId: comment.userId.toString(),
             userLogin: comment.userLogin,
           },
           createdAt: comment.createdAt,

@@ -57,7 +57,7 @@ RETURNING "id"`,
 
     return comment[0].id;
   }
-  async deleteALl() {
-    await this.CommentsModel.deleteMany();
+  async deleteAll() {
+    await this.dataSource.query(`DELETE FROM public."Comments"`);
   }
 }

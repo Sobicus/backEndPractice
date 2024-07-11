@@ -12,6 +12,9 @@ import { SessionsRepositorySQL } from '../../SecurityDevices/infrastructure/sess
 import { PasswordRecoveryRepositorySQL } from '../../auth/infrastructure/passwordRecoverySQL.repository';
 import { PostsRepositorySQL } from '../../posts/infrastructure/postsSQL.repository';
 import { BlogsRepositorySQL } from '../../blogs/infrastructure/blogsSQL.repository';
+import { PostsLikesInfoRepositorySQL } from '../../posts/infrastructure/posts-likesInfoSQL.repository';
+import { CommentsLikesInfoRepositorySQL } from '../../comments/infrastructure/comments-likesInfoSQL.repository';
+import { CommentsRepositorySQL } from '../../comments/infrastructure/commentsSQL.repository';
 
 @Controller('/testing/all-data')
 export class TestingAllDataController {
@@ -29,6 +32,9 @@ export class TestingAllDataController {
     private passwordRecoveryRepositorySQL: PasswordRecoveryRepositorySQL,
     private postsRepositorySQL: PostsRepositorySQL,
     private blogsRepositorySQL: BlogsRepositorySQL,
+    private postsLikesInfoRepositorySQL: PostsLikesInfoRepositorySQL,
+    private commentsLikesInfoRepositorySQL: CommentsLikesInfoRepositorySQL,
+    private commentsRepositorySQL: CommentsRepositorySQL,
   ) {}
 
   @Delete()
@@ -42,7 +48,10 @@ export class TestingAllDataController {
     // await this.postsLikesInfoRepository.deleteALl();
     // await this.sessionsRepository.deleteALl();
     // await this.passwordRecoveryRepository.deleteALl();
+    await this.commentsLikesInfoRepositorySQL.deleteAll();
+    await this.postsLikesInfoRepositorySQL.deleteAll();
     await this.passwordRecoveryRepositorySQL.deleteAll();
+    await this.commentsRepositorySQL.deleteAll();
     await this.sessionsRepositorySQL.deleteAll();
     await this.usersRepositorySQL.deleteAll();
     await this.postsRepositorySQL.deleteAll();

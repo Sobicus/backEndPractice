@@ -40,6 +40,7 @@ ORDER BY ${sortBy} ${sortDirection}
 LIMIT $1 OFFSET $2`,
       [pagination.pageSize, pagination.skip],
     );
+
     const allPosts = await Promise.all(
       posts.map(async (p) => {
         let myStatus = LikesStatusComments.None;
@@ -54,14 +55,23 @@ LIMIT $1 OFFSET $2`,
           myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
         }
 
-        const threeLastLikes = await this.dataSource.query(
-          `SELECT "createdAt" as addedAt, "userId", "login"
+        const threeLikes = await this.dataSource.query(
+          `SELECT CAST("createdAt" as text),CAST("userId" as text), "login"
 FROM public."PostsLikes"
 WHERE "postId"=$1
 ORDER BY "createdAt" DESC
-LIMIT 3 OFFSET 0`,
+LIMIT 3 OFFSET 0
+`,
           [p.id],
         );
+
+        const threeLastLikes = threeLikes.map((like) => {
+          return {
+            addedAt: like.createdAt,
+            userId: like.userId,
+            login: like.login,
+          };
+        });
 
         return {
           id: p.id.toString(),
@@ -75,71 +85,18 @@ LIMIT 3 OFFSET 0`,
             likesCount: p.likes_count,
             dislikesCount: p.dislikes_count,
             myStatus: myStatus,
-            newestLikes: [...threeLastLikes],
+            newestLikes: threeLastLikes,
           },
         };
       }),
     );
-
-    // const posts = await this.PostsModel.find()
-    //   .sort({ [pagination.sortBy]: pagination.sortDirection })
-    //   .limit(pagination.pageSize)
-    //   .skip(pagination.skip)
-    //   .lean();
-    // const allPosts = await Promise.all(
-    //   posts.map(async (p) => {
-    //     let myStatus = LikesStatusPosts.None;
-    //     if (userId) {
-    //       const reaction =
-    //         await this.postsLikesInfoRepository.findLikeInfoByPostIdUserId(
-    //           p._id.toString(),
-    //           userId,
-    //         );
-    //       myStatus = reaction ? reaction.myStatus : myStatus;
-    //     }
-    //     const likesCount = await this.postsLikesInfoRepository.countDocuments(
-    //       p._id.toString(),
-    //       LikesStatusPosts.Like,
-    //     );
-    //     const dislikesCount =
-    //       await this.postsLikesInfoRepository.countDocuments(
-    //         p._id.toString(),
-    //         LikesStatusPosts.Dislike,
-    //       );
-    //     const newestLikes =
-    //       await this.postsLikesInfoRepository.findLastThreeLikes(
-    //         p._id.toString(),
-    //         LikesStatusPosts.Like,
-    //       );
-    //     const newestLikesViewModel = newestLikes.map((like) => {
-    //       return {
-    //         addedAt: like.createdAt,
-    //         userId: like.userId,
-    //         login: like.login,
-    //       };
-    //     });
-    //     return {
-    //       id: p._id.toString(),
-    //       title: p.title,
-    //       shortDescription: p.shortDescription,
-    //       content: p.content,
-    //       blogId: p.blogId,
-    //       blogName: p.blogName,
-    //       createdAt: p.createdAt,
-    //       extendedLikesInfo: {
-    //         likesCount: likesCount,
-    //         dislikesCount: dislikesCount,
-    //         myStatus: myStatus,
-    //         newestLikes: newestLikesViewModel,
-    //       },
-    //     };
-    //   }),
-    // );
     const totalCount = await this.dataSource
       .query(`SELECT CAST(count(*) as INTEGER)
 FROM public."Posts"`);
     const formatTotalCount = totalCount[0].count;
+
     const pagesCount = Math.ceil(formatTotalCount / pagination.pageSize);
+
     return {
       pagesCount: pagesCount,
       page: pagination.pageNumber,
@@ -157,10 +114,10 @@ FROM public."Posts"`);
       `SELECT p.*,
 (SELECT CAST(count(*) as INTEGER)
 FROM public."PostsLikes" as pl
-WHERE p."id" = pl."postId" and "myStatus"='Like'),
+WHERE p."id" = pl."postId" and "myStatus"='Like') as likes_count,
 (SELECT CAST(count(*) as INTEGER)
 FROM public."PostsLikes" as pl
-WHERE p."id" = pl."postId" and "myStatus"='Dislike')
+WHERE p."id" = pl."postId" and "myStatus"='Dislike') as dislikes_count
 FROM public."Posts" as p
 WHERE "id"=$1`,
       [postId],
@@ -180,8 +137,8 @@ WHERE "id"=$1`,
       );
       myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
     }
-    const threeLastLikes = await this.dataSource.query(
-      `SELECT "createdAt" as addedAt, "userId", "login"
+    const threeLikes = await this.dataSource.query(
+      `SELECT CAST("createdAt" as text),CAST("userId" as text), "login"
 FROM public."PostsLikes"
 WHERE "postId"=$1
 ORDER BY "createdAt" DESC
@@ -189,7 +146,13 @@ LIMIT 3 OFFSET 0
 `,
       [postId],
     );
-
+    const threeLastLikes = threeLikes.map((like) => {
+      return {
+        addedAt: like.createdAt,
+        userId: like.userId,
+        login: like.login,
+      };
+    });
     return {
       id: postData.id.toString(),
       title: postData.title,
@@ -199,10 +162,10 @@ LIMIT 3 OFFSET 0
       blogName: postData.blogName,
       createdAt: postData.createdAt,
       extendedLikesInfo: {
-        likesCount: post.likesCount,
-        dislikesCount: post.dislikesCount,
+        likesCount: postData.likes_count,
+        dislikesCount: postData.dislikes_count,
         myStatus: myStatus,
-        newestLikes: [...threeLastLikes],
+        newestLikes: threeLastLikes,
       },
     };
 
@@ -265,31 +228,72 @@ WHERE
     const sortDirection = pagination.sortDirection === 'asc' ? 'asc' : 'desc';
 
     const posts = await this.dataSource.query(
-      `Select *
-FROM public."Posts"
-WHERE "blogId"=$1
+      `SELECT p.*,
+(SELECT CAST(count(*) as INTEGER)
+FROM public."PostsLikes" as pl
+WHERE p."id" = pl."postId" and "myStatus"='Like') as likes_count,
+(SELECT CAST(count(*) as INTEGER)
+FROM public."PostsLikes" as pl
+WHERE p."id" = pl."postId" and "myStatus"='Dislike') as dislikes_count
+FROM public."Posts" as p
+WHERE p."blogId"=$1
 ORDER BY ${sortBy} ${sortDirection}
 LIMIT $2 OFFSET $3`,
       [blogId, pagination.pageSize, pagination.skip],
     );
+    console.log('getPostByBlogId======================>>>>>>');
+    console.log('posts', posts);
+    const allPosts = await Promise.all(
+      posts.map(async (p) => {
+        let myStatus = LikesStatusComments.None;
 
-    const allPosts = posts.map((p) => {
-      return {
-        id: p.id.toString(),
-        title: p.title,
-        shortDescription: p.shortDescription,
-        content: p.content,
-        blogId: p.blogId.toString(),
-        blogName: p.blogName,
-        createdAt: p.createdAt,
-        extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'None',
-          newestLikes: [],
-        },
-      };
-    });
+        if (userId) {
+          const reaction = await this.dataSource.query(
+            `SELECT *
+        FROM public."PostsLikes"
+        WHERE "userId"=$2 and "postId"=$1`,
+            [p.id, userId],
+          );
+          myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
+        }
+
+        const threeLikes = await this.dataSource.query(
+          `SELECT CAST("createdAt" as text),CAST("userId" as text), "login"
+FROM public."PostsLikes"
+WHERE "postId"=$1
+ORDER BY "createdAt" DESC
+LIMIT 3 OFFSET 0
+`,
+          [p.id],
+        );
+        console.log('threeLikes', threeLikes);
+        const threeLastLikes = threeLikes.map((like) => {
+          return {
+            addedAt: like.createdAt,
+            userId: like.userId,
+            login: like.login,
+          };
+        });
+        console.log('threeLastLikes', threeLastLikes);
+
+        return {
+          id: p.id.toString(),
+          title: p.title,
+          shortDescription: p.shortDescription,
+          content: p.content,
+          blogId: p.blogId.toString(),
+          blogName: p.blogName,
+          createdAt: p.createdAt,
+          extendedLikesInfo: {
+            likesCount: p.likes_count,
+            dislikesCount: p.dislikes_count,
+            myStatus: myStatus,
+            newestLikes: threeLastLikes,
+          },
+        };
+      }),
+    );
+    console.log('allPosts', posts);
 
     const totalCount = await this.dataSource.query(
       `SELECT CAST(count(*) as INTEGER)
