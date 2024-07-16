@@ -1,0 +1,19 @@
+import { BlogInputModelType } from '../api/models/input/create-blog.input.model';
+
+export class Blogs {
+  name: string;
+  description: string;
+  websiteUrl: string;
+  createdAt: string;
+  isMembership: boolean;
+
+  static create({ name, websiteUrl, description }: BlogInputModelType) {
+    const blog = new Blogs();
+    blog.name = name;
+    blog.websiteUrl = websiteUrl;
+    blog.description = description;
+    blog.createdAt = new Date().toISOString();
+    blog.isMembership = false;
+    return blog;
+  }
+}
