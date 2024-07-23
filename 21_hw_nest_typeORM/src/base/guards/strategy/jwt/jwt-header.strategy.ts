@@ -18,7 +18,7 @@ export class JwtAccessStrategy extends PassportStrategy(
   }
 
   async validate({ userId }: { userId: string }) {
-    const user = await this.userRepositorySQL.getUserById(userId);
+    const user = await this.userRepositorySQL.getUserById(Number(userId));
     console.log('jwt header passport', user);
     if (!user) {
       throw new UnauthorizedException();

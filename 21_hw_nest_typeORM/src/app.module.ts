@@ -75,6 +75,9 @@ import { CommentsQueryRepository } from './features/comments/infrastructure/comm
 import { CommentsLikesInfoRepository } from './features/comments/infrastructure/comments-likesInfo.repository';
 import { PostsLikesInfoRepository } from './features/posts/infrastructure/posts-likesInfo.repository';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { EmailConfirmation } from './features/users/domain/emailConfirmation.entity';
+import { Users } from './features/users/domain/users.entity';
+import { Posts } from './features/posts/domain/posts.entity';
 
 const repositoriesSQL = [
   UsersRepository,
@@ -130,8 +133,11 @@ const commands = [
       username: 'postgres',
       password: '2456',
       database: 'socialHM',
-      synchronize: false,
+      synchronize: true,
+      autoLoadEntities: true,
+      entities: [Users, EmailConfirmation, Posts],
     }),
+    TypeOrmModule.forFeature([Users, EmailConfirmation, Posts]),
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,

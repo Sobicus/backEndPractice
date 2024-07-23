@@ -11,7 +11,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
   constructor(private UsersRepository: UsersRepository) {}
 
   async execute(command: DeleteUserCommand) {
-    const user = await this.UsersRepository.getUserById(command.userId);
+    const user = await this.UsersRepository.getUserById(Number(command.userId));
     if (!user) {
       return {
         status: statusType.NotFound,
@@ -19,7 +19,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
         data: null,
       };
     }
-    await this.UsersRepository.removeUser(command.userId);
+    await this.UsersRepository.removeUser(Number(command.userId));
     return {
       status: statusType.Success,
       statusMessages: 'User has been delete',

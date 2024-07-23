@@ -1,12 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { EmailConfirmation, Users } from '../domain/users.entity';
+import { DataSource, Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { Users } from '../domain/users.entity';
+import { EmailConfirmation } from '../domain/emailConfirmation.entity';
 
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
-
+  constructor(
+    @InjectDataSource() protected dataSource: DataSource,
+    @InjectRepository(Users) protected userRepository: Repository<Users>,
+    @InjectRepository(EmailConfirmation)
+    protected emailConfirmationRepository: Repository<EmailConfirmation>,
+  ) {}
+  async saveUser(user: Users): Promise<number> {
+    const newUser = await this.userRepository.save(user);
+    return newUser.id;
+  }
+  async saveEmailConfirmation(emailConfirmation: EmailConfirmation) {
+    await this.emailConfirmationRepository.save(emailConfirmation);
+  }
   async createUser(user: Users, emailConfirmation: EmailConfirmation) {
     const userId = await this.dataSource.query(
       `INSERT INTO public."Users"(
@@ -39,28 +51,13 @@ export class UsersRepository {
     return id;
   }
 
-  async getUserById(userId: string): Promise<Users | null> {
-    const user = await this.dataSource.query(
-      `SELECT *
-    FROM public."Users"
-    WHERE "id"= $1`,
-      [userId],
-    );
-    console.log(user);
-    return user[0];
+  async getUserById(userId: number): Promise<Users | null> {
+    return await this.userRepository.findOne({ where: { id: userId } });
   }
 
-  async removeUser(userId: string) {
-    await this.dataSource.query(
-      `DELETE FROM public."EmailConfirmation"
-                WHERE "userId"= $1`,
-      [userId],
-    );
-    await this.dataSource.query(
-      `DELETE FROM public."Users"
-                WHERE "id"= $1`,
-      [userId],
-    );
+  async removeUser(userId: number) {
+    await this.emailConfirmationRepository.delete({ userId: userId });
+    await this.userRepository.delete({ id: userId });
   }
 
   async findUserByLoginOrEmail(loginOrEmail: string): Promise<Users | null> {

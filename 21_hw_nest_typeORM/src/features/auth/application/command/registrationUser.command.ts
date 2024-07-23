@@ -21,7 +21,9 @@ export class RegistrationUserHandler
   async execute(command: RegistrationUserCommand) {
     const userId = await this.userService.createUser(command.registrationDTO);
     const emailConfirmationDTO =
-      await this.usersRepositorySQL.findEmailConfirmationByUserId(userId);
+      await this.usersRepositorySQL.findEmailConfirmationByUserId(
+        userId.toString(),
+      );
     await this.emailService.sendUserConfirmationCode(
       command.registrationDTO.email,
       command.registrationDTO.login,

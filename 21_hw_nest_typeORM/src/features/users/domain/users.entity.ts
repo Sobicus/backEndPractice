@@ -1,40 +1,49 @@
-import { randomUUID } from 'crypto';
 import { UserInputModelType } from '../api/models/input/create-users.input.model';
-import { add } from 'date-fns';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { EmailConfirmation } from './emailConfirmation.entity';
+import { Posts } from 'src/features/posts/domain/posts.entity';
 
-export class EmailConfirmation {
-  confirmationCode: string;
-  expirationDate: Date;
-  isConfirmed: boolean;
-
-  constructor() {
-    (this.confirmationCode = randomUUID()),
-      (this.expirationDate = add(new Date(), {
-        days: 1,
-        hours: 1,
-        minutes: 1,
-        seconds: 1,
-      })),
-      (this.isConfirmed = false);
-  }
-}
-
+@Entity()
 export class Users {
-  login: string;
+  @PrimaryGeneratedColumn()
+  id: number;
+  @Column()
   email: string;
+  @Column()
+  login: string;
+  @Column()
   passwordSalt: string;
+  @Column()
   passwordHash: string;
-  createdAt: string;
+  @CreateDateColumn({ type: 'time with time zone' })
+  createdAt: Date;
+  @UpdateDateColumn({ type: 'time with time zone' })
+  updatedAt: Date;
 
-  constructor(
+  @OneToOne(() => EmailConfirmation, (e) => e.user)
+  emailConfirmation: EmailConfirmation;
+
+  // @OneToMany(() => Posts, (posts) => posts.user)
+  // posts: Posts[];
+
+  static createUser(
     inputModel: UserInputModelType,
     passwordSalt: string,
     passwordHash: string,
   ) {
-    (this.login = inputModel.login),
-      (this.email = inputModel.email),
-      (this.passwordSalt = passwordSalt),
-      (this.passwordHash = passwordHash),
-      (this.createdAt = new Date().toISOString());
+    const user = new Users();
+    user.login = inputModel.login;
+    user.email = inputModel.email;
+    user.passwordSalt = passwordSalt;
+    user.passwordHash = passwordHash;
+    return user;
   }
 }

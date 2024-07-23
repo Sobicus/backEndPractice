@@ -31,7 +31,7 @@ export class CreateCommentHandler
         data: null,
       };
     }
-    const user = await this.usersRepository.getUserById(command.userId);
+    const user = await this.usersRepository.getUserById(Number(command.userId));
     const newComment = {
       content: command.content,
       userId: command.userId,

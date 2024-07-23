@@ -32,7 +32,7 @@ export class UpdatePostLikeHandler
         data: null,
       };
     }
-    const user = await this.usersRepository.getUserById(command.userId);
+    const user = await this.usersRepository.getUserById(Number(command.userId));
     const existingReaction =
       await this.postsLikesInfoRepository.findLikeInfoByPostIdUserId(
         command.postId,
