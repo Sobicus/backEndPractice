@@ -14,16 +14,14 @@ export class RegistrationUserHandler
 {
   constructor(
     private userService: UsersService,
-    private usersRepositorySQL: UsersRepository,
+    private usersRepository: UsersRepository,
     private emailService: EmailService,
   ) {}
 
   async execute(command: RegistrationUserCommand) {
     const userId = await this.userService.createUser(command.registrationDTO);
     const emailConfirmationDTO =
-      await this.usersRepositorySQL.findEmailConfirmationByUserId(
-        userId.toString(),
-      );
+      await this.usersRepository.findEmailConfirmationByUserId(userId);
     await this.emailService.sendUserConfirmationCode(
       command.registrationDTO.email,
       command.registrationDTO.login,

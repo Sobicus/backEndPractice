@@ -10,11 +10,11 @@ export class RegistrationConfirmationCommand {
 export class RegistrationConfirmationHandler
   implements ICommandHandler<RegistrationConfirmationCommand>
 {
-  constructor(private usersRepositorySQL: UsersRepository) {}
+  constructor(private usersRepository: UsersRepository) {}
 
   async execute(command: RegistrationConfirmationCommand) {
     const emailConfirmationDTO =
-      await this.usersRepositorySQL.findEmailConfirmationByCode(command.code);
+      await this.usersRepository.findEmailConfirmationByCode(command.code);
     if (!emailConfirmationDTO) {
       return {
         status: statusType.NotFound,
@@ -27,7 +27,7 @@ export class RegistrationConfirmationHandler
       emailConfirmationCode: 'null',
       isConfirmed: true,
     };
-    await this.usersRepositorySQL.changeEmailConfirmationStatus(
+    await this.usersRepository.changeEmailConfirmationStatus(
       changeEmailConfirmationStatus,
     );
     return {

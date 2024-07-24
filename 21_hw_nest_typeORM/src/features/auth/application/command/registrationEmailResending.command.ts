@@ -14,15 +14,14 @@ export class RegistrationEmailResendingHandler
   implements ICommandHandler<RegistrationEmailResendingCommand>
 {
   constructor(
-    private usersRepositorySQL: UsersRepository,
+    private usersRepository: UsersRepository,
     private emailService: EmailService,
   ) {}
 
   async execute(command: RegistrationEmailResendingCommand) {
-    const user =
-      await this.usersRepositorySQL.findUserAndEmailConfirmationByEmail(
-        command.email,
-      );
+    const user = await this.usersRepository.findUserAndEmailConfirmationByEmail(
+      command.email,
+    );
     if (!user) {
       return {
         status: statusType.NotFound,
@@ -48,13 +47,7 @@ export class RegistrationEmailResendingHandler
       }),
       userId: user.id,
     };
-    await this.usersRepositorySQL.updateConfirmationCode(
-      updateConfirmationCode,
-    );
-    console.log(
-      'updateConfirmationCode.confirmationCode',
-      updateConfirmationCode.confirmationCode,
-    );
+    await this.usersRepository.updateConfirmationCode(updateConfirmationCode);
     await this.emailService.sendUserConfirmationCode(
       user.email,
       user.login,

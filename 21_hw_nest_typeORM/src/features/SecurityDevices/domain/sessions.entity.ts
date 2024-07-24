@@ -19,8 +19,8 @@ export class Sessions {
   ip: string;
   @Column()
   deviceName: string;
-
-  userId: string;
+  @Column()
+  issuedAt: string;
   @CreateDateColumn({ type: 'time with time zone' })
   createdAt: Date;
   @UpdateDateColumn({ type: 'time with time zone' })
@@ -29,4 +29,21 @@ export class Sessions {
   @ManyToOne(() => Users, (user) => user.sessions)
   @JoinColumn({ name: 'userId' })
   user: Users;
+  @Column()
+  userId: number;
+  static createSession(
+    deviceId: string,
+    ip: string,
+    deviceName: string,
+    userId: number,
+    issuedAt: string,
+  ) {
+    const session = new Sessions();
+    session.deviceId = deviceId;
+    session.ip = ip;
+    session.deviceName = deviceName;
+    session.userId = userId;
+    session.issuedAt = issuedAt;
+    return session;
+  }
 }

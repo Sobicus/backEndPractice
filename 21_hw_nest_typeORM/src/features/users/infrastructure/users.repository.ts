@@ -71,28 +71,34 @@ export class UsersRepository {
   }
 
   async findEmailConfirmationByUserId(
-    userId: string,
+    userId: number,
   ): Promise<EmailConfirmation | null> {
-    const emailConfirmationDTO = await this.dataSource.query(
-      `SELECT *
-FROM public."EmailConfirmation"
-WHERE "userId"= $1`,
-      [userId],
-    );
-    //return confirmationCode[0].confirmationCode;
-    return emailConfirmationDTO[0];
+    return await this.emailConfirmationRepository.findOne({
+      where: { userId },
+    });
+    //     const emailConfirmationDTO = await this.dataSource.query(
+    //       `SELECT *
+    // FROM public."EmailConfirmation"
+    // WHERE "userId"= $1`,
+    //       [userId],
+    //     );
+    //     //return confirmationCode[0].confirmationCode;
+    //     return emailConfirmationDTO[0];
   }
 
   async findEmailConfirmationByCode(
     code: string,
   ): Promise<EmailConfirmation | null> {
-    const emailConfirmationDTO = await this.dataSource.query(
-      `SELECT *
-    FROM public."EmailConfirmation"
-WHERE "confirmationCode"=$1`,
-      [code],
-    );
-    return emailConfirmationDTO[0];
+    return await this.emailConfirmationRepository.findOne({
+      where: { confirmationCode: code },
+    });
+    //     const emailConfirmationDTO = await this.dataSource.query(
+    //       `SELECT *
+    //     FROM public."EmailConfirmation"
+    // WHERE "confirmationCode"=$1`,
+    //       [code],
+    //     );
+    //     return emailConfirmationDTO[0];
   }
 
   async changeEmailConfirmationStatus(data: {
@@ -100,12 +106,19 @@ WHERE "confirmationCode"=$1`,
     emailConfirmationCode: string;
     isConfirmed: boolean;
   }): Promise<void> {
-    await this.dataSource.query(
-      `UPDATE public."EmailConfirmation"
-SET "confirmationCode"=$2,  "isConfirmed"=$3
-WHERE "confirmationCode"=$1`,
-      [data.code, data.emailConfirmationCode, data.isConfirmed],
+    await this.emailConfirmationRepository.update(
+      { confirmationCode: data.code }, // Условие поиска
+      {
+        confirmationCode: data.emailConfirmationCode,
+        isConfirmed: data.isConfirmed,
+      }, // Обновляемые поля
     );
+    //     await this.dataSource.query(
+    //       `UPDATE public."EmailConfirmation"
+    // SET "confirmationCode"=$2,  "isConfirmed"=$3
+    // WHERE "confirmationCode"=$1`,
+    //       [data.code, data.emailConfirmationCode, data.isConfirmed],
+    //     );
   }
 
   async findUserByEmail(email: string) {
@@ -119,17 +132,24 @@ WHERE "email" = $1`,
       .then((res) => res[0]);
     return user;
   }
-
+  //todo: add return type
   async findUserAndEmailConfirmationByEmail(email: string) {
-    const result = await this.dataSource.query(
-      `SELECT u.*, ec.*
-FROM public."Users" as u
-LEFT JOIN public."EmailConfirmation" as ec
-ON u."id" = ec."userId"
-WHERE u."email" = $1`,
-      [email],
-    );
-    return result[0];
+    const result = await this.emailConfirmationRepository
+      .createQueryBuilder('ec')
+      .leftJoinAndSelect('ec.user', 'u')
+      .where('u.email = :email', { email })
+      .getOne();
+
+    return result;
+    //     const result = await this.dataSource.query(
+    //       `SELECT u.*, ec.*
+    // FROM public."Users" as u
+    // LEFT JOIN public."EmailConfirmation" as ec
+    // ON u."id" = ec."userId"
+    // WHERE u."email" = $1`,
+    //       [email],
+    //     );
+    //     return result[0];
   }
 
   async updateConfirmationCode(updateConfirmationCode: {
