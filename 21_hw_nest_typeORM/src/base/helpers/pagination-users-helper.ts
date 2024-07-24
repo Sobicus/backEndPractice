@@ -44,12 +44,6 @@ enum SortDirection {
   asc = 'asc',
   desc = 'desc',
 }
-/*
-enum Description {
-  asc = 1,
-  desc = -1,
-}
-*/
 export type PaginationUsersInputModelType = {
   searchLoginTerm: string;
   searchEmailTerm: string;

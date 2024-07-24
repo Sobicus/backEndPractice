@@ -22,7 +22,7 @@ export class UsersQueryRepository {
       ? pagination.sortBy
       : 'createdAt';
     const sortDirection = pagination.sortDirection === 'asc' ? 'ASC' : 'DESC';
-
+    this.userRepository.createQueryBuilder();
     const [users, totalCount] = await this.userRepository.findAndCount({
       where: [
         { login: ILike(`%${pagination.searchLoginTerm}%`) },

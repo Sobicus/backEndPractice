@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { EmailConfirmation } from './emailConfirmation.entity';
 import { Posts } from 'src/features/posts/domain/posts.entity';
+import { Sessions } from '../../SecurityDevices/domain/sessions.entity';
 
 @Entity()
 export class Users {
@@ -30,10 +31,10 @@ export class Users {
 
   @OneToOne(() => EmailConfirmation, (e) => e.user)
   emailConfirmation: EmailConfirmation;
-
+  @OneToMany(() => Sessions, (sessions) => sessions.user)
+  sessions: Sessions[];
   // @OneToMany(() => Posts, (posts) => posts.user)
   // posts: Posts[];
-
   static createUser(
     inputModel: UserInputModelType,
     passwordSalt: string,

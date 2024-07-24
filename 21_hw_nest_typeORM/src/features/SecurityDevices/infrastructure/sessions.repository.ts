@@ -1,26 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { allActiveSessionViewType } from '../api/models/otput/sessions.output.module';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Sessions } from '../domain/sessions.entity';
 
 @Injectable()
 export class SessionsRepository {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() protected dataSource: DataSource,
+    @InjectRepository(Sessions)
+    protected sessionsRepository: Repository<Sessions>,
+  ) {}
 
   async createDeviceSession(newSession: Sessions): Promise<void> {
-    await this.dataSource.query(
-      `INSERT INTO public."Sessions"(
-        "issuedAt", "deviceId", ip, "deviceName", "userId")
-        VALUES ($1, $2, $3, $4, $5)`,
-      [
-        newSession.issuedAt,
-        newSession.deviceId,
-        newSession.ip,
-        newSession.deviceName,
-        newSession.userId,
-      ],
-    );
+    await this.sessionsRepository.save(newSession);
+    // await this.dataSource.query(
+    //   `INSERT INTO public."Sessions"(
+    //     "issuedAt", "deviceId", ip, "deviceName", "userId")
+    //     VALUES ($1, $2, $3, $4, $5)`,
+    //   [
+    //     newSession.createdAt,
+    //     newSession.deviceId,
+    //     newSession.ip,
+    //     newSession.deviceName,
+    //     newSession.userId,
+    //   ],
+    // );
   }
 
   async findSessionByUserIdAndDeviceId(

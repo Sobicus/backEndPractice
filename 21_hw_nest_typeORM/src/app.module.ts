@@ -78,6 +78,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { EmailConfirmation } from './features/users/domain/emailConfirmation.entity';
 import { Users } from './features/users/domain/users.entity';
 import { Posts } from './features/posts/domain/posts.entity';
+import { Sessions } from './features/SecurityDevices/domain/sessions.entity';
 
 const repositoriesSQL = [
   UsersRepository,
@@ -135,9 +136,9 @@ const commands = [
       database: 'socialHM',
       synchronize: true,
       autoLoadEntities: true,
-      entities: [Users, EmailConfirmation, Posts],
+      entities: [Users, EmailConfirmation, Posts, Sessions],
     }),
-    TypeOrmModule.forFeature([Users, EmailConfirmation, Posts]),
+    TypeOrmModule.forFeature([Users, EmailConfirmation, Posts, Sessions]),
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,

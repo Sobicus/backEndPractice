@@ -22,8 +22,8 @@ export class CreateDeviceSessionHandler
   async execute(command: CreateDeviceSessionCommand) {
     const { refreshToken, deviceName, ip } = command;
     const { userId, deviceId, iat } = this.jwtService.decode(refreshToken);
-    const issuedAt = new Date(iat * 1000).toISOString();
-    const newSession = { issuedAt, deviceId, ip, deviceName, userId };
+    const createdAt = new Date(iat * 1000).toISOString();
+    const newSession = { createdAt, deviceId, ip, deviceName, userId };
     await this.sessionRepository.createDeviceSession(newSession);
   }
 }

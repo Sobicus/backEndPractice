@@ -24,6 +24,7 @@ WHERE "id"=CAST($1 as INTEGER)`,
       [commentId],
     );
   }
+  a;
 
   async updateComment(commentId: string, content: string) {
     await this.dataSource.query(

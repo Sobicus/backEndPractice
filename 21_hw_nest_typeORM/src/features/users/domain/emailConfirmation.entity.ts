@@ -1,7 +1,6 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 
 import { Users } from './users.entity';
-import { UserInputModelType } from '../api/models/input/create-users.input.model';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
 
