@@ -14,13 +14,13 @@ export class PasswordRecoveryHandler
   implements ICommandHandler<PasswordRecoveryCommand>
 {
   constructor(
-    private usersRepositorySQL: UsersRepository,
-    private passwordRecoveryRepositorySQL: PasswordRecoveryRepository,
+    private usersRepository: UsersRepository,
+    private passwordRecoveryRepository: PasswordRecoveryRepository,
     private emailService: EmailService,
   ) {}
 
   async execute(command: PasswordRecoveryCommand) {
-    const user = await this.usersRepositorySQL.findUserByEmail(command.email);
+    const user = await this.usersRepository.findUserByEmail(command.email);
     if (!user) {
       return {
         status: statusType.NotFound,
@@ -29,7 +29,7 @@ export class PasswordRecoveryHandler
       };
     }
     const passwordRecovery = new PasswordRecovery(user._id.toString());
-    await this.passwordRecoveryRepositorySQL.createPasswordRecovery(
+    await this.passwordRecoveryRepository.createPasswordRecovery(
       passwordRecovery,
     );
     await this.emailService.sendPasswordRecoveryCode(

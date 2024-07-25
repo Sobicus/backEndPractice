@@ -29,7 +29,7 @@ export class RegistrationEmailResendingHandler
         data: null,
       };
     }
-    if (user.isConfirmed) {
+    if (user.emailConfirmation.isConfirmed) {
       return {
         status: statusType.NotFound,
         statusMessages: 'user has been already confirmed',

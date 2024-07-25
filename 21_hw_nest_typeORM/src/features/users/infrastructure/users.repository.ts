@@ -3,22 +3,26 @@ import { DataSource, Repository } from 'typeorm';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Users } from '../domain/users.entity';
 import { EmailConfirmation } from '../domain/emailConfirmation.entity';
+import { UsersEmailConfirmationOutputDTO } from '../api/models/output/users.output.module';
 
 @Injectable()
 export class UsersRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    @InjectRepository(Users) protected userRepository: Repository<Users>,
+    @InjectRepository(Users) protected usersRepository: Repository<Users>,
     @InjectRepository(EmailConfirmation)
     protected emailConfirmationRepository: Repository<EmailConfirmation>,
   ) {}
+
   async saveUser(user: Users): Promise<number> {
-    const newUser = await this.userRepository.save(user);
+    const newUser = await this.usersRepository.save(user);
     return newUser.id;
   }
+
   async saveEmailConfirmation(emailConfirmation: EmailConfirmation) {
     await this.emailConfirmationRepository.save(emailConfirmation);
   }
+
   async createUser(user: Users, emailConfirmation: EmailConfirmation) {
     const userId = await this.dataSource.query(
       `INSERT INTO public."Users"(
@@ -52,12 +56,12 @@ export class UsersRepository {
   }
 
   async getUserById(userId: number): Promise<Users | null> {
-    return await this.userRepository.findOne({ where: { id: userId } });
+    return await this.usersRepository.findOne({ where: { id: userId } });
   }
 
   async removeUser(userId: number) {
     await this.emailConfirmationRepository.delete({ userId: userId });
-    await this.userRepository.delete({ id: userId });
+    await this.usersRepository.delete({ id: userId });
   }
 
   async findUserByLoginOrEmail(loginOrEmail: string): Promise<Users | null> {
@@ -121,22 +125,26 @@ export class UsersRepository {
     //     );
   }
 
-  async findUserByEmail(email: string) {
-    const user = await this.dataSource
-      .query(
-        `SELECT *
-FROM public."Users"
-WHERE "email" = $1`,
-        [email],
-      )
-      .then((res) => res[0]);
-    return user;
+  async findUserByEmail(email: string): Promise<Users | null> {
+    return await this.usersRepository.findOne({ where: { email } });
+    //     const user = await this.dataSource
+    //       .query(
+    //         `SELECT *
+    // FROM public."Users"
+    // WHERE "email" = $1`,
+    //         [email],
+    //       )
+    //       .then((res) => res[0]);
+    //     return user;
   }
+
   //todo: add return type
-  async findUserAndEmailConfirmationByEmail(email: string) {
-    const result = await this.emailConfirmationRepository
-      .createQueryBuilder('ec')
-      .leftJoinAndSelect('ec.user', 'u')
+  async findUserAndEmailConfirmationByEmail(
+    email: string,
+  ): Promise<UsersEmailConfirmationOutputDTO | null> {
+    const result = await this.usersRepository
+      .createQueryBuilder('u')
+      .leftJoinAndSelect('u.emailConfirmation', 'ec')
       .where('u.email = :email', { email })
       .getOne();
 
@@ -156,18 +164,26 @@ WHERE "email" = $1`,
     confirmationCode: string;
     expirationDate: Date;
     userId: number;
-  }) {
-    await this.dataSource.query(
-      `UPDATE public."EmailConfirmation"
-SET "confirmationCode"=$1, "expirationDate"=$2
-WHERE "userId"=$3;`,
-      [
-        updateConfirmationCode.confirmationCode,
-        updateConfirmationCode.expirationDate,
-        updateConfirmationCode.userId,
-      ],
+  }): Promise<void> {
+    await this.emailConfirmationRepository.update(
+      { userId: updateConfirmationCode.userId },
+      {
+        expirationDate: updateConfirmationCode.expirationDate,
+        confirmationCode: updateConfirmationCode.confirmationCode,
+      },
     );
+    //     await this.dataSource.query(
+    //       `UPDATE public."EmailConfirmation"
+    // SET "confirmationCode"=$1, "expirationDate"=$2
+    // WHERE "userId"=$3;`,
+    //       [
+    //         updateConfirmationCode.confirmationCode,
+    //         updateConfirmationCode.expirationDate,
+    //         updateConfirmationCode.userId,
+    //       ],
+    //     );
   }
+
   async changePassword(
     userId: string,
     passwordSalt: string,

@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { EmailConfirmation } from './emailConfirmation.entity';
-import { Posts } from 'src/features/posts/domain/posts.entity';
 import { Sessions } from '../../SecurityDevices/domain/sessions.entity';
 
 @Entity()
