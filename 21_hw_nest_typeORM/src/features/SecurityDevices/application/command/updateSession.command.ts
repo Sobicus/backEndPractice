@@ -26,7 +26,7 @@ export class UpdateSessionHandler
     const iat = decodeJwtRefreshToken['iat'];
     const issuedAt = new Date(iat * 1000).toISOString();
     await this.sessionRepository.updateSession(
-      command.userId,
+      Number(command.userId),
       command.deviceId,
       issuedAt,
     );

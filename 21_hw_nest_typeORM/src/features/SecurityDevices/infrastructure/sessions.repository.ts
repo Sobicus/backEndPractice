@@ -29,38 +29,46 @@ export class SessionsRepository {
   }
 
   async findSessionByUserIdAndDeviceId(
-    userId: string,
+    userId: number,
     deviceId: string,
   ): Promise<null | Sessions> {
-    const session = await this.dataSource.query(
-      `SELECT *
-FROM public."Sessions"
-WHERE "userId"=$1 and "deviceId"=$2`,
-      [userId, deviceId],
-    );
-    return session[0];
+    return await this.sessionsRepository.findOne({
+      where: { userId, deviceId },
+    });
+    //     const session = await this.dataSource.query(
+    //       `SELECT *
+    // FROM public."Sessions"
+    // WHERE "userId"=$1 and "deviceId"=$2`,
+    //       [userId, deviceId],
+    //     );
+    //     return session[0];
   }
 
-  async deleteSession(userId: string, deviceId: string) {
-    await this.dataSource.query(
-      `DELETE FROM public."Sessions"
-WHERE "userId"=$1 and "deviceId"=$2`,
-      [userId, deviceId],
-    );
+  async deleteSession(userId: number, deviceId: string) {
+    await this.sessionsRepository.delete({ userId, deviceId });
+    //     await this.dataSource.query(
+    //       `DELETE FROM public."Sessions"
+    // WHERE "userId"=$1 and "deviceId"=$2`,
+    //       [userId, deviceId],
+    //     );
   }
 
   async updateSession(
-    userId: string,
+    userId: number,
     deviceId: string,
     issuedAt: string,
   ): Promise<void> {
-    await this.dataSource.query(
-      `
-UPDATE public."Sessions"
-SET "issuedAt"=$3
-WHERE "deviceId"=$2 and "userId"=$1`,
-      [userId, deviceId, issuedAt],
+    await this.sessionsRepository.update(
+      { userId, deviceId },
+      { issuedAt: issuedAt },
     );
+    //     await this.dataSource.query(
+    //       `
+    // UPDATE public."Sessions"
+    // SET "issuedAt"=$3
+    // WHERE "deviceId"=$2 and "userId"=$1`,
+    //       [userId, deviceId, issuedAt],
+    //     );
   }
 
   async getAllActiveSessions(

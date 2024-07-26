@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { EmailConfirmation } from './emailConfirmation.entity';
 import { Sessions } from '../../SecurityDevices/domain/sessions.entity';
+import { PasswordRecovery } from 'src/features/auth/domain/passwordRecovery.entity';
 
 @Entity()
 export class Users {
@@ -30,8 +31,12 @@ export class Users {
 
   @OneToOne(() => EmailConfirmation, (e) => e.user)
   emailConfirmation: EmailConfirmation;
+
   @OneToMany(() => Sessions, (sessions) => sessions.user)
   sessions: Sessions[];
+
+  @OneToOne(() => PasswordRecovery, (passwordRecovery) => passwordRecovery.user)
+  passwordRecovery: PasswordRecovery;
   // @OneToMany(() => Posts, (posts) => posts.user)
   // posts: Posts[];
   static createUser(

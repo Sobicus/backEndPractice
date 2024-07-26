@@ -28,7 +28,7 @@ export class PasswordRecoveryHandler
         data: null,
       };
     }
-    const passwordRecovery = new PasswordRecovery(user._id.toString());
+    const passwordRecovery = PasswordRecovery.createPasswordRecovery(user.id);
     await this.passwordRecoveryRepository.createPasswordRecovery(
       passwordRecovery,
     );

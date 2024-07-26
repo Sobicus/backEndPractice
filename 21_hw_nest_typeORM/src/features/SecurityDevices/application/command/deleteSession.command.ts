@@ -16,7 +16,7 @@ export class DeleteSessionHandler
 
   async execute(command: DeleteSessionCommand) {
     await this.sessionRepository.deleteSession(
-      command.userId,
+      Number(command.userId),
       command.deviceId,
     );
   }

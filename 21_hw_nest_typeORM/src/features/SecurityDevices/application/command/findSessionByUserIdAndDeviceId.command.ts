@@ -16,7 +16,7 @@ export class FindSessionByUserIdAndDeviceIdHandler
 
   async execute(command: FindSessionByUserIdAndDeviceIdCommand) {
     return this.sessionRepository.findSessionByUserIdAndDeviceId(
-      command.userId,
+      Number(command.userId),
       command.deviceId,
     );
   }

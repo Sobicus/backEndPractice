@@ -12,13 +12,13 @@ export class NewPasswordCommand {
 @CommandHandler(NewPasswordCommand)
 export class NewPasswordHandler implements ICommandHandler<NewPasswordCommand> {
   constructor(
-    private passwordRecoveryRepositorySQL: PasswordRecoveryRepository,
+    private passwordRecoveryRepository: PasswordRecoveryRepository,
     private usersRepositorySQL: UsersRepository,
   ) {}
 
   async execute(command: NewPasswordCommand) {
     const recoveryDTO =
-      await this.passwordRecoveryRepositorySQL.findRecoveryCodeByCode(
+      await this.passwordRecoveryRepository.findRecoveryCodeByCode(
         command.newPasswordModel.recoveryCode,
       );
     if (!recoveryDTO) {
@@ -52,7 +52,7 @@ export class NewPasswordHandler implements ICommandHandler<NewPasswordCommand> {
       data: null,
     };
   }
-  private async changePassword(userId: string, newPassword: string) {
+  private async changePassword(userId: number, newPassword: string) {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(newPassword, passwordSalt);
     await this.usersRepositorySQL.changePassword(

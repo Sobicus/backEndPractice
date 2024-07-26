@@ -79,6 +79,7 @@ import { EmailConfirmation } from './features/users/domain/emailConfirmation.ent
 import { Users } from './features/users/domain/users.entity';
 import { Posts } from './features/posts/domain/posts.entity';
 import { Sessions } from './features/SecurityDevices/domain/sessions.entity';
+import { PasswordRecovery } from './features/auth/domain/passwordRecovery.entity';
 
 const repositoriesSQL = [
   UsersRepository,
@@ -136,9 +137,15 @@ const commands = [
       database: 'socialHM',
       synchronize: true,
       autoLoadEntities: true,
-      entities: [Users, EmailConfirmation, Posts, Sessions],
+      entities: [Users, EmailConfirmation, Posts, Sessions, PasswordRecovery],
     }),
-    TypeOrmModule.forFeature([Users, EmailConfirmation, Posts, Sessions]),
+    TypeOrmModule.forFeature([
+      Users,
+      EmailConfirmation,
+      Posts,
+      Sessions,
+      PasswordRecovery,
+    ]),
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,

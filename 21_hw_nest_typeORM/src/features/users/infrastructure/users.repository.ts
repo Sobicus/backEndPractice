@@ -185,16 +185,20 @@ export class UsersRepository {
   }
 
   async changePassword(
-    userId: string,
+    userId: number,
     passwordSalt: string,
     passwordHash: string,
   ) {
-    await this.dataSource.query(
-      `UPDATE public."Users"
-SET "passwordSalt"=$2, "passwordHash"=$3
-WHERE "id"=$1;`,
-      [userId, passwordSalt, passwordHash],
+    await this.usersRepository.update(
+      { id: userId },
+      { passwordSalt, passwordHash },
     );
+    //     await this.dataSource.query(
+    //       `UPDATE public."Users"
+    // SET "passwordSalt"=$2, "passwordHash"=$3
+    // WHERE "id"=$1;`,
+    //       [userId, passwordSalt, passwordHash],
+    //     );
   }
 
   //------------------------------------------------------
