@@ -44,6 +44,7 @@ export class PasswordRecoveryRepository {
 
   //----------------------------------------------------------------------
   async deleteAll() {
-    await this.dataSource.query(`DELETE FROM public."PasswordRecovery"`);
+    await this.passwordRecovery.clear();
+    // await this.dataSource.query(`DELETE FROM public."PasswordRecovery"`);
   }
 }

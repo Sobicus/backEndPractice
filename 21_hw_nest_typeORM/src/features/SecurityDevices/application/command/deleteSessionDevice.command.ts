@@ -29,14 +29,14 @@ export class DeleteDeviceSessionHandler
     }
     console.log(
       'command.userId !== deviceSessionByDeviceId.userId',
-      command.userId !== deviceSessionByDeviceId.userId,
+      Number(command.userId) !== deviceSessionByDeviceId.userId,
     );
     console.log('command.userId ', command.userId);
     console.log(
       'deviceSessionByDeviceId.userId',
       deviceSessionByDeviceId.userId,
     );
-    if (command.userId != deviceSessionByDeviceId.userId) {
+    if (Number(command.userId) != deviceSessionByDeviceId.userId) {
       return {
         status: statusType.Forbidden,
         statusMessages: 'Is not your deviceSession',
@@ -44,7 +44,7 @@ export class DeleteDeviceSessionHandler
       };
     }
     await this.sessionsRepository.deleteSession(
-      command.userId,
+      Number(command.userId),
       command.deviceId,
     );
     return {

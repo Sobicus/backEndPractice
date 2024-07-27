@@ -153,7 +153,7 @@ const commands = [
     ThrottlerModule.forRoot([
       {
         ttl: 10000,
-        limit: 5000,
+        limit: 5,
       },
     ]),
     PassportModule,

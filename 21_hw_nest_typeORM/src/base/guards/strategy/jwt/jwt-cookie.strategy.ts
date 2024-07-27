@@ -9,7 +9,7 @@ config();
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-cookie') {
-  constructor(private readonly sessionsRepositorySQL: SessionsRepository) {
+  constructor(private readonly sessionsRepository: SessionsRepository) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
@@ -31,8 +31,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-cookie') {
     iat: string;
   }) {
     const issuedAt = new Date(+iat * 1000).toISOString();
-    const session = await this.sessionsRepositorySQL.findSessionForCheckCookie(
-      userId,
+    const session = await this.sessionsRepository.findSessionForCheckCookie(
+      Number(userId),
       deviceId,
       issuedAt,
     );

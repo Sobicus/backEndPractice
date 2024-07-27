@@ -18,15 +18,15 @@ export class Users {
   id: number;
   @Column()
   email: string;
-  @Column()
+  @Column({ collation: 'c' })
   login: string;
   @Column()
   passwordSalt: string;
   @Column()
   passwordHash: string;
-  @CreateDateColumn({ type: 'time with time zone' })
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
-  @UpdateDateColumn({ type: 'time with time zone' })
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
   @OneToOne(() => EmailConfirmation, (e) => e.user)
@@ -37,6 +37,7 @@ export class Users {
 
   @OneToOne(() => PasswordRecovery, (passwordRecovery) => passwordRecovery.user)
   passwordRecovery: PasswordRecovery;
+
   // @OneToMany(() => Posts, (posts) => posts.user)
   // posts: Posts[];
   static createUser(

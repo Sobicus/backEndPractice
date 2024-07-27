@@ -74,6 +74,7 @@ export class SessionsRepository {
   async getAllActiveSessions(
     userId: string,
   ): Promise<allActiveSessionViewType[]> {
+    const sessons = await this.sessionsRepository.find({
     const sessions = await this.dataSource.query(
       `SELECT "issuedAt", "deviceId", "ip", "deviceName"
 FROM public."Sessions"
@@ -100,31 +101,37 @@ WHERE "userId"=$1 and "deviceId"!=$2`,
   }
 
   async findSessionByDeviceId(deviceId: string): Promise<Sessions | null> {
-    const session = await this.dataSource.query(
-      `
-SELECT *
- FROM public."Sessions"
-WHERE "deviceId"=$1`,
-      [deviceId],
-    );
-    return session[0];
+    return await this.sessionsRepository.findOne({
+      where: { deviceId },
+    });
+    //     const session = await this.dataSource.query(
+    //       `
+    // SELECT *
+    //  FROM public."Sessions"
+    // WHERE "deviceId"=$1`,
+    //       [deviceId],
+    //     );
+    //     return session[0];
   }
 
   async findSessionForCheckCookie(
-    userId: string,
+    userId: number,
     deviceId: string,
     issuedAt: string,
-  ): Promise<null> {
-    console.log(userId, deviceId, issuedAt);
-    const result = await this.dataSource.query(
-      `SELECT *
- FROM public."Sessions" WHERE "userId"=$1 AND "deviceId"=$2 AND  "issuedAt"=$3`,
-      [userId, deviceId, issuedAt],
-    );
-    return result[0];
+  ): Promise<null | Sessions> {
+    return await this.sessionsRepository.findOne({
+      where: { userId, deviceId, issuedAt },
+    });
+    //    const result = await this.dataSource.query(
+    //      `SELECT *
+    // FROM public."Sessions" WHERE "userId"=$1 AND "deviceId"=$2 AND  "issuedAt"=$3`,
+    //      [userId, deviceId, issuedAt],
+    //    );
+    //    return result[0];
   }
   //--------------------
   async deleteAll() {
-    await this.dataSource.query(`DELETE FROM public."Sessions"`);
+    await this.sessionsRepository.clear();
+    // await this.dataSource.query(`DELETE FROM public."Sessions"`);
   }
 }

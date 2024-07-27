@@ -65,13 +65,16 @@ export class UsersRepository {
   }
 
   async findUserByLoginOrEmail(loginOrEmail: string): Promise<Users | null> {
-    const res = await this.dataSource.query(
-      `SELECT *
-    FROM public."Users"
-    WHERE "login" = $1 or "email" = $1`,
-      [loginOrEmail],
-    );
-    return res[0];
+    return await this.usersRepository.findOne({
+      where: [{ login: loginOrEmail }, { email: loginOrEmail }],
+    });
+    // const res = await this.dataSource.query(
+    //   `SELECT *
+    // FROM public."Users"
+    // WHERE "login" = $1 or "email" = $1`,
+    //   [loginOrEmail],
+    // );
+    // return res[0];
   }
 
   async findEmailConfirmationByUserId(
@@ -147,7 +150,7 @@ export class UsersRepository {
       .leftJoinAndSelect('u.emailConfirmation', 'ec')
       .where('u.email = :email', { email })
       .getOne();
-
+    console.log('findUserAndEmailConfirmationByEmail', result);
     return result;
     //     const result = await this.dataSource.query(
     //       `SELECT u.*, ec.*
@@ -203,7 +206,9 @@ export class UsersRepository {
 
   //------------------------------------------------------
   async deleteAll() {
-    await this.dataSource.query(`DELETE FROM public."EmailConfirmation"`);
-    await this.dataSource.query(`DELETE FROM public."Users"`);
+    // await this.dataSource.query(`DELETE FROM public."EmailConfirmation"`);
+    // await this.dataSource.query(`DELETE FROM public."Users"`);
+    await this.emailConfirmationRepository.clear();
+    await this.usersRepository.clear();
   }
 }

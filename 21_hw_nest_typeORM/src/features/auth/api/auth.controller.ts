@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Ip,
+  NotFoundException,
   Post,
   Res,
   UnauthorizedException,
@@ -145,6 +146,10 @@ export class AuthController {
   @UseGuards(JwtAccessAuthGuard)
   @Get('me')
   async authMe(@TakeUserId() { userId }: { userId: number }) {
-    return this.usersQueryRepository.getUserByIdForAuthMe(userId);
+    const authMe = await this.usersQueryRepository.getUserByIdForAuthMe(userId);
+    if (!authMe) {
+      throw new NotFoundException();
+    }
+    return authMe;
   }
 }

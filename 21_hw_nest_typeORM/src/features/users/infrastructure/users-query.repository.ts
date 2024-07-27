@@ -14,7 +14,7 @@ import { Users } from '../domain/users.entity';
 export class UsersQueryRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    @InjectRepository(Users) protected userRepository: Repository<Users>,
+    @InjectRepository(Users) protected usersRepository: Repository<Users>,
   ) {}
   async getAllUsers(pagination: PaginationUsersOutModelType) {
     const validSortColumns = ['id', 'login', 'email', 'createdAt'];
@@ -22,8 +22,8 @@ export class UsersQueryRepository {
       ? pagination.sortBy
       : 'createdAt';
     const sortDirection = pagination.sortDirection === 'asc' ? 'ASC' : 'DESC';
-    this.userRepository.createQueryBuilder();
-    const [users, totalCount] = await this.userRepository.findAndCount({
+    this.usersRepository.createQueryBuilder();
+    const [users, totalCount] = await this.usersRepository.findAndCount({
       where: [
         { login: ILike(`%${pagination.searchLoginTerm}%`) },
         { email: ILike(`%${pagination.searchEmailTerm}%`) },
@@ -106,34 +106,62 @@ export class UsersQueryRepository {
   // }
 
   async getUserById(userId: number): Promise<UserOutputDTO | null> {
-    const user = await this.dataSource.query(
-      `SELECT u."id", u."login", u."email", u."createdAt"
-    FROM public."Users" as u
-    WHERE "id"= $1`,
-      [userId],
-    );
-    const userMapped = user.map((u) => {
-      return {
-        id: u.id.toString(),
-        login: u.login,
-        email: u.email,
-        createdAt: u.createdAt,
-      };
-    });
-    return userMapped[0];
+    const user = await this.usersRepository.findOneBy({ id: userId });
+    if (!user) {
+      return null;
+    }
+    console.log('user', user);
+    return {
+      id: user.id.toString(),
+      login: user.login,
+      email: user.email,
+      createdAt: user.createdAt.toISOString(),
+    };
+    // const user = await this.dataSource.query(
+    //   `SELECT u."id", u."login", u."email", u."createdAt"
+    // FROM public."Users" as u
+    // WHERE "id"= $1`,
+    //   [userId],
+    // );
+    // const userMapped = user.map((u) => {
+    //   return {
+    //     id: u.id.toString(),
+    //     login: u.login,
+    //     email: u.email,
+    //     createdAt: u.createdAt,
+    //   };
+    // });
+    // return userMapped[0];
   }
 
   async getUserByIdForAuthMe(userId: number): Promise<null | UserAuthMeDTO> {
-    const user = await this.dataSource.query(
-      `SELECT u."id", u."login", u."email"
-    FROM public."Users" as u
-    WHERE "id"= $1`,
-      [userId],
-    );
-    const userMapped = user.map((u) => {
-      return { userId: u.id.toString(), login: u.login, email: u.email };
+    const user = await this.usersRepository.findOne({
+      select: ['id', 'login', 'email'],
+      where: { id: userId },
     });
-    return userMapped[0];
+
+    if (!user) {
+      return null;
+    }
+
+    const userMapped: UserAuthMeDTO = {
+      userId: user.id.toString(),
+      login: user.login,
+      email: user.email,
+    };
+
+    return userMapped;
+
+    // const user = await this.dataSource.query(
+    //   `SELECT u."id" /*as "userId"*/, u."login", u."email"
+    // FROM public."Users" as u
+    // WHERE "id"= $1`,
+    //   [userId],
+    // );
+    // const userMapped = user.map((u) => {
+    //   return { userId: u.id.toString(), login: u.login, email: u.email };
+    // });
+    // return userMapped[0];
   }
 }
 // const userMappers = (user: any): UserOutputDTO => {
