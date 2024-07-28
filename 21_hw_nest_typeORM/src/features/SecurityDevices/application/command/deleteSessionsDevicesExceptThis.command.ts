@@ -16,7 +16,7 @@ export class DeleteSessionExceptThisHandler
 
   async execute(command: DeleteSessionExceptThisCommand) {
     await this.sessionRepository.deleteDevicesExceptThis(
-      command.userId,
+      Number(command.userId),
       command.deviceId,
     );
   }

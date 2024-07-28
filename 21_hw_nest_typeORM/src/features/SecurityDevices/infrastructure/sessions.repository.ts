@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { allActiveSessionViewType } from '../api/models/otput/sessions.output.module';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Not, Repository } from 'typeorm';
 import { Sessions } from '../domain/sessions.entity';
 
 @Injectable()
@@ -72,15 +72,13 @@ export class SessionsRepository {
   }
 
   async getAllActiveSessions(
-    userId: string,
+    userId: number,
   ): Promise<allActiveSessionViewType[]> {
-    const sessons = await this.sessionsRepository.find({
-    const sessions = await this.dataSource.query(
-      `SELECT "issuedAt", "deviceId", "ip", "deviceName"
-FROM public."Sessions"
-WHERE "userId"=$1`,
-      [userId],
-    );
+    const sessions = await this.sessionsRepository.find({
+      where: { userId },
+      select: ['issuedAt', 'deviceId', 'ip', 'deviceName'],
+    });
+
     const allSession = sessions.map((session) => {
       return {
         ip: session.ip,
@@ -89,15 +87,38 @@ WHERE "userId"=$1`,
         deviceId: session.deviceId,
       };
     });
+
     return allSession;
+    //     const sessions = await this.dataSource.query(
+    //       `SELECT "issuedAt", "deviceId", "ip", "deviceName"
+    // FROM public."Sessions"
+    // WHERE "userId"=$1`,
+    //       [userId],
+    //     );
+    //     const allSession = sessions.map((session) => {
+    //       return {
+    //         ip: session.ip,
+    //         title: session.deviceName,
+    //         lastActiveDate: session.issuedAt,
+    //         deviceId: session.deviceId,
+    //       };
+    //     });
+    //     return allSession;
   }
 
-  async deleteDevicesExceptThis(userId: string, deviceId: string) {
-    await this.dataSource.query(
-      `DELETE FROM public."Sessions"
-WHERE "userId"=$1 and "deviceId"!=$2`,
-      [userId, deviceId],
-    );
+  async deleteDevicesExceptThis(
+    userId: number,
+    deviceId: string,
+  ): Promise<void> {
+    await this.sessionsRepository.delete({
+      userId: userId,
+      deviceId: Not(deviceId),
+    });
+    //     await this.dataSource.query(
+    //       `DELETE FROM public."Sessions"
+    // WHERE "userId"=$1 and "deviceId"!=$2`,
+    //       [userId, deviceId],
+    //     );
   }
 
   async findSessionByDeviceId(deviceId: string): Promise<Sessions | null> {

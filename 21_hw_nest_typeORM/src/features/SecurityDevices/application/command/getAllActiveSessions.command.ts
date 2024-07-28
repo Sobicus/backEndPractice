@@ -12,6 +12,6 @@ export class FindActiveSessionHandler
   constructor(private sessionRepository: SessionsRepository) {}
 
   async execute(command: FindActiveSessionCommand) {
-    return this.sessionRepository.getAllActiveSessions(command.userId);
+    return this.sessionRepository.getAllActiveSessions(Number(command.userId));
   }
 }
