@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { statusType } from '../../../../base/oject-result';
+import { ObjectClassResult, statusType } from '../../../../base/oject-result';
 import { PostInputModelType } from '../../api/models/input/create-post.input.model';
 import { BlogsRepository } from '../../../blogs/infrastructure/blogs.repository';
 import { PostsRepository } from '../../infrastructure/posts.repository';
@@ -16,7 +16,9 @@ export class CreatePostHandler implements ICommandHandler<CreatePostCommand> {
     private postRepository: PostsRepository,
   ) {}
 
-  async execute(command: CreatePostCommand) {
+  async execute(
+    command: CreatePostCommand,
+  ): Promise<ObjectClassResult<number | null>> {
     const blog = await this.blogRepository.getBlogByBlogId(
       Number(command.post.blogId),
     );
@@ -27,20 +29,20 @@ export class CreatePostHandler implements ICommandHandler<CreatePostCommand> {
         data: null,
       };
     }
-    const post = await Posts.createPost(command.post);
-    const post1 = Posts.createPost(
+    // const post = await Posts.createPost(command.post);
+    const post = Posts.createPost(
       command.post.title,
       command.post.shortDescription,
       command.post.content,
       Number(command.post.blogId),
     );
-    await this.postRepository.createPost(post1);
-    const createdAt = new Date().toISOString();
-    const postId = await this.postRepository.createPost({
-      ...command.post,
-      blogName: blog.name,
-      createdAt,
-    });
+    const postId = await this.postRepository.createPost(post);
+    // const createdAt = new Date().toISOString();
+    // const postId = await this.postRepository.createPost({
+    //   ...command.post,
+    //   blogName: blog.name,
+    //   createdAt,
+    // });
     return {
       status: statusType.Created,
       statusMessages: 'Post has been created',

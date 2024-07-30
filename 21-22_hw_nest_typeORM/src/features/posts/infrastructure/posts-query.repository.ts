@@ -5,13 +5,17 @@ import {
   PaginationPostsType,
   PostOutputModelType,
 } from '../api/models/output/post.output.model';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { LikesStatusComments } from '../../comments/api/models/input/comments-likesInfo.input.model';
+import { Posts } from '../domain/posts.entity';
 
 @Injectable()
 export class PostsQueryRepository {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() protected dataSource: DataSource,
+    @InjectRepository(Posts) protected postsRepository: Repository<Posts>,
+  ) {}
 
   async getAllPosts(
     pagination: PaginationPostsOutputModelType,
@@ -99,9 +103,27 @@ FROM public."Posts"`);
   }
 
   async getPostById(
-    postId: string,
+    postId: number,
     userId?: string | null,
   ): Promise<PostOutputModelType | null> {
+    const test = await this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.blog', 'blog')
+      .select([
+        // 'post.id',
+        // 'post.title',
+        // 'post.shortDescription',
+        // 'post.content',
+        // 'post.blogId',
+        'post.*',
+        'blog.name as "blogName"',
+        //'post.createdAt',
+      ])
+      .where('post.id = :postId', { postId })
+      .getRawOne();
+
+    console.log('test', test);
+
     const post = await this.dataSource.query(
       `SELECT p.*,
 (SELECT CAST(count(*) as INTEGER)

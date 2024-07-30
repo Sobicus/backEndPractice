@@ -50,7 +50,10 @@ export class PostsController {
     @Param('id') postId: string,
     @TakeUserId() { userId }: { userId: string | null },
   ) {
-    const post = await this.postsQueryRepositorySQL.getPostById(postId, userId);
+    const post = await this.postsQueryRepositorySQL.getPostById(
+      Number(postId),
+      userId,
+    );
     if (!post) {
       throw new NotFoundException();
     }
@@ -63,7 +66,7 @@ export class PostsController {
     @Query() pagination: PaginationCommentsInputModelType,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    const post = await this.postsQueryRepositorySQL.getPostById(postId);
+    const post = await this.postsQueryRepositorySQL.getPostById(Number(postId));
     if (!post) {
       throw new NotFoundException();
     }

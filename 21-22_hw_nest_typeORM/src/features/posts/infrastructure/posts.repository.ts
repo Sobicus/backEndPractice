@@ -24,8 +24,8 @@ export class PostsRepository {
     return post[0];
   }
 
-  async createPost(post: postCreateDTO) {
-    const post = await this.postsRepository.save(post);
+  async createPost(postDTO: Posts): Promise<number> {
+    const post = await this.postsRepository.save(postDTO);
     return post.id;
     //     const postId = await this.dataSource.query(
     //       `INSERT INTO public."Posts"(

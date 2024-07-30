@@ -19,9 +19,9 @@ export class Posts {
   shortDescription: string;
   @Column()
   content: string;
-  @CreateDateColumn({ type: 'time with time zone' })
+  @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
-  @UpdateDateColumn({ type: 'time with time zone' })
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt: Date;
 
   @ManyToOne(() => Blogs, (blogs) => blogs.posts)

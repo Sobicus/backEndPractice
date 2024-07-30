@@ -36,6 +36,7 @@ import { BlogsQueryRepository } from '../infrastructure/blogs-query.repository';
 import { PostsQueryRepository } from '../../posts/infrastructure/posts-query.repository';
 import { UpdatePostCommand } from '../../posts/application/command/updatePost.command';
 import { DeletePostCommand } from '../../posts/application/command/deletePost.command';
+import { ObjectClassResult } from '../../../base/oject-result';
 
 @Controller('sa/blogs')
 export class BlogsControllerSA {
