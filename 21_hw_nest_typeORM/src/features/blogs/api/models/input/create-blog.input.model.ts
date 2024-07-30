@@ -16,3 +16,10 @@ export class BlogInputModelType {
   )
   websiteUrl: string;
 }
+
+export type BlogUpdetedModelType = {
+  id: number;
+  name: string;
+  description: string;
+  websiteUrl: string;
+};

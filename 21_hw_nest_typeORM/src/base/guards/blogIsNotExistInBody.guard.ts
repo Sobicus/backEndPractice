@@ -15,9 +15,9 @@ export class IsNotBlogExistInBodyConstraint
   constructor(private blogsRepositorySQL: BlogsRepository) {}
 
   async validate(blogId: string, args: ValidationArguments) {
-    console.log('blogId ', blogId);
-    const result = await this.blogsRepositorySQL.getBlogByBlogId(blogId);
-    console.log('result ', result);
+    const result = await this.blogsRepositorySQL.getBlogByBlogId(
+      Number(blogId),
+    );
     if (result) {
       return true;
     }

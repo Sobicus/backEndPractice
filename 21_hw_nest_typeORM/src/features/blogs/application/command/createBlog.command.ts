@@ -11,7 +11,7 @@ export class CreateBlogCommand {
 export class CreateBlogHandler implements ICommandHandler<CreateBlogCommand> {
   constructor(private blogRepository: BlogsRepository) {}
 
-  async execute(command: CreateBlogCommand) {
+  async execute(command: CreateBlogCommand): Promise<number> {
     const blog = Blogs.create(command.inputBlogModel);
     return await this.blogRepository.createBlog(blog);
   }

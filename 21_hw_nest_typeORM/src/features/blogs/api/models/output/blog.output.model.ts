@@ -3,7 +3,7 @@ export class BlogOutputModelType {
   name: string;
   description: string;
   websiteUrl: string;
-  createdAt: string;
+  createdAt: Date;
   isMembership: boolean;
 }
 export type PaginationBlogsType = {

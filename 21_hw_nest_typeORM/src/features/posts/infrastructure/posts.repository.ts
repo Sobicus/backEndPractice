@@ -3,12 +3,16 @@ import {
   postCreateDTO,
   PostUpdateDTO,
 } from '../api/models/input/create-post.input.model';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { Posts } from '../domain/posts.entity';
 
 @Injectable()
 export class PostsRepository {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() protected dataSource: DataSource,
+    @InjectRepository(Posts) protected postsRepository: Repository<Posts>,
+  ) {}
 
   async getPostByPostId(postId: string) {
     const post = await this.dataSource.query(
@@ -21,22 +25,24 @@ export class PostsRepository {
   }
 
   async createPost(post: postCreateDTO) {
-    const postId = await this.dataSource.query(
-      `INSERT INTO public."Posts"(
-"title", "shortDescription", "content", "blogId", "blogName", "createdAt")
-VALUES ($1, $2, $3, CAST($4 as INTEGER), $5, $6)
-RETURNING "id"`,
-      [
-        post.title,
-        post.shortDescription,
-        post.content,
-        post.blogId,
-        post.blogName,
-        post.createdAt,
-      ],
-    );
-    console.log('postId[0].id', postId[0].id);
-    return postId[0].id;
+    const post = await this.postsRepository.save(post);
+    return post.id;
+    //     const postId = await this.dataSource.query(
+    //       `INSERT INTO public."Posts"(
+    // "title", "shortDescription", "content", "blogId", "blogName", "createdAt")
+    // VALUES ($1, $2, $3, CAST($4 as INTEGER), $5, $6)
+    // RETURNING "id"`,
+    //       [
+    //         post.title,
+    //         post.shortDescription,
+    //         post.content,
+    //         post.blogId,
+    //         post.blogName,
+    //         post.createdAt,
+    //       ],
+    //     );
+    //     console.log('postId[0].id', postId[0].id);
+    //     return postId[0].id;
   }
 
   async updatePost(postUpdateDTO: PostUpdateDTO) {

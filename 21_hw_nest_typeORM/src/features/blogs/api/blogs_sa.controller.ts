@@ -55,7 +55,7 @@ export class BlogsControllerSA {
   @UseGuards(UserAuthGuard)
   @Post()
   async createBlog(@Body() inputModel: BlogInputModelType) {
-    const newBlogId = await this.commandBus.execute(
+    const newBlogId = await this.commandBus.execute<CreateBlogCommand, number>(
       new CreateBlogCommand(inputModel),
     );
     return this.blogsQueryRepository.getBlogById(newBlogId);
@@ -112,7 +112,7 @@ export class BlogsControllerSA {
     @Query() query: PaginationPostsInputModelType,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    const res = await this.blogsQueryRepository.getBlogById(blogId);
+    const res = await this.blogsQueryRepository.getBlogById(Number(blogId));
     if (!res) {
       throw new NotFoundException();
     }
@@ -128,7 +128,7 @@ export class BlogsControllerSA {
     @Body() inputModel: PostChangeBody,
   ) {
     const checkBlog = await this.blogsQueryRepository.getBlogById(
-      putModel.blogId,
+      Number(putModel.blogId),
     );
     if (!checkBlog) {
       throw new NotFoundException();

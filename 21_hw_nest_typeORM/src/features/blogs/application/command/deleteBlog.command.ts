@@ -11,7 +11,9 @@ export class DeleteBlogHandler implements ICommandHandler<DeleteBlogCommand> {
   constructor(private blogRepository: BlogsRepository) {}
 
   async execute(command: DeleteBlogCommand) {
-    const blog = await this.blogRepository.getBlogByBlogId(command.blogId);
+    const blog = await this.blogRepository.getBlogByBlogId(
+      Number(command.blogId),
+    );
     if (!blog) {
       return {
         status: statusType.NotFound,

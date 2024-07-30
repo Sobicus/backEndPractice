@@ -32,7 +32,7 @@ export class BlogsController {
 
   @Get(':id')
   async getBlogById(@Param('id' /*ParseIntPipe*/) userId: string) {
-    const res = await this.blogsQueryRepository.getBlogById(userId);
+    const res = await this.blogsQueryRepository.getBlogById(Number(userId));
     if (!res) {
       throw new NotFoundException();
     }
@@ -45,9 +45,7 @@ export class BlogsController {
     @Query() query: PaginationPostsInputModelType,
     @TakeUserId() { userId }: { userId: string },
   ) {
-    console.log('GET -> "/blogs/:blogId/posts": ', blogId);
-    const res = await this.blogsQueryRepository.getBlogById(blogId);
-    console.log('GET -> "/blogs/:blogId/posts": res', res);
+    const res = await this.blogsQueryRepository.getBlogById(Number(blogId));
 
     if (!res) {
       throw new NotFoundException();

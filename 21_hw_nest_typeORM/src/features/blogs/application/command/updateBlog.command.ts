@@ -15,7 +15,9 @@ export class UpdateBlogHandler implements ICommandHandler<UpdateBlogCommand> {
   constructor(private blogRepository: BlogsRepository) {}
 
   async execute(command: UpdateBlogCommand) {
-    const blog = await this.blogRepository.getBlogByBlogId(command.blogId);
+    const blog = await this.blogRepository.getBlogByBlogId(
+      Number(command.blogId),
+    );
     if (!blog) {
       return {
         status: statusType.NotFound,
@@ -23,7 +25,13 @@ export class UpdateBlogHandler implements ICommandHandler<UpdateBlogCommand> {
         data: null,
       };
     }
-    await this.blogRepository.updateBlog(command);
+
+    await this.blogRepository.updateBlog({
+      id: Number(command.blogId),
+      name: command.inputModel.name,
+      description: command.inputModel.description,
+      websiteUrl: command.inputModel.websiteUrl,
+    });
     return {
       status: statusType.Success,
       statusMessages: 'Blog has been update',

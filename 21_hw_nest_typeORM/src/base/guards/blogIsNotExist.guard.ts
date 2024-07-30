@@ -13,7 +13,9 @@ export class IsNotBlogExistConstraint implements ValidatorConstraintInterface {
   constructor(private blogsRepositorySQL: BlogsRepository) {}
 
   async validate(blogId: string, args: ValidationArguments) {
-    const result = await this.blogsRepositorySQL.getBlogByBlogId(blogId);
+    const result = await this.blogsRepositorySQL.getBlogByBlogId(
+      Number(blogId),
+    );
     if (result) {
       return true;
     }
