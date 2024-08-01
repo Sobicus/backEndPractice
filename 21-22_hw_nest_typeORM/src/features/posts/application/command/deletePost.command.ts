@@ -19,7 +19,7 @@ export class DeletePostHandler implements ICommandHandler<DeletePostCommand> {
         data: null,
       };
     }
-    await this.postsRepository.deletePost(command.postId);
+    await this.postsRepository.deletePost(Number(command.postId));
     return {
       status: statusType.Success,
       statusMessages: 'Post has been delete',

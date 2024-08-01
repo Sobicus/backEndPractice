@@ -31,6 +31,8 @@ export class TestingAllDataController {
     await this.dataSource.query('DELETE FROM sessions');
     await this.dataSource.query('DELETE FROM email_confirmation');
     await this.dataSource.query('DELETE FROM users');
+    await this.dataSource.query('DELETE FROM posts');
+    await this.dataSource.query('DELETE FROM blogs');
     //await this.commentsLikesInfoRepositorySQL.deleteAll();
     //await this.postsLikesInfoRepositorySQL.deleteAll();
     //await this.passwordRecoveryRepositorySQL.deleteAll();

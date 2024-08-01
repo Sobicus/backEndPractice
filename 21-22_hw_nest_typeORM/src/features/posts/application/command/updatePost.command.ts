@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { statusType } from '../../../../base/oject-result';
+import { ObjectClassResult, statusType } from '../../../../base/oject-result';
 import { PostChangeBody } from '../../api/models/input/create-post.input.model';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 
@@ -14,8 +14,7 @@ export class UpdatePostCommand {
 export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
   constructor(private postRepository: PostsRepository) {}
 
-  async execute(command: UpdatePostCommand) {
-    console.log('UpdatePostCommand', command.postId);
+  async execute(command: UpdatePostCommand): Promise<ObjectClassResult> {
     const post = await this.postRepository.getPostByPostId(command.postId);
     if (!post) {
       return {
@@ -24,7 +23,6 @@ export class UpdatePostHandler implements ICommandHandler<UpdatePostCommand> {
         data: null,
       };
     }
-    console.log('getPostByPostId', post);
     const postUpdateDTO = { postId: command.postId, ...command.postDTO };
     await this.postRepository.updatePost(postUpdateDTO);
     return {

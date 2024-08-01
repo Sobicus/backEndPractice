@@ -13,7 +13,7 @@ import { Posts } from '../../posts/domain/posts.entity';
 export class Blogs {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({ collation: 'c' })
   name: string;
   @Column()
   description: string;

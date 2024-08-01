@@ -45,19 +45,3 @@ export class Posts {
     return posts;
   }
 }
-
-// @Entity()
-// export class Posts {
-//   @PrimaryGeneratedColumn()
-//   id: number;
-//   @Column()
-//   title: string;
-//   @Column()
-//   shortDescription: string;
-//   @Column()
-//   content: string;
-//   @CreateDateColumn({ type: 'time with time zone' })
-//   createdAt: Date;
-//   @UpdateDateColumn({ type: 'time with time zone' })
-//   updatedAt: Date;
-// }

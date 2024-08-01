@@ -106,7 +106,7 @@ FROM public."Posts"`);
     postId: number,
     userId?: string | null,
   ): Promise<PostOutputModelType | null> {
-    const test = await this.postsRepository
+    const postData = await this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.blog', 'blog')
       .select([
@@ -122,51 +122,49 @@ FROM public."Posts"`);
       .where('post.id = :postId', { postId })
       .getRawOne();
 
-    console.log('test', test);
-
-    const post = await this.dataSource.query(
-      `SELECT p.*,
-(SELECT CAST(count(*) as INTEGER)
-FROM public."PostsLikes" as pl
-WHERE p."id" = pl."postId" and "myStatus"='Like') as likes_count,
-(SELECT CAST(count(*) as INTEGER)
-FROM public."PostsLikes" as pl
-WHERE p."id" = pl."postId" and "myStatus"='Dislike') as dislikes_count
-FROM public."Posts" as p
-WHERE "id"=$1`,
-      [postId],
-    );
-    const postData = post[0];
+    //     const post = await this.dataSource.query(
+    //       `SELECT p.*,
+    // (SELECT CAST(count(*) as INTEGER)
+    // FROM public."PostsLikes" as pl
+    // WHERE p."id" = pl."postId" and "myStatus"='Like') as likes_count,
+    // (SELECT CAST(count(*) as INTEGER)
+    // FROM public."PostsLikes" as pl
+    // WHERE p."id" = pl."postId" and "myStatus"='Dislike') as dislikes_count
+    // FROM public."Posts" as p
+    // WHERE "id"=$1`,
+    //       [postId],
+    //     );
+    //     const postData = post[0];
     if (!postData) {
       return null;
     }
-    let myStatus = LikesStatusComments.None;
-
-    if (userId) {
-      const reaction = await this.dataSource.query(
-        `SELECT *
-        FROM public."PostsLikes"
-        WHERE "userId"=$2 and "postId"=$1`,
-        [postId, userId],
-      );
-      myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
-    }
-    const threeLikes = await this.dataSource.query(
-      `SELECT CAST("createdAt" as text),CAST("userId" as text), "login"
-FROM public."PostsLikes"
-WHERE "postId"=$1 AND "myStatus"='Like'
-ORDER BY "createdAt" DESC
-LIMIT 3 OFFSET 0
-`,
-      [postId],
-    );
-    const threeLastLikes = threeLikes.map((like) => {
-      return {
-        addedAt: like.createdAt,
-        userId: like.userId,
-        login: like.login,
-      };
-    });
+    //     let myStatus = LikesStatusComments.None;
+    //
+    //     if (userId) {
+    //       const reaction = await this.dataSource.query(
+    //         `SELECT *
+    //         FROM public."PostsLikes"
+    //         WHERE "userId"=$2 and "postId"=$1`,
+    //         [postId, userId],
+    //       );
+    //       myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
+    //     }
+    //     const threeLikes = await this.dataSource.query(
+    //       `SELECT CAST("createdAt" as text),CAST("userId" as text), "login"
+    // FROM public."PostsLikes"
+    // WHERE "postId"=$1 AND "myStatus"='Like'
+    // ORDER BY "createdAt" DESC
+    // LIMIT 3 OFFSET 0
+    // `,
+    //       [postId],
+    //     );
+    //     const threeLastLikes = threeLikes.map((like) => {
+    //       return {
+    //         addedAt: like.createdAt,
+    //         userId: like.userId,
+    //         login: like.login,
+    //       };
+    //     });
     return {
       id: postData.id.toString(),
       title: postData.title,
@@ -176,10 +174,10 @@ LIMIT 3 OFFSET 0
       blogName: postData.blogName,
       createdAt: postData.createdAt,
       extendedLikesInfo: {
-        likesCount: postData.likes_count,
-        dislikesCount: postData.dislikes_count,
-        myStatus: myStatus,
-        newestLikes: threeLastLikes,
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
       },
     };
 
@@ -237,94 +235,51 @@ WHERE
     blogId: string,
     pagination: PaginationPostsOutputModelType,
     userId?: string,
-  ): Promise<PaginationPostsType | null> {
+  ): Promise<PaginationPostsType> {
     const sortBy = `"${pagination.sortBy}"` ?? '"createdAt"';
     const sortDirection = pagination.sortDirection === 'asc' ? 'asc' : 'desc';
+    const postData = await this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.blog', 'blog')
+      .select(['post.*', 'blog.name as "blogName"'])
+      .where('post.blogId = :blogId', { blogId })
+      .orderBy(sortBy, sortDirection === 'asc' ? 'ASC' : 'DESC')
+      .take(pagination.pageSize)
+      .skip(pagination.skip)
+      .getRawMany();
 
-    const posts = await this.dataSource.query(
-      `SELECT p.*,
-(SELECT CAST(count(*) as INTEGER)
-FROM public."PostsLikes" as pl
-WHERE p."id" = pl."postId" and "myStatus"='Like') as likes_count,
-(SELECT CAST(count(*) as INTEGER)
-FROM public."PostsLikes" as pl
-WHERE p."id" = pl."postId" and "myStatus"='Dislike') as dislikes_count
-FROM public."Posts" as p
-WHERE p."blogId"=$1
-ORDER BY ${sortBy} ${sortDirection}
-LIMIT $2 OFFSET $3`,
-      [blogId, pagination.pageSize, pagination.skip],
-    );
-    console.log('getPostByBlogId======================>>>>>>');
-    console.log('posts', posts);
-    const allPosts = await Promise.all(
-      posts.map(async (p) => {
-        let myStatus = LikesStatusComments.None;
+    console.log(postData);
 
-        if (userId) {
-          const reaction = await this.dataSource.query(
-            `SELECT *
-        FROM public."PostsLikes"
-        WHERE "userId"=$2 and "postId"=$1`,
-            [p.id, userId],
-          );
-          myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
-        }
+    const allPosts = postData.map((p) => {
+      return {
+        id: p.id.toString(),
+        title: p.title,
+        shortDescription: p.shortDescription,
+        content: p.content,
+        blogId: p.blogId.toString(),
+        blogName: p.blogName,
+        createdAt: p.createdAt,
+        extendedLikesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: 'None',
+          newestLikes: [],
+        },
+      };
+    });
+    console.log('allPosts', allPosts);
+    const totalCount = await this.postsRepository
+      .createQueryBuilder('post')
+      .where('post.blogId = :blogId', { blogId })
+      .getCount();
 
-        const threeLikes = await this.dataSource.query(
-          `SELECT CAST("createdAt" as text),CAST("userId" as text), "login"
-FROM public."PostsLikes"
-WHERE "postId"=$1 AND "myStatus"='Like'
-ORDER BY "createdAt" DESC
-LIMIT 3 OFFSET 0
-`,
-          [p.id],
-        );
-        console.log('threeLikes', threeLikes);
-        const threeLastLikes = threeLikes.map((like) => {
-          return {
-            addedAt: like.createdAt,
-            userId: like.userId,
-            login: like.login,
-          };
-        });
-        console.log('threeLastLikes', threeLastLikes);
-
-        return {
-          id: p.id.toString(),
-          title: p.title,
-          shortDescription: p.shortDescription,
-          content: p.content,
-          blogId: p.blogId.toString(),
-          blogName: p.blogName,
-          createdAt: p.createdAt,
-          extendedLikesInfo: {
-            likesCount: p.likes_count,
-            dislikesCount: p.dislikes_count,
-            myStatus: myStatus,
-            newestLikes: threeLastLikes,
-          },
-        };
-      }),
-    );
-    console.log('allPosts', posts);
-
-    const totalCount = await this.dataSource.query(
-      `SELECT CAST(count(*) as INTEGER)
-FROM public."Posts"
-WHERE "blogId"=$1`,
-      [blogId],
-    );
-
-    const formatTotalCount = totalCount[0].count;
-
-    const pagesCount = Math.ceil(formatTotalCount / pagination.pageSize);
+    const pagesCount = Math.ceil(totalCount / pagination.pageSize);
 
     return {
       pagesCount: pagesCount,
       page: pagination.pageNumber,
       pageSize: pagination.pageSize,
-      totalCount: formatTotalCount,
+      totalCount: totalCount,
       items: allPosts,
     };
   }

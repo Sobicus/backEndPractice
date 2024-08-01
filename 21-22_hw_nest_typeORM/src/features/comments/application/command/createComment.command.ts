@@ -39,12 +39,12 @@ export class CreateCommentHandler
       createdAt: new Date().toISOString(),
       postId: post.id,
     };
-    const newCommentId =
-      await this.commentsRepository.createComment(newComment);
-    return {
-      status: statusType.Created,
-      statusMessages: 'Comment has been created',
-      data: newCommentId,
-    };
+    // const newCommentId =
+    //   await this.commentsRepository.createComment(newComment);
+    // return {
+    //   status: statusType.Created,
+    //   statusMessages: 'Comment has been created',
+    //   data: newCommentId,
+    // };
   }
 }

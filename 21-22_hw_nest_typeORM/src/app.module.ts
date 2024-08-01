@@ -145,7 +145,6 @@ const commands = [
         Sessions,
         PasswordRecovery,
         Blogs,
-        Posts,
       ],
     }),
     TypeOrmModule.forFeature([
@@ -155,7 +154,6 @@ const commands = [
       Sessions,
       PasswordRecovery,
       Blogs,
-      Posts,
     ]),
     ConfigModule.forRoot({
       load: [configuration],
