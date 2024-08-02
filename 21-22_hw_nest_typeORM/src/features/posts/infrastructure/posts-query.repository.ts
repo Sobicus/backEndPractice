@@ -22,82 +22,115 @@ export class PostsQueryRepository {
     userId?: string,
   ): Promise<PaginationPostsType> {
     const sortBy = `"${pagination.sortBy}"` ?? '"createdAt"';
-    const sortDirection = pagination.sortDirection === 'asc' ? 'asc' : 'desc';
-    const posts = await this.dataSource.query(
-      `SELECT p.*,
-	(SELECT CAST(count(*) as INTEGER)
-	FROM public."PostsLikes" as pl
-	WHERE p."id" = pl."postId" and "myStatus"='Like') as likes_count,
-	(SELECT CAST(count(*) as INTEGER)
-	FROM public."PostsLikes" as pl
-	WHERE p."id" = pl."postId" and "myStatus"='Dislike') as dislikes_count
-FROM public."Posts" as p
-ORDER BY ${sortBy} ${sortDirection}
-LIMIT $1 OFFSET $2`,
-      [pagination.pageSize, pagination.skip],
-    );
+    const sortDirection = pagination.sortDirection === 'asc' ? 'ASC' : 'DESC';
 
-    const allPosts = await Promise.all(
-      posts.map(async (p) => {
-        let myStatus = LikesStatusComments.None;
+    const postsData = await this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.blog', 'blog')
+      .select(['post.*', 'blog.name as "blogName"'])
+      .orderBy(
+        pagination.sortBy ? `"${pagination.sortBy}"` : '"createdAt"',
+        pagination.sortDirection === 'asc' ? 'ASC' : 'DESC',
+      )
+      .limit(pagination.pageSize)
+      .offset(pagination.skip)
+      .getRawMany();
 
-        if (userId) {
-          const reaction = await this.dataSource.query(
-            `SELECT *
-        FROM public."PostsLikes"
-        WHERE "userId"=$2 and "postId"=$1`,
-            [p.id, userId],
-          );
-          myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
-        }
+    const allPosts = postsData.map((p) => {
+      return {
+        id: p.id.toString(),
+        title: p.title,
+        shortDescription: p.shortDescription,
+        content: p.content,
+        blogId: p.blogId.toString(),
+        blogName: p.blogName,
+        createdAt: p.createdAt,
+        extendedLikesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: 'None',
+          newestLikes: [],
+        },
+      };
+    });
+    //     const posts = await this.dataSource.query(
+    //       `SELECT p.*,
+    // 	(SELECT CAST(count(*) as INTEGER)
+    // 	FROM public."PostsLikes" as pl
+    // 	WHERE p."id" = pl."postId" and "myStatus"='Like') as likes_count,
+    // 	(SELECT CAST(count(*) as INTEGER)
+    // 	FROM public."PostsLikes" as pl
+    // 	WHERE p."id" = pl."postId" and "myStatus"='Dislike') as dislikes_count
+    // FROM public."Posts" as p
+    // ORDER BY ${sortBy} ${sortDirection}
+    // LIMIT $1 OFFSET $2`,
+    //       [pagination.pageSize, pagination.skip],
+    //     );
 
-        const threeLikes = await this.dataSource.query(
-          `SELECT CAST("createdAt" as text),CAST("userId" as text), "login"
-FROM public."PostsLikes"
-WHERE "postId"=$1 AND "myStatus"='Like'
-ORDER BY "createdAt" DESC
-LIMIT 3 OFFSET 0
-`,
-          [p.id],
-        );
+    //     const allPosts = await Promise.all(
+    //       posts.map(async (p) => {
+    //         let myStatus = LikesStatusComments.None;
+    //
+    //         if (userId) {
+    //           const reaction = await this.dataSource.query(
+    //             `SELECT *
+    //         FROM public."PostsLikes"
+    //         WHERE "userId"=$2 and "postId"=$1`,
+    //             [p.id, userId],
+    //           );
+    //           myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
+    //         }
+    //
+    //         const threeLikes = await this.dataSource.query(
+    //           `SELECT CAST("createdAt" as text),CAST("userId" as text), "login"
+    // FROM public."PostsLikes"
+    // WHERE "postId"=$1 AND "myStatus"='Like'
+    // ORDER BY "createdAt" DESC
+    // LIMIT 3 OFFSET 0
+    // `,
+    //           [p.id],
+    //         );
+    //
+    //         const threeLastLikes = threeLikes.map((like) => {
+    //           return {
+    //             addedAt: like.createdAt,
+    //             userId: like.userId,
+    //             login: like.login,
+    //           };
+    //         });
+    //
+    //         return {
+    //           id: p.id.toString(),
+    //           title: p.title,
+    //           shortDescription: p.shortDescription,
+    //           content: p.content,
+    //           blogId: p.blogId.toString(),
+    //           blogName: p.blogName,
+    //           createdAt: p.createdAt,
+    //           extendedLikesInfo: {
+    //             likesCount: p.likes_count,
+    //             dislikesCount: p.dislikes_count,
+    //             myStatus: myStatus,
+    //             newestLikes: threeLastLikes,
+    //           },
+    //         };
+    //       }),
+    //     );
+    //     const totalCount = await this.dataSource
+    //       .query(`SELECT CAST(count(*) as INTEGER)
+    // FROM public."Posts"`);
+    //     const formatTotalCount = totalCount[0].count;
+    const totalCount = await this.postsRepository
+      .createQueryBuilder('post')
+      .getCount();
 
-        const threeLastLikes = threeLikes.map((like) => {
-          return {
-            addedAt: like.createdAt,
-            userId: like.userId,
-            login: like.login,
-          };
-        });
-
-        return {
-          id: p.id.toString(),
-          title: p.title,
-          shortDescription: p.shortDescription,
-          content: p.content,
-          blogId: p.blogId.toString(),
-          blogName: p.blogName,
-          createdAt: p.createdAt,
-          extendedLikesInfo: {
-            likesCount: p.likes_count,
-            dislikesCount: p.dislikes_count,
-            myStatus: myStatus,
-            newestLikes: threeLastLikes,
-          },
-        };
-      }),
-    );
-    const totalCount = await this.dataSource
-      .query(`SELECT CAST(count(*) as INTEGER)
-FROM public."Posts"`);
-    const formatTotalCount = totalCount[0].count;
-
-    const pagesCount = Math.ceil(formatTotalCount / pagination.pageSize);
+    const pagesCount = Math.ceil(totalCount / pagination.pageSize);
 
     return {
       pagesCount: pagesCount,
       page: pagination.pageNumber,
       pageSize: pagination.pageSize,
-      totalCount: formatTotalCount,
+      totalCount: totalCount,
       items: allPosts,
     };
   }
@@ -236,16 +269,20 @@ WHERE
     pagination: PaginationPostsOutputModelType,
     userId?: string,
   ): Promise<PaginationPostsType> {
-    const sortBy = `"${pagination.sortBy}"` ?? '"createdAt"';
+    const sortBy = pagination.sortBy ?? 'createdAt';
+    console.error(pagination, ' pagination');
     const sortDirection = pagination.sortDirection === 'asc' ? 'asc' : 'desc';
     const postData = await this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.blog', 'blog')
       .select(['post.*', 'blog.name as "blogName"'])
       .where('post.blogId = :blogId', { blogId })
-      .orderBy(sortBy, sortDirection === 'asc' ? 'ASC' : 'DESC')
-      .take(pagination.pageSize)
-      .skip(pagination.skip)
+      .orderBy(
+        pagination.sortBy ? `"${pagination.sortBy}"` : '"createdAt"',
+        sortDirection === 'asc' ? 'ASC' : 'DESC',
+      )
+      .limit(pagination.pageSize)
+      .offset(pagination.skip)
       .getRawMany();
 
     console.log(postData);

@@ -18,7 +18,7 @@ export class Users {
   id: number;
   @Column()
   email: string;
-  @Column({ collation: 'c' })
+  @Column({ collation: 'C' })
   login: string;
   @Column()
   passwordSalt: string;
