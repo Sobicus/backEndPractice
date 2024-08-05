@@ -1,8 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { statusType } from '../../../../base/oject-result';
+import { ObjectClassResult, statusType } from '../../../../base/oject-result';
 import { PostsRepository } from '../../../posts/infrastructure/posts.repository';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
+import { Comments } from '../../domain/comments.entity';
 
 export class CreateCommentCommand {
   constructor(
@@ -18,11 +19,12 @@ export class CreateCommentHandler
 {
   constructor(
     private postsRepository: PostsRepository,
-    private usersRepository: UsersRepository,
     private commentsRepository: CommentsRepository,
   ) {}
 
-  async execute(command: CreateCommentCommand) {
+  async execute(
+    command: CreateCommentCommand,
+  ): Promise<ObjectClassResult<number | null>> {
     const post = await this.postsRepository.getPostByPostId(command.postId);
     if (!post) {
       return {
@@ -31,20 +33,17 @@ export class CreateCommentHandler
         data: null,
       };
     }
-    const user = await this.usersRepository.getUserById(Number(command.userId));
-    const newComment = {
-      content: command.content,
-      userId: command.userId,
-      userLogin: user!.login,
-      createdAt: new Date().toISOString(),
-      postId: post.id,
+    const newComment = Comments.createComment(
+      command.content,
+      Number(command.userId),
+      post.id,
+    );
+    const newCommentId =
+      await this.commentsRepository.createComment(newComment);
+    return {
+      status: statusType.Created,
+      statusMessages: 'Comment has been created',
+      data: newCommentId,
     };
-    // const newCommentId =
-    //   await this.commentsRepository.createComment(newComment);
-    // return {
-    //   status: statusType.Created,
-    //   statusMessages: 'Comment has been created',
-    //   data: newCommentId,
-    // };
   }
 }

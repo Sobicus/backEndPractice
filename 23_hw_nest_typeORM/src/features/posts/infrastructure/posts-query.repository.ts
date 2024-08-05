@@ -7,7 +7,6 @@ import {
 } from '../api/models/output/post.output.model';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { LikesStatusComments } from '../../comments/api/models/input/comments-likesInfo.input.model';
 import { Posts } from '../domain/posts.entity';
 
 @Injectable()
@@ -27,7 +26,7 @@ export class PostsQueryRepository {
     const postsData = await this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.blog', 'blog')
-      .select(['post.*', 'blog.name as "blogName"'])
+      .select('post.*', 'blog.name as "blogName"')
       .orderBy(
         pagination.sortBy ? `"${pagination.sortBy}"` : '"createdAt"',
         pagination.sortDirection === 'asc' ? 'ASC' : 'DESC',
@@ -154,7 +153,7 @@ export class PostsQueryRepository {
       ])
       .where('post.id = :postId', { postId })
       .getRawOne();
-
+    console.log(postData);
     //     const post = await this.dataSource.query(
     //       `SELECT p.*,
     // (SELECT CAST(count(*) as INTEGER)
@@ -284,9 +283,6 @@ WHERE
       .limit(pagination.pageSize)
       .offset(pagination.skip)
       .getRawMany();
-
-    console.log(postData);
-
     const allPosts = postData.map((p) => {
       return {
         id: p.id.toString(),

@@ -81,6 +81,7 @@ import { Posts } from './features/posts/domain/posts.entity';
 import { Sessions } from './features/SecurityDevices/domain/sessions.entity';
 import { PasswordRecovery } from './features/auth/domain/passwordRecovery.entity';
 import { Blogs } from './features/blogs/domain/blogs.entity';
+import { Comments } from './features/comments/domain/comments.entity';
 
 const repositoriesSQL = [
   UsersRepository,
@@ -145,6 +146,7 @@ const commands = [
         Sessions,
         PasswordRecovery,
         Blogs,
+        Comments,
       ],
     }),
     TypeOrmModule.forFeature([
@@ -154,6 +156,7 @@ const commands = [
       Sessions,
       PasswordRecovery,
       Blogs,
+      Comments,
     ]),
     ConfigModule.forRoot({
       load: [configuration],

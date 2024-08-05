@@ -17,10 +17,8 @@ export class DeleteCommentHandler
 
   async execute(command: DeleteCommentCommand) {
     const comment = await this.commentsRepository.getCommentById(
-      command.commentId,
+      Number(command.commentId),
     );
-    console.log('command userID', command);
-    console.log('deleted comment', comment);
     if (!comment) {
       return {
         status: statusType.NotFound,
@@ -28,15 +26,15 @@ export class DeleteCommentHandler
         data: null,
       };
     }
-    //todo вот тут пришлось сделать +
-    if (comment.userId !== +command.userId) {
+    //todo вот тут пришлось сделать Number
+    if (comment.userId !== Number(command.userId)) {
       return {
         status: statusType.Forbidden,
         statusMessages: 'this comment does not belong for you ',
         data: null,
       };
     }
-    await this.commentsRepository.deleteComment(command.commentId);
+    await this.commentsRepository.deleteComment(Number(command.commentId));
     return {
       status: statusType.Success,
       statusMessages: 'Comments has been deleted',

@@ -4,10 +4,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Blogs } from '../../blogs/domain/blogs.entity';
+import { Comments } from 'src/features/comments/domain/comments.entity';
 
 @Entity()
 export class Posts {
@@ -30,6 +32,9 @@ export class Posts {
 
   @Column()
   blogId: number;
+
+  @OneToMany(() => Comments, (comments) => comments.post)
+  comments: Comments[];
 
   static createPost(
     title: string,

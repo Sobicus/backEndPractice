@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import {
   UserAuthMeDTO,
   UserOutputDTO,
-  UsersOutputDTO,
 } from '../api/models/output/users.output.module';
 import { PaginationUsersOutModelType } from '../../../base/helpers/pagination-users-helper';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';

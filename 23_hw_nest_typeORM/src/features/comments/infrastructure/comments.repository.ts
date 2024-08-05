@@ -1,29 +1,45 @@
 import { Injectable } from '@nestjs/common';
-import { InputCreateCommentModel } from '../api/models/input/comments.input.model';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { Comments } from '../domain/comments.entity';
 
 @Injectable()
 export class CommentsRepository {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() protected dataSource: DataSource,
+    @InjectRepository(Comments)
+    protected commentsRepository: Repository<Comments>,
+  ) {}
 
-  async getCommentById(commentId: string) {
-    const comment = await this.dataSource.query(
-      `SELECT *
-    FROM public."Comments"
-    WHERE "id"=$1`,
-      [commentId],
-    );
-    return comment[0];
+  async getCommentById(commentId: number): Promise<Comments | null> {
+    return await this.commentsRepository
+      .createQueryBuilder('comment')
+      .select()
+      .where('comment.id = :commentId', { commentId })
+      .getOne();
+    // const comment = await this.dataSource.query(
+    //   `SELECT *
+    // FROM public."Comments"
+    // WHERE "id"=$1`,
+    //   [commentId],
+    // );
+    // return comment[0];
   }
 
-  async deleteComment(commentId: string): Promise<void> {
-    await this.dataSource.query(
-      `DELETE FROM public."Comments"
-WHERE "id"=CAST($1 as INTEGER)`,
-      [commentId],
-    );
+  async deleteComment(commentId: number): Promise<void> {
+    console.log('deleteComment commentId', commentId);
+    await this.commentsRepository
+      .createQueryBuilder('comment')
+      .delete()
+      .where('comments.id = :commentId', { commentId })
+      .execute();
+    //     await this.dataSource.query(
+    //       `DELETE FROM public."Comments"
+    // WHERE "id"=CAST($1 as INTEGER)`,
+    //       [commentId],
+    //     );
   }
+
   a;
 
   async updateComment(commentId: string, content: string) {
@@ -35,23 +51,26 @@ WHERE "id"=$1`,
     );
   }
 
-  async createComment(newComment: InputCreateCommentModel): Promise<number> {
-    const comment = await this.dataSource.query(
-      `INSERT INTO public."Comments"(
-"content", "userId", "userLogin", "createdAt", "postId")
-VALUES ($1, $2, $3, $4, $5)
-RETURNING "id"`,
-      [
-        newComment.content,
-        newComment.userId,
-        newComment.userLogin,
-        newComment.createdAt,
-        newComment.postId,
-      ],
-    );
-
-    return comment[0].id;
+  async createComment(newComment: Comments): Promise<number> {
+    const comment = await this.commentsRepository.save(newComment);
+    return comment.id;
+    //     const comment = await this.dataSource.query(
+    //       `INSERT INTO public."Comments"(
+    // "content", "userId", "userLogin", "createdAt", "postId")
+    // VALUES ($1, $2, $3, $4, $5)
+    // RETURNING "id"`,
+    //       [
+    //         newComment.content,
+    //         newComment.userId,
+    //         newComment.userLogin,
+    //         newComment.createdAt,
+    //         newComment.postId,
+    //       ],
+    //     );
+    //
+    //     return comment[0].id;
   }
+
   async deleteAll() {
     await this.dataSource.query(`DELETE FROM public."Comments"`);
   }

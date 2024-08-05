@@ -11,6 +11,7 @@ import {
 import { EmailConfirmation } from './emailConfirmation.entity';
 import { Sessions } from '../../SecurityDevices/domain/sessions.entity';
 import { PasswordRecovery } from 'src/features/auth/domain/passwordRecovery.entity';
+import { Comments } from 'src/features/comments/domain/comments.entity';
 
 @Entity()
 export class Users {
@@ -38,8 +39,9 @@ export class Users {
   @OneToOne(() => PasswordRecovery, (passwordRecovery) => passwordRecovery.user)
   passwordRecovery: PasswordRecovery;
 
-  // @OneToMany(() => Posts, (posts) => posts.user)
-  // posts: Posts[];
+  @OneToMany(() => Comments, (comments) => comments.user)
+  comments: Comments[];
+
   static createUser(
     inputModel: UserInputModelType,
     passwordSalt: string,

@@ -18,7 +18,7 @@ export class UpdateCommentHandler
 
   async execute(command: UpdateCommentCommand) {
     const comment = await this.commentsRepository.getCommentById(
-      command.commentId,
+      Number(command.commentId),
     );
     if (!comment) {
       return {

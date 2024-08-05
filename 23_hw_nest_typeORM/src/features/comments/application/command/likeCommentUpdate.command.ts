@@ -23,7 +23,7 @@ export class LikeCommentUpdateHandler
 
   async execute(command: LikeCommentUpdateCommand) {
     const comment = await this.commentsRepository.getCommentById(
-      command.commentId,
+      Number(command.commentId),
     );
 
     if (!comment) {

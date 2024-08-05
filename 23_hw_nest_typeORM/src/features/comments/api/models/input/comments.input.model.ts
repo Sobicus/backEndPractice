@@ -52,7 +52,5 @@ export class InputUpdateCommentModel {
 export class InputCreateCommentModel {
   content: string;
   userId: number;
-  userLogin: string;
-  createdAt: string;
   postId: number;
 }
