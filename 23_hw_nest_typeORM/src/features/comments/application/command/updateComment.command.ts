@@ -28,7 +28,7 @@ export class UpdateCommentHandler
       };
     }
     //todo the same probleme with userID and type
-    if (comment.userId !== +command.userId) {
+    if (comment.userId !== Number(command.userId)) {
       return {
         status: statusType.Forbidden,
         statusMessages: 'this comment does not belong for you ',

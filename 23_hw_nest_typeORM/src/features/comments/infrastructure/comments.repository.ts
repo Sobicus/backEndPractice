@@ -43,12 +43,18 @@ export class CommentsRepository {
   a;
 
   async updateComment(commentId: string, content: string) {
-    await this.dataSource.query(
-      `UPDATE public."Comments"
-SET content=$2
-WHERE "id"=$1`,
-      [commentId, content],
-    );
+    await this.commentsRepository
+      .createQueryBuilder('comment')
+      .update()
+      .set({ content })
+      .where('comments.id = :commentId', { commentId })
+      .execute();
+    //     await this.dataSource.query(
+    //       `UPDATE public."Comments"
+    // SET content=$2
+    // WHERE "id"=$1`,
+    //       [commentId, content],
+    //     );
   }
 
   async createComment(newComment: Comments): Promise<number> {
