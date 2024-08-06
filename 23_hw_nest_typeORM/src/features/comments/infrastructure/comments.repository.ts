@@ -27,11 +27,10 @@ export class CommentsRepository {
   }
 
   async deleteComment(commentId: number): Promise<void> {
-    console.log('deleteComment commentId', commentId);
     await this.commentsRepository
-      .createQueryBuilder('comment')
+      .createQueryBuilder()
       .delete()
-      .where('comments.id = :commentId', { commentId })
+      .where('id = :commentId', { commentId })
       .execute();
     //     await this.dataSource.query(
     //       `DELETE FROM public."Comments"
@@ -49,12 +48,12 @@ export class CommentsRepository {
       .set({ content })
       .where('comments.id = :commentId', { commentId })
       .execute();
-    //     await this.dataSource.query(
-    //       `UPDATE public."Comments"
-    // SET content=$2
-    // WHERE "id"=$1`,
-    //       [commentId, content],
-    //     );
+    //--------------------------------------------------------------------
+    /*
+    or we can find  comment by id and update throw the save method
+    const updatedComment = { ...comment, content: command.content };
+    and sent to save method
+    */
   }
 
   async createComment(newComment: Comments): Promise<number> {

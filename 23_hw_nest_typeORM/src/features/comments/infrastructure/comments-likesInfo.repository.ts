@@ -3,50 +3,71 @@ import {
   CommentsLikesInfoInputModel,
   LikesStatusComments,
 } from '../api/models/input/comments-likesInfo.input.model';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { CommentsLikesInfo } from '../domain/comments-likesInfo.entity';
 
 @Injectable()
 export class CommentsLikesInfoRepository {
-  constructor(@InjectDataSource() protected dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() protected dataSource: DataSource,
+    @InjectRepository(CommentsLikesInfo)
+    protected commentsLikesInfoRepository: Repository<CommentsLikesInfo>,
+  ) {}
 
-  async createLikeInfoComment(
-    commentLikesInfoDTO: CommentsLikesInfoInputModel,
-  ) {
-    await this.dataSource.query(
-      `INSERT INTO public."CommentsLikes"(
-"commentId", "userId", "createdAt", "myStatus")
-VALUES ($1, $2, $3, $4)`,
-      [
-        commentLikesInfoDTO.commentId,
-        commentLikesInfoDTO.userId,
-        commentLikesInfoDTO.createdAt,
-        commentLikesInfoDTO.myStatus,
-      ],
-    );
+  async createLikeInfoComment(commentLikesInfoDTO: CommentsLikesInfo) {
+    await this.commentsLikesInfoRepository.save(commentLikesInfoDTO);
+    //     await this.dataSource.query(
+    //       `INSERT INTO public."CommentsLikes"(
+    // "commentId", "userId", "createdAt", "myStatus")
+    // VALUES ($1, $2, $3, $4)`,
+    //       [
+    //         commentLikesInfoDTO.commentId,
+    //         commentLikesInfoDTO.userId,
+    //         commentLikesInfoDTO.createdAt,
+    //         commentLikesInfoDTO.myStatus,
+    //       ],
+    //     );
   }
 
-  async findLikeInfoByCommentIdUserId(commentId: string, userId: string) {
-    const likeInfo = await this.dataSource.query(
-      `SELECT id, "commentId", "userId", "createdAt", "myStatus"
-FROM public."CommentsLikes"
-WHERE "commentId"=$1 and "userId"=$2`,
-      [commentId, userId],
-    );
-    return likeInfo[0];
+  async findLikeInfoByCommentIdUserId(
+    commentId: number,
+    userId: number,
+  ): Promise<CommentsLikesInfo | null> {
+    const data = await this.commentsLikesInfoRepository
+      .createQueryBuilder('commentLikesInfo')
+      //.select('commentLikesInfo.*')
+      .where('commentLikesInfo.commentId = :commentId', { commentId })
+      .andWhere('commentLikesInfo.userId = :userId', { userId })
+      .getOne();
+    return data;
+    //     const likeInfo = await this.dataSource.query(
+    //       `SELECT id, "commentId", "userId", "createdAt", "myStatus"
+    // FROM public."CommentsLikes"
+    // WHERE "commentId"=$1 and "userId"=$2`,
+    //       [commentId, userId],
+    //     );
+    //     return likeInfo[0];
   }
 
   async updateLikeInfoComment(
-    commentId: string,
+    commentId: number,
     likeStatus: LikesStatusComments,
-    userId: string,
+    userId: number,
   ) {
-    await this.dataSource.query(
-      `UPDATE public."CommentsLikes"
-SET "myStatus"=$2
-WHERE "commentId"=$1 and "userId"=$3`,
-      [commentId, likeStatus, userId],
-    );
+    await this.commentsLikesInfoRepository
+      .createQueryBuilder('commentsLikesInfo')
+      .update()
+      .set({ myStatus: likeStatus })
+      .where('commentsLikesInfo.commentId = :commentId', { commentId })
+      .andWhere('commentsLikesInfo.userId = :userId', { userId })
+      .execute();
+    //     await this.dataSource.query(
+    //       `UPDATE public."CommentsLikes"
+    // SET "myStatus"=$2
+    // WHERE "commentId"=$1 and "userId"=$3`,
+    //       [commentId, likeStatus, userId],
+    //     );
   }
 
   async deleteAll() {

@@ -3,6 +3,7 @@ import { statusType } from '../../../../base/oject-result';
 import { LikesStatusComments } from '../../api/models/input/comments-likesInfo.input.model';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { CommentsLikesInfoRepository } from '../../infrastructure/comments-likesInfo.repository';
+import { CommentsLikesInfo } from '../../domain/comments-likesInfo.entity';
 
 export class LikeCommentUpdateCommand {
   constructor(
@@ -35,16 +36,15 @@ export class LikeCommentUpdateHandler
     }
     const existingReaction =
       await this.commentsLikesInfoRepository.findLikeInfoByCommentIdUserId(
-        command.commentId,
-        command.userId,
+        Number(command.commentId),
+        Number(command.userId),
       );
     if (!existingReaction) {
-      const newCommentLikeInfo = {
-        commentId: command.commentId,
-        userId: command.userId,
-        createdAt: new Date().toISOString(),
-        myStatus: command.likeStatus,
-      };
+      const newCommentLikeInfo = CommentsLikesInfo.createCommentLikesInfo(
+        Number(command.userId),
+        Number(command.commentId),
+        command.likeStatus,
+      );
       await this.commentsLikesInfoRepository.createLikeInfoComment(
         newCommentLikeInfo,
       );
@@ -61,11 +61,18 @@ export class LikeCommentUpdateHandler
         data: null,
       };
     } else {
-      await this.commentsLikesInfoRepository.updateLikeInfoComment(
-        command.commentId,
-        command.likeStatus,
-        command.userId,
+      const updateExistingReaction = {
+        ...existingReaction,
+        myStatus: command.likeStatus,
+      };
+      await this.commentsLikesInfoRepository.createLikeInfoComment(
+        updateExistingReaction,
       );
+      // await this.commentsLikesInfoRepository.updateLikeInfoComment(
+      //   Number(command.commentId),
+      //   command.likeStatus,
+      //   Number(command.userId),
+      // );
       return {
         status: statusType.Success,
         statusMessages: 'comment likes has been changed',

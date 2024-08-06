@@ -26,10 +26,12 @@ export class PostsQueryRepository {
     const postsData = await this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.blog', 'blog')
-      .select('post.*', 'blog.name as "blogName"')
+      .select(['post.*', 'blog.name as "blogName"'])
       .orderBy(
-        pagination.sortBy ? `"${pagination.sortBy}"` : '"createdAt"',
-        pagination.sortDirection === 'asc' ? 'ASC' : 'DESC',
+        sortBy,
+        sortDirection,
+        // pagination.sortBy ? `"${pagination.sortBy}"` : '"createdAt"',
+        // pagination.sortDirection === 'asc' ? 'ASC' : 'DESC',
       )
       .limit(pagination.pageSize)
       .offset(pagination.skip)

@@ -6,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -35,11 +36,11 @@ export class Comments {
   @Column()
   postId: number;
 
-  @OneToOne(
+  @OneToMany(
     () => CommentsLikesInfo,
     (commentsLikesInfo) => commentsLikesInfo.comment,
   )
-  commentLikesInfo: CommentsLikesInfo;
+  commentLikesInfo: CommentsLikesInfo[];
 
   static createComment(content: string, userId: number, postId: number) {
     const comment = new Comments();

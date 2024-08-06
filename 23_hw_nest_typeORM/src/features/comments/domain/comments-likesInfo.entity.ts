@@ -4,14 +4,16 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToOne,
-  PrimaryColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Comments } from './comments.entity';
 
 @Entity()
 export class CommentsLikesInfo {
+  @PrimaryGeneratedColumn()
+  id: number;
   @Column()
   userId: number;
   @CreateDateColumn({ type: 'timestamp with time zone' })
@@ -20,9 +22,22 @@ export class CommentsLikesInfo {
   updatedAt: Date;
   @Column()
   myStatus: LikesStatusComments;
-  @OneToOne(() => Comments, (comments) => comments.commentLikesInfo)
+
+  @ManyToOne(() => Comments, (comments) => comments.commentLikesInfo)
   @JoinColumn({ name: 'commentId' })
   comment: Comments;
-  @PrimaryColumn()
+  @Column()
   commentId: number;
+
+  static createCommentLikesInfo(
+    userId: number,
+    commentId: number,
+    myStatus: LikesStatusComments,
+  ) {
+    const commentLikesInfo = new CommentsLikesInfo();
+    commentLikesInfo.userId = userId;
+    commentLikesInfo.commentId = commentId;
+    commentLikesInfo.myStatus = myStatus;
+    return commentLikesInfo;
+  }
 }
