@@ -12,6 +12,7 @@ import { EmailConfirmation } from './emailConfirmation.entity';
 import { Sessions } from '../../SecurityDevices/domain/sessions.entity';
 import { PasswordRecovery } from 'src/features/auth/domain/passwordRecovery.entity';
 import { Comments } from 'src/features/comments/domain/comments.entity';
+import { CommentsLikesInfo } from '../../comments/domain/comments-likesInfo.entity';
 
 @Entity()
 export class Users {
@@ -42,6 +43,8 @@ export class Users {
   @OneToMany(() => Comments, (comments) => comments.user)
   comments: Comments[];
 
+  @OneToMany(() => Comments, (comments) => comments.user)
+  commentsLikesInfo: CommentsLikesInfo[];
   static createUser(
     inputModel: UserInputModelType,
     passwordSalt: string,

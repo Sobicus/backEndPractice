@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  CommentsLikesInfoInputModel,
-  LikesStatusComments,
-} from '../api/models/input/comments-likesInfo.input.model';
+import { LikesStatusComments } from '../api/models/input/comments-likesInfo.input.model';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { CommentsLikesInfo } from '../domain/comments-likesInfo.entity';
@@ -56,11 +53,11 @@ export class CommentsLikesInfoRepository {
     userId: number,
   ) {
     await this.commentsLikesInfoRepository
-      .createQueryBuilder('commentsLikesInfo')
+      .createQueryBuilder()
       .update()
       .set({ myStatus: likeStatus })
-      .where('commentsLikesInfo.commentId = :commentId', { commentId })
-      .andWhere('commentsLikesInfo.userId = :userId', { userId })
+      .where('commentId = :commentId', { commentId })
+      .andWhere('userId = :userId', { userId })
       .execute();
     //     await this.dataSource.query(
     //       `UPDATE public."CommentsLikes"

@@ -65,14 +65,14 @@ export class LikeCommentUpdateHandler
         ...existingReaction,
         myStatus: command.likeStatus,
       };
-      await this.commentsLikesInfoRepository.createLikeInfoComment(
-        updateExistingReaction,
-      );
-      // await this.commentsLikesInfoRepository.updateLikeInfoComment(
-      //   Number(command.commentId),
-      //   command.likeStatus,
-      //   Number(command.userId),
+      // await this.commentsLikesInfoRepository.createLikeInfoComment(
+      //   updateExistingReaction,
       // );
+      await this.commentsLikesInfoRepository.updateLikeInfoComment(
+        Number(command.commentId),
+        command.likeStatus,
+        Number(command.userId),
+      );
       return {
         status: statusType.Success,
         statusMessages: 'comment likes has been changed',
