@@ -90,7 +90,7 @@ export class CommentsQueryRepository {
   async getCommentsByPostId(
     postId: string,
     pagination: PaginationCommentsOutputModelType,
-    userId?: string,
+    userId?: number,
   ): Promise<CommentsOutputModel> {
     //const sortBy = `"${pagination.sortBy}"` ?? '"createdAt"';
     const sortBy = pagination.sortBy
@@ -107,29 +107,30 @@ export class CommentsQueryRepository {
         'user.login',
       ])
       .leftJoin('comment.user', 'user')
-      // .addSelect((qb) => {
-      //   return qb
-      //     .select('COUNT(commentLikesInfoLike.id)')
-      //     .from(CommentsLikesInfo, 'commentLikesInfoLike')
-      //     .where('commentLikesInfoLike.commentId = comment.id')
-      //     .andWhere('commentLikesInfoLike.myStatus = :like', { like: 'Like' })
-      //     .groupBy('commentLikesInfoLike.commentId');
-      // }, 'likesCount')
-      // .addSelect((qb) => {
-      //   return qb
-      //     .select('COUNT(commentLikesInfoDislike.id')
-      //     .from(CommentsLikesInfo, 'commentLikesInfoDislike')
-      //     .where('commentLikesInfoDislike.commentId = comment.id')
-      //     .andWhere('commentLikesInfoDislike.myStatus = :dislike', {
-      //       dislike: 'Dislike',
-      //     })
-      //     .groupBy('commentLikesInfoDislike.commentId');
-      // }, 'dislikesCount')
+      .addSelect((qb) => {
+        return qb
+          .select('COUNT(Like.id)')
+          .from(CommentsLikesInfo, 'Like')
+          .where('Like.commentId = comment.id')
+          .andWhere('Like.myStatus = :like', { like: 'Like' });
+        //.groupBy('Like.commentId');
+      }, 'likesCount')
+      .addSelect((qb) => {
+        return qb
+          .select('COUNT(Dislike.id)')
+          .from(CommentsLikesInfo, 'Dislike')
+          .where('Dislike.commentId = comment.id')
+          .andWhere('Dislike.myStatus = :dislike', {
+            dislike: 'Dislike',
+          });
+        // .groupBy('Dislike.commentId');
+      }, 'dislikesCount')
       .where('comment.postId = :postId', { postId })
       .orderBy(sortBy, sortDirection)
       .offset(pagination.skip)
       .limit(pagination.pageSize)
       .getRawMany();
+
     const commentsIds = commentsData.map((comment) => comment.comment_id);
     const commentsLikeInfo = await this.commentsLikesInfoRepository
       .createQueryBuilder('commentLikesInfo')
@@ -138,50 +139,23 @@ export class CommentsQueryRepository {
         'commentLikesInfo.userId',
         'commentLikesInfo.myStatus',
       ])
-      .where('commentLikesInfo.commentId IN (:...commentsIds)', { commentsIds })
+      .where('commentLikesInfo.commentId IN (:...commentsIds)', {
+        commentsIds,
+      })
+      .andWhere('commentLikesInfo.commentId IN (:...commentsIds)', { userId })
       .getRawMany();
 
     const allComments = commentsData.map((comment) => {
-      const like = 0;
-      const dislike = 0;
-
-      const myStatus = LikesStatusComments.None;
-
-      // if (userId) {
-      //   if (userId === comment.comment_userId) {
-      //   }
-      //   const reaction = await this.dataSource.query(
-      //     `SELECT *
-      //         FROM public."CommentsLikes"
-      //         WHERE "commentId"=${comment.id} and "userId"=$1`,
-      //     [userId],
-      //   );
-      //   myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
-      // }
-
-      commentsLikeInfo.map((l) => {
-        if (l.commentLikesInfo_userId === userId) {
-          myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
-        }
-        if (
-          l.commentLikesInfo_commentId === comment.comment_id &&
-          l.commentLikesInfo_myStatus === 'Like'
-        ) {
-          like++;
-          console.log('Like 123123123');
-        }
-      });
-      commentsLikeInfo.map((d) => {
-        if (
-          d.commentLikesInfo_commentId === comment.comment_id &&
-          d.commentLikesInfo_myStatus === 'Dislike'
-        ) {
-          dislike++;
-          console.log('Dislike 123123123');
-          console.log('Dislike 123123123', dislike);
-        }
-      });
-      console.log('dislike', dislike);
+      let myStatus = LikesStatusComments.None;
+      if (userId) {
+        const myReaction = commentsLikeInfo.find(
+          (com) =>
+            com.commentLikesInfo_userId === userId &&
+            com.commentLikesInfo_commentId === comment.comment_id,
+        );
+        console.log('myReaction if user', myReaction);
+        myStatus = myReaction ? myReaction.commentLikesInfo_myStatus : myStatus;
+      }
       return {
         id: comment.comment_id.toString(),
         content: comment.comment_content,
@@ -191,9 +165,9 @@ export class CommentsQueryRepository {
         },
         createdAt: comment.comment_createdAt,
         likesInfo: {
-          likesCount: like,
-          dislikesCount: dislike,
-          myStatus: 'None',
+          likesCount: comment.likesCount,
+          dislikesCount: comment.dislikesCount,
+          myStatus: myStatus,
         },
       };
     });
@@ -211,66 +185,5 @@ export class CommentsQueryRepository {
       totalCount: totalCount,
       items: allComments,
     };
-    //     const comments = await this.dataSource.query(
-    //       `SELECT c.*,
-    // (SELECT CAST(count(*) as INTEGER)
-    // FROM public."CommentsLikes" as cl
-    // WHERE c."id"=cl."commentId" and cl."myStatus" ILIKE 'Like') as likes_count,
-    // (SELECT CAST(count(*) as INTEGER)
-    // FROM public."CommentsLikes" as cl
-    // WHERE c."id"=cl."commentId" and cl."myStatus" ILIKE 'Dislike') as dislikes_count
-    // FROM public."Comments" as c
-    // WHERE "postId"=$1
-    // ORDER BY ${sortBy} ${sortDirection}
-    // LIMIT $2 OFFSET $3`,
-    //       [postId, pagination.pageSize, pagination.skip],
-    //     );
-    //     const allComments = await Promise.all(
-    //       comments.map(async (comment) => {
-    //         let myStatus = LikesStatusComments.None;
-    //
-    //         if (userId) {
-    //           const reaction = await this.dataSource.query(
-    //             `SELECT *
-    //         FROM public."CommentsLikes"
-    //         WHERE "commentId"=${comment.id} and "userId"=$1`,
-    //             [userId],
-    //           );
-    //           myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
-    //         }
-    //
-    //         return {
-    //           id: comment.id.toString(),
-    //           content: comment.content,
-    //           commentatorInfo: {
-    //             userId: comment.userId.toString(),
-    //             userLogin: comment.userLogin,
-    //           },
-    //           createdAt: comment.createdAt,
-    //           likesInfo: {
-    //             likesCount: comment.likes_count,
-    //             dislikesCount: comment.dislikes_count,
-    //             myStatus: myStatus,
-    //           },
-    //         };
-    //       }),
-    //     );
-    //
-    //     const totalCount = await this.dataSource.query(
-    //       `SELECT CAST(count(*) as INTEGER)
-    //       FROM public."Comments"
-    //             WHERE "postId"=$1`,
-    //       [postId],
-    //     );
-    //     const formatTotalCount = totalCount[0].count;
-    //
-    //     const pagesCount = Math.ceil(formatTotalCount / pagination.pageSize);
-    //     return {
-    //       pagesCount: pagesCount,
-    //       page: pagination.pageNumber,
-    //       pageSize: pagination.pageSize,
-    //       totalCount: formatTotalCount,
-    //       items: allComments,
-    //     };
   }
 }
