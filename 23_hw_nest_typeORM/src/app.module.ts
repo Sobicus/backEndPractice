@@ -83,6 +83,7 @@ import { PasswordRecovery } from './features/auth/domain/passwordRecovery.entity
 import { Blogs } from './features/blogs/domain/blogs.entity';
 import { Comments } from './features/comments/domain/comments.entity';
 import { CommentsLikesInfo } from './features/comments/domain/comments-likesInfo.entity';
+import { PostsLikesInfo } from './features/posts/domain/posts-likesInfo.entity';
 
 const repositoriesSQL = [
   UsersRepository,
@@ -149,6 +150,7 @@ const commands = [
         Blogs,
         Comments,
         CommentsLikesInfo,
+        PostsLikesInfo,
       ],
     }),
     TypeOrmModule.forFeature([
@@ -160,6 +162,7 @@ const commands = [
       Blogs,
       Comments,
       CommentsLikesInfo,
+      PostsLikesInfo,
     ]),
     ConfigModule.forRoot({
       load: [configuration],

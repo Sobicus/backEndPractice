@@ -53,6 +53,13 @@ export class CommentsQueryRepository {
           })
           .groupBy('commentLikesInfoDislike.commentId');
       }, 'dislikesCount')
+      // .addSelect([
+      //   'comment.id',
+      //   'comment.content',
+      //   'user.login',
+      //   'comment.createdAt',
+      //   'comment.userId',
+      // ])
       .where('comment.id = :commentsId', { commentsId })
       .getRawOne();
     console.log('commentData', commentData);
@@ -153,7 +160,6 @@ export class CommentsQueryRepository {
             com.commentLikesInfo_userId === userId &&
             com.commentLikesInfo_commentId === comment.comment_id,
         );
-        console.log('myReaction if user', myReaction);
         myStatus = myReaction ? myReaction.commentLikesInfo_myStatus : myStatus;
       }
       return {

@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Blogs } from '../../blogs/domain/blogs.entity';
 import { Comments } from 'src/features/comments/domain/comments.entity';
+import { PostsLikesInfo } from './posts-likesInfo.entity';
 
 @Entity()
 export class Posts {
@@ -35,6 +36,9 @@ export class Posts {
 
   @OneToMany(() => Comments, (comments) => comments.post)
   comments: Comments[];
+
+  @OneToMany(() => PostsLikesInfo, (postsLikesInfo) => postsLikesInfo.post)
+  postsLikesInfo: PostsLikesInfo[];
 
   static createPost(
     title: string,

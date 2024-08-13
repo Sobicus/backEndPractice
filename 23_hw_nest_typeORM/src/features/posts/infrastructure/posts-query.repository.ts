@@ -142,33 +142,23 @@ export class PostsQueryRepository {
   ): Promise<PostOutputModelType | null> {
     const postData = await this.postsRepository
       .createQueryBuilder('post')
-      .leftJoinAndSelect('post.blog', 'blog')
+      .leftJoin('post.blog', 'blog')
       .select([
-        // 'post.id',
-        // 'post.title',
-        // 'post.shortDescription',
-        // 'post.content',
-        // 'post.blogId',
-        'post.*',
+        'post.id',
+        'post.title',
+        'post.shortDescription',
+        'post.content',
+        'post.blogId',
         'blog.name as "blogName"',
-        //'post.createdAt',
+        'post.createdAt',
       ])
+      .addSelect((qb) => {
+        return qb.select().from().where().andWhere();
+      })
       .where('post.id = :postId', { postId })
       .getRawOne();
     console.log(postData);
-    //     const post = await this.dataSource.query(
-    //       `SELECT p.*,
-    // (SELECT CAST(count(*) as INTEGER)
-    // FROM public."PostsLikes" as pl
-    // WHERE p."id" = pl."postId" and "myStatus"='Like') as likes_count,
-    // (SELECT CAST(count(*) as INTEGER)
-    // FROM public."PostsLikes" as pl
-    // WHERE p."id" = pl."postId" and "myStatus"='Dislike') as dislikes_count
-    // FROM public."Posts" as p
-    // WHERE "id"=$1`,
-    //       [postId],
-    //     );
-    //     const postData = post[0];
+
     if (!postData) {
       return null;
     }
@@ -214,55 +204,6 @@ export class PostsQueryRepository {
         newestLikes: [],
       },
     };
-
-    //------------------------------------------
-    /*
-    SELECT
-    p."id",
-    p."title",
-    p."shortDescription",
-    p."content",
-    p."blogId",
-    p."blogName",
-    p."createdAt",
-    JSON_BUILD_OBJECT(
-        'likesCount', COALESCE(likes_count, 0),
-        'dislikesCount', COALESCE(dislikes_count, 0),
-        'myStatus', 'None', -- Здесь можно указать статус, если он известен
-        'newestLikes', COALESCE(newest_likes, '[]'::json)
-    ) AS "extendedLikesInfo"
-FROM
-    public."Posts" p
-LEFT JOIN (
-    SELECT
-        "postId",
-        COUNT(*) FILTER (WHERE "myStatus" = 'Like') AS likes_count,
-        COUNT(*) FILTER (WHERE "myStatus" = 'Dislike') AS dislikes_count,
-        (
-            SELECT JSON_AGG(
-                JSON_BUILD_OBJECT(
-                    'addedAt', "createdAt",
-                    'userId', "userId",
-                    'login', "login"
-                )
-            )
-            FROM (
-                SELECT "createdAt", "userId", "login"
-                FROM public."PostsLikes"
-                WHERE "postId" = pl."postId" AND "myStatus" = 'Like'
-                ORDER BY "createdAt" DESC
-                LIMIT 3
-            ) subquery
-        ) AS newest_likes
-    FROM
-        public."PostsLikes" pl
-    GROUP BY
-        "postId"
-) pl ON p."id" = pl."postId"
-WHERE
-    p."id" = 594;
-    */
-    //------------------------------------------
   }
 
   async getPostByBlogId(

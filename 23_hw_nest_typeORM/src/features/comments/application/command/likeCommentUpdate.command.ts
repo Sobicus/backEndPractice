@@ -61,13 +61,6 @@ export class LikeCommentUpdateHandler
         data: null,
       };
     } else {
-      const updateExistingReaction = {
-        ...existingReaction,
-        myStatus: command.likeStatus,
-      };
-      // await this.commentsLikesInfoRepository.createLikeInfoComment(
-      //   updateExistingReaction,
-      // );
       await this.commentsLikesInfoRepository.updateLikeInfoComment(
         Number(command.commentId),
         command.likeStatus,

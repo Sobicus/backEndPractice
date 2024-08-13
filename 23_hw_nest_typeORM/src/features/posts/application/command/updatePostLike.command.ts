@@ -4,6 +4,7 @@ import { LikesStatusPosts } from '../../api/models/input/posts-likesInfo.input.m
 import { PostsLikesInfoRepository } from '../../infrastructure/posts-likesInfo.repository';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { PostsLikesInfo } from '../../domain/posts-likesInfo.entity';
 
 export class UpdatePostLikeCommand {
   constructor(
@@ -25,6 +26,7 @@ export class UpdatePostLikeHandler
 
   async execute(command: UpdatePostLikeCommand) {
     const post = await this.postsRepository.getPostByPostId(command.postId);
+    console.log('UpdatePostLikeHandler post ', post);
     if (!post) {
       return {
         status: statusType.NotFound,
@@ -32,21 +34,29 @@ export class UpdatePostLikeHandler
         data: null,
       };
     }
+    //todo why i try find user by id if i have userId
     const user = await this.usersRepository.getUserById(Number(command.userId));
+    console.log('UpdatePostLikeHandler user ', user);
     const existingReaction =
       await this.postsLikesInfoRepository.findLikeInfoByPostIdUserId(
-        command.postId,
-        command.userId,
+        Number(command.postId),
+        Number(command.userId),
       );
+    console.log('UpdatePostLikeHandler existingReaction', existingReaction);
     if (!existingReaction) {
-      const newPostLikesInfo = {
-        postId: command.postId,
-        userId: command.userId,
-        login: user!.login,
-        createdAt: new Date().toISOString(),
-        myStatus: command.likeStatus,
-      };
-      await this.postsLikesInfoRepository.createLikeInfoPost(newPostLikesInfo);
+      const newPostLikeInfo = PostsLikesInfo.createPostLikesinfo(
+        Number(command.userId),
+        Number(command.postId),
+        command.likeStatus,
+      );
+      // const newPostLikesInfo = {
+      //   postId: command.postId,
+      //   userId: command.userId,
+      //   login: user!.login,
+      //   createdAt: new Date().toISOString(),
+      //   myStatus: command.likeStatus,
+      // };
+      await this.postsLikesInfoRepository.createLikeInfoPost(newPostLikeInfo);
       return {
         status: statusType.Created,
         statusMessages: 'Post likes has been created',
@@ -60,11 +70,18 @@ export class UpdatePostLikeHandler
         data: null,
       };
     } else {
-      await this.postsLikesInfoRepository.updateLikeInfoPost(
-        command.postId,
-        command.userId,
-        command.likeStatus,
+      const updatePostReaction = {
+        ...existingReaction,
+        myStatus: command.likeStatus,
+      };
+      await this.postsLikesInfoRepository.createLikeInfoPost(
+        updatePostReaction,
       );
+      // await this.postsLikesInfoRepository.updateLikeInfoPost(
+      //   command.postId,
+      //   command.userId,
+      //   command.likeStatus,
+      // );
       return {
         status: statusType.Success,
         statusMessages: 'Post likes the same',

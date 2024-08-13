@@ -13,6 +13,7 @@ import { Sessions } from '../../SecurityDevices/domain/sessions.entity';
 import { PasswordRecovery } from 'src/features/auth/domain/passwordRecovery.entity';
 import { Comments } from 'src/features/comments/domain/comments.entity';
 import { CommentsLikesInfo } from '../../comments/domain/comments-likesInfo.entity';
+import { PostsLikesInfo } from 'src/features/posts/domain/posts-likesInfo.entity';
 
 @Entity()
 export class Users {
@@ -45,6 +46,10 @@ export class Users {
 
   @OneToMany(() => Comments, (comments) => comments.user)
   commentsLikesInfo: CommentsLikesInfo[];
+
+  @OneToMany(() => PostsLikesInfo, (postsLikesInfo) => postsLikesInfo.user)
+  postsLikesInfo: PostsLikesInfo[];
+
   static createUser(
     inputModel: UserInputModelType,
     passwordSalt: string,
