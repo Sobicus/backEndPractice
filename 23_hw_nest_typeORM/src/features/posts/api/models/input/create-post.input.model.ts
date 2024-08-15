@@ -28,6 +28,12 @@ export class PostChangeParam {
   @IsString()
   postId: string;
 }
+
+export type IPost = {
+  title: string;
+  shortDescription: string;
+  content: string;
+};
 export class PostChangeBody {
   @Trim()
   @Length(1, 30)

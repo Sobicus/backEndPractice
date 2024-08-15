@@ -27,12 +27,16 @@ export class TestingAllDataController {
   @Delete()
   @HttpCode(204)
   async deleteAllBD() {
+    await this.dataSource.query('DELETE FROM posts_likes_info');
+    await this.dataSource.query('DELETE FROM comments_likes_info');
     await this.dataSource.query('DELETE FROM password_recovery');
     await this.dataSource.query('DELETE FROM sessions');
     await this.dataSource.query('DELETE FROM email_confirmation');
-    await this.dataSource.query('DELETE FROM users');
+    await this.dataSource.query('DELETE FROM comments');
     await this.dataSource.query('DELETE FROM posts');
     await this.dataSource.query('DELETE FROM blogs');
+    await this.dataSource.query('DELETE FROM users');
+
     //await this.commentsLikesInfoRepositorySQL.deleteAll();
     //await this.postsLikesInfoRepositorySQL.deleteAll();
     //await this.passwordRecoveryRepositorySQL.deleteAll();

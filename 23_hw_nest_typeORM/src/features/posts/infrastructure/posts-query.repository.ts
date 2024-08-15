@@ -8,36 +8,102 @@ import {
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Posts } from '../domain/posts.entity';
+import { PostsLikesInfo } from '../domain/posts-likesInfo.entity';
+import { LikesStatusPosts } from '../api/models/input/posts-likesInfo.input.model';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectDataSource() protected dataSource: DataSource,
-    @InjectRepository(Posts) protected postsRepository: Repository<Posts>,
+    @InjectRepository(Posts)
+    protected postsRepository: Repository<Posts>,
+    @InjectRepository(PostsLikesInfo)
+    protected postsLikesInfoRepository: Repository<PostsLikesInfo>,
   ) {}
 
   async getAllPosts(
     pagination: PaginationPostsOutputModelType,
     userId?: string,
-  ): Promise<PaginationPostsType> {
+  ) /*: Promise<PaginationPostsType>*/ {
     const sortBy = `"${pagination.sortBy}"` ?? '"createdAt"';
     const sortDirection = pagination.sortDirection === 'asc' ? 'ASC' : 'DESC';
 
+    //all posts with likes and dislikes
     const postsData = await this.postsRepository
       .createQueryBuilder('post')
-      .leftJoinAndSelect('post.blog', 'blog')
       .select(['post.*', 'blog.name as "blogName"'])
-      .orderBy(
-        sortBy,
-        sortDirection,
-        // pagination.sortBy ? `"${pagination.sortBy}"` : '"createdAt"',
-        // pagination.sortDirection === 'asc' ? 'ASC' : 'DESC',
-      )
+      .leftJoin('post.blog', 'blog')
+      .addSelect((qb) => {
+        return qb
+          .select('COUNT(like.id)')
+          .from(PostsLikesInfo, 'like')
+          .where('like.postId = post.id')
+          .andWhere('like.myStatus = :like', { like: 'Like' });
+      }, 'likesCount')
+      .addSelect((qb) => {
+        return qb
+          .select('COUNT(dislike.id)')
+          .from(PostsLikesInfo, 'dislike')
+          .where('dislike.postId = post.id')
+          .andWhere('dislike.myStatus = :dislike', { dislike: 'Dislike' });
+      }, 'dislikesCount')
+      .orderBy(sortBy, sortDirection)
       .limit(pagination.pageSize)
       .offset(pagination.skip)
       .getRawMany();
+    //take all postsId from postData
+    const postsIds = postsData.map((p) => p.id);
+    console.log('getAllPosts postsIds', postsIds);
+    //get 3 last likes by postsIds
+    const postsLikesInfo = await this.postsLikesInfoRepository
+      .createQueryBuilder('postsLikesInfo')
+      .select([
+        'postsLikesInfo.createdAt as "addedAt"',
+        'postsLikesInfo.userId as "userId"',
+        'postsLikesInfo.postId as "postId"',
+        'user.login as "login"',
+      ])
+      .leftJoin('postsLikesInfo.user', 'user')
+      .where('postsLikesInfo.postId IN (:...postsIds)', { postsIds })
+      .andWhere('postsLikesInfo.myStatus = :like', { like: 'Like' })
+      .orderBy('postsLikesInfo.createdAt', 'DESC')
+      //.limit(3)
+      .getRawMany();
+    console.log('getAllPosts postsLikesInfo', postsLikesInfo);
 
+    const allPostsLikesInfo = await this.postsLikesInfoRepository
+      .createQueryBuilder('postsLikesInfo')
+      .select([
+        'postsLikesInfo.createdAt',
+        'postsLikesInfo.userId',
+        'postsLikesInfo.postId',
+        'user.login',
+      ])
+      .leftJoin('postsLikesInfo.user', 'user')
+      .where('postsLikesInfo.postId IN (:...postsIds)', { postsIds })
+      .andWhere('postsLikesInfo.userId = :userId', { userId })
+      .getRawMany();
     const allPosts = postsData.map((p) => {
+      let myStatus = LikesStatusPosts.None;
+      if (userId) {
+        const reaction = allPostsLikesInfo.find(
+          (like) =>
+            like.postsLikesInfo_postId === p.id &&
+            like.postsLikesInfo_userId === +userId,
+        );
+        myStatus = reaction ? LikesStatusPosts.Like : myStatus;
+      }
+      const newsLikes = postsLikesInfo
+        .filter((like) => like.postId === p.id)
+        .slice(0, 3)
+        .map((like) => {
+          return {
+            addedAt: like.addedAt,
+            login: like.login,
+            userId: like.userId.toString(),
+          };
+        });
+      console.log('getAllPosts newsLikes', newsLikes);
       return {
         id: p.id.toString(),
         title: p.title,
@@ -47,80 +113,13 @@ export class PostsQueryRepository {
         blogName: p.blogName,
         createdAt: p.createdAt,
         extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'None',
-          newestLikes: [],
+          likesCount: Number(p.likesCount),
+          dislikesCount: Number(p.dislikesCount),
+          myStatus: myStatus,
+          newestLikes: newsLikes,
         },
       };
     });
-    //     const posts = await this.dataSource.query(
-    //       `SELECT p.*,
-    // 	(SELECT CAST(count(*) as INTEGER)
-    // 	FROM public."PostsLikes" as pl
-    // 	WHERE p."id" = pl."postId" and "myStatus"='Like') as likes_count,
-    // 	(SELECT CAST(count(*) as INTEGER)
-    // 	FROM public."PostsLikes" as pl
-    // 	WHERE p."id" = pl."postId" and "myStatus"='Dislike') as dislikes_count
-    // FROM public."Posts" as p
-    // ORDER BY ${sortBy} ${sortDirection}
-    // LIMIT $1 OFFSET $2`,
-    //       [pagination.pageSize, pagination.skip],
-    //     );
-
-    //     const allPosts = await Promise.all(
-    //       posts.map(async (p) => {
-    //         let myStatus = LikesStatusComments.None;
-    //
-    //         if (userId) {
-    //           const reaction = await this.dataSource.query(
-    //             `SELECT *
-    //         FROM public."PostsLikes"
-    //         WHERE "userId"=$2 and "postId"=$1`,
-    //             [p.id, userId],
-    //           );
-    //           myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
-    //         }
-    //
-    //         const threeLikes = await this.dataSource.query(
-    //           `SELECT CAST("createdAt" as text),CAST("userId" as text), "login"
-    // FROM public."PostsLikes"
-    // WHERE "postId"=$1 AND "myStatus"='Like'
-    // ORDER BY "createdAt" DESC
-    // LIMIT 3 OFFSET 0
-    // `,
-    //           [p.id],
-    //         );
-    //
-    //         const threeLastLikes = threeLikes.map((like) => {
-    //           return {
-    //             addedAt: like.createdAt,
-    //             userId: like.userId,
-    //             login: like.login,
-    //           };
-    //         });
-    //
-    //         return {
-    //           id: p.id.toString(),
-    //           title: p.title,
-    //           shortDescription: p.shortDescription,
-    //           content: p.content,
-    //           blogId: p.blogId.toString(),
-    //           blogName: p.blogName,
-    //           createdAt: p.createdAt,
-    //           extendedLikesInfo: {
-    //             likesCount: p.likes_count,
-    //             dislikesCount: p.dislikes_count,
-    //             myStatus: myStatus,
-    //             newestLikes: threeLastLikes,
-    //           },
-    //         };
-    //       }),
-    //     );
-    //     const totalCount = await this.dataSource
-    //       .query(`SELECT CAST(count(*) as INTEGER)
-    // FROM public."Posts"`);
-    //     const formatTotalCount = totalCount[0].count;
     const totalCount = await this.postsRepository
       .createQueryBuilder('post')
       .getCount();
@@ -149,12 +148,23 @@ export class PostsQueryRepository {
         'post.shortDescription',
         'post.content',
         'post.blogId',
-        'blog.name as "blogName"',
+        'blog.name',
         'post.createdAt',
       ])
       .addSelect((qb) => {
-        return qb.select().from().where().andWhere();
-      })
+        return qb
+          .select('COUNT(like.id)')
+          .from(PostsLikesInfo, 'like')
+          .where('like.postId = post.id')
+          .andWhere('like.myStatus = :like', { like: 'Like' });
+      }, 'likesCount')
+      .addSelect((qb) => {
+        return qb
+          .select('COUNT(dislike.id)')
+          .from(PostsLikesInfo, 'dislike')
+          .where('dislike.postId = post.id')
+          .andWhere('dislike.myStatus = :dislike', { dislike: 'Dislike' });
+      }, 'dislikesCount')
       .where('post.id = :postId', { postId })
       .getRawOne();
     console.log(postData);
@@ -162,46 +172,48 @@ export class PostsQueryRepository {
     if (!postData) {
       return null;
     }
-    //     let myStatus = LikesStatusComments.None;
-    //
-    //     if (userId) {
-    //       const reaction = await this.dataSource.query(
-    //         `SELECT *
-    //         FROM public."PostsLikes"
-    //         WHERE "userId"=$2 and "postId"=$1`,
-    //         [postId, userId],
-    //       );
-    //       myStatus = reaction[0] ? reaction[0].myStatus : myStatus;
-    //     }
-    //     const threeLikes = await this.dataSource.query(
-    //       `SELECT CAST("createdAt" as text),CAST("userId" as text), "login"
-    // FROM public."PostsLikes"
-    // WHERE "postId"=$1 AND "myStatus"='Like'
-    // ORDER BY "createdAt" DESC
-    // LIMIT 3 OFFSET 0
-    // `,
-    //       [postId],
-    //     );
-    //     const threeLastLikes = threeLikes.map((like) => {
-    //       return {
-    //         addedAt: like.createdAt,
-    //         userId: like.userId,
-    //         login: like.login,
-    //       };
-    //     });
+    let myStatus = LikesStatusPosts.None;
+    if (userId) {
+      const reaction = await this.postsLikesInfoRepository
+        .createQueryBuilder('postsLikesInfo')
+        .where('postsLikesInfo.postId = :postId', { postId })
+        .andWhere('postsLikesInfo.userId = :userId', { userId })
+        .getOne();
+      myStatus = reaction ? reaction.myStatus : myStatus;
+    }
+    const newsLikes = await this.postsLikesInfoRepository
+      .createQueryBuilder('postsLikesInfo')
+      .select([
+        'postsLikesInfo.createdAt',
+        'postsLikesInfo.userId',
+        'user.login',
+      ])
+      .leftJoinAndSelect('postsLikesInfo.user', 'user')
+      .where('postsLikesInfo.postId = :postId', { postId })
+      .andWhere('postsLikesInfo.myStatus = :like', { like: 'Like' })
+      .orderBy('postsLikesInfo.createdAt', 'DESC')
+      .limit(3)
+      .getRawMany();
+    const threeLastLikes = newsLikes.map((like) => {
+      return {
+        addedAt: like.postsLikesInfo_createdAt,
+        userId: like.postsLikesInfo_userId.toString(),
+        login: like.login,
+      };
+    });
     return {
-      id: postData.id.toString(),
-      title: postData.title,
-      shortDescription: postData.shortDescription,
-      content: postData.content,
-      blogId: postData.blogId.toString(),
-      blogName: postData.blogName,
-      createdAt: postData.createdAt,
+      id: postData.post_id.toString(),
+      title: postData.post_title,
+      shortDescription: postData.post_shortDescription,
+      content: postData.post_content,
+      blogId: postData.post_blogId.toString(),
+      blogName: postData.post_blogName,
+      createdAt: postData.post_createdAt,
       extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-        newestLikes: [],
+        likesCount: Number(postData.likesCount),
+        dislikesCount: Number(postData.dislikesCount),
+        myStatus: myStatus,
+        newestLikes: threeLastLikes,
       },
     };
   }
@@ -211,22 +223,81 @@ export class PostsQueryRepository {
     pagination: PaginationPostsOutputModelType,
     userId?: string,
   ): Promise<PaginationPostsType> {
-    const sortBy = pagination.sortBy ?? 'createdAt';
-    console.error(pagination, ' pagination');
-    const sortDirection = pagination.sortDirection === 'asc' ? 'asc' : 'desc';
-    const postData = await this.postsRepository
+    const sortBy = `post."${pagination.sortBy}"` ?? 'post."createdAt"';
+    const sortDirection = pagination.sortDirection === 'asc' ? 'ASC' : 'DESC';
+    //all postsByBlogId with likes and dislikes
+    const postsData = await this.postsRepository
       .createQueryBuilder('post')
-      .leftJoinAndSelect('post.blog', 'blog')
       .select(['post.*', 'blog.name as "blogName"'])
+      .leftJoin('post.blog', 'blog')
+      .addSelect((qb) => {
+        return qb
+          .select('COUNT(like.id)')
+          .from(PostsLikesInfo, 'like')
+          .where('like.postId = post.id')
+          .andWhere('like.myStatus = :like', { like: 'Like' });
+      }, 'likesCount')
+      .addSelect((qb) => {
+        return qb
+          .select('COUNT(dislike.id)')
+          .from(PostsLikesInfo, 'dislike')
+          .where('dislike.postId = post.id')
+          .andWhere('dislike.myStatus = :dislike', { dislike: 'Dislike' });
+      }, 'dislikesCount')
       .where('post.blogId = :blogId', { blogId })
-      .orderBy(
-        pagination.sortBy ? `"${pagination.sortBy}"` : '"createdAt"',
-        sortDirection === 'asc' ? 'ASC' : 'DESC',
-      )
+      .orderBy(sortBy, sortDirection)
       .limit(pagination.pageSize)
       .offset(pagination.skip)
       .getRawMany();
-    const allPosts = postData.map((p) => {
+    //take all postsId from postData
+    const postsIds = postsData.map((p) => p.id);
+    //get 3 last likes by postsIds
+    const postsLikesInfo = await this.postsLikesInfoRepository
+      .createQueryBuilder('postsLikesInfo')
+      .select([
+        'postsLikesInfo.createdAt as "addedAt"',
+        'postsLikesInfo.userId as "userId"',
+        'postsLikesInfo.postId as "postId"',
+        'user.login as "login"',
+      ])
+      .leftJoin('postsLikesInfo.user', 'user')
+      .where('postsLikesInfo.postId IN (:...postsIds)', { postsIds })
+      .andWhere('postsLikesInfo.myStatus = :like', { like: 'Like' })
+      .orderBy('postsLikesInfo.createdAt', 'DESC')
+      .limit(3)
+      .getRawMany();
+
+    const allPostsLikesInfo = await this.postsLikesInfoRepository
+      .createQueryBuilder('postsLikesInfo')
+      .select([
+        'postsLikesInfo.createdAt',
+        'postsLikesInfo.userId',
+        'postsLikesInfo.postId',
+        'user.login',
+      ])
+      .leftJoin('postsLikesInfo.user', 'user')
+      .where('postsLikesInfo.postId IN (:...postsIds)', { postsIds })
+      .andWhere('postsLikesInfo.userId = :userId', { userId })
+      .getRawMany();
+
+    const allPosts = postsData.map((p) => {
+      let myStatus = LikesStatusPosts.None;
+      if (userId) {
+        const reaction = allPostsLikesInfo.find(
+          (like) =>
+            like.postsLikesInfo_postId === p.id &&
+            like.postsLikesInfo_userId === +userId,
+        );
+        myStatus = reaction ? LikesStatusPosts.Like : myStatus;
+      }
+      const newsLikes = postsLikesInfo
+        .filter((like) => like.postId === p.id)
+        .map((like) => {
+          return {
+            ...like,
+            userId: like.userId.toString(),
+          };
+        });
       return {
         id: p.id.toString(),
         title: p.title,
@@ -236,14 +307,13 @@ export class PostsQueryRepository {
         blogName: p.blogName,
         createdAt: p.createdAt,
         extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'None',
-          newestLikes: [],
+          likesCount: Number(p.likesCount),
+          dislikesCount: Number(p.dislikesCount),
+          myStatus: myStatus,
+          newestLikes: newsLikes,
         },
       };
     });
-    console.log('allPosts', allPosts);
     const totalCount = await this.postsRepository
       .createQueryBuilder('post')
       .where('post.blogId = :blogId', { blogId })

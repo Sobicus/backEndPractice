@@ -87,8 +87,8 @@ export class CommentsQueryRepository {
       },
       createdAt: commentData.comment_createdAt,
       likesInfo: {
-        likesCount: Number(commentData.likesCount) ?? 0,
-        dislikesCount: Number(commentData.dislikesCount) ?? 0,
+        likesCount: Number(commentData.likesCount),
+        dislikesCount: Number(commentData.dislikesCount),
         myStatus: myStatus,
       },
     };
@@ -149,9 +149,8 @@ export class CommentsQueryRepository {
       .where('commentLikesInfo.commentId IN (:...commentsIds)', {
         commentsIds,
       })
-      .andWhere('commentLikesInfo.commentId IN (:...commentsIds)', { userId })
+      .andWhere('commentLikesInfo.userId = :userId', { userId })
       .getRawMany();
-
     const allComments = commentsData.map((comment) => {
       let myStatus = LikesStatusComments.None;
       if (userId) {
@@ -171,8 +170,8 @@ export class CommentsQueryRepository {
         },
         createdAt: comment.comment_createdAt,
         likesInfo: {
-          likesCount: comment.likesCount,
-          dislikesCount: comment.dislikesCount,
+          likesCount: Number(comment.likesCount),
+          dislikesCount: Number(comment.dislikesCount),
           myStatus: myStatus,
         },
       };
