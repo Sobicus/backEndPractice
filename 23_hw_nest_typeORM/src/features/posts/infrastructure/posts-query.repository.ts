@@ -78,6 +78,7 @@ export class PostsQueryRepository {
         'postsLikesInfo.userId',
         'postsLikesInfo.postId',
         'user.login',
+        'postsLikesInfo.myStatus as "myStatus"',
       ])
       .leftJoin('postsLikesInfo.user', 'user')
       .where('postsLikesInfo.postId IN (:...postsIds)', { postsIds })
@@ -91,7 +92,13 @@ export class PostsQueryRepository {
             like.postsLikesInfo_postId === p.id &&
             like.postsLikesInfo_userId === +userId,
         );
-        myStatus = reaction ? LikesStatusPosts.Like : myStatus;
+        console.log(
+          'getAllPosts reaction===============================',
+          reaction,
+        );
+        console.log('p.id', p.id);
+
+        myStatus = reaction ? reaction.myStatus : myStatus;
       }
       const newsLikes = postsLikesInfo
         .filter((like) => like.postId === p.id)
@@ -172,6 +179,7 @@ export class PostsQueryRepository {
     if (!postData) {
       return null;
     }
+
     let myStatus = LikesStatusPosts.None;
     if (userId) {
       const reaction = await this.postsLikesInfoRepository
@@ -179,6 +187,10 @@ export class PostsQueryRepository {
         .where('postsLikesInfo.postId = :postId', { postId })
         .andWhere('postsLikesInfo.userId = :userId', { userId })
         .getOne();
+      console.log(
+        'reaction==============================================================',
+        reaction,
+      );
       myStatus = reaction ? reaction.myStatus : myStatus;
     }
     const newsLikes = await this.postsLikesInfoRepository
@@ -201,13 +213,17 @@ export class PostsQueryRepository {
         login: like.login,
       };
     });
+    console.log(
+      '0000000000000000000000000000000000000000000000000000000',
+      postData,
+    );
     return {
       id: postData.post_id.toString(),
       title: postData.post_title,
       shortDescription: postData.post_shortDescription,
       content: postData.post_content,
       blogId: postData.post_blogId.toString(),
-      blogName: postData.post_blogName,
+      blogName: postData.blog_name,
       createdAt: postData.post_createdAt,
       extendedLikesInfo: {
         likesCount: Number(postData.likesCount),
@@ -264,7 +280,6 @@ export class PostsQueryRepository {
       .where('postsLikesInfo.postId IN (:...postsIds)', { postsIds })
       .andWhere('postsLikesInfo.myStatus = :like', { like: 'Like' })
       .orderBy('postsLikesInfo.createdAt', 'DESC')
-      .limit(3)
       .getRawMany();
 
     const allPostsLikesInfo = await this.postsLikesInfoRepository
@@ -274,6 +289,7 @@ export class PostsQueryRepository {
         'postsLikesInfo.userId',
         'postsLikesInfo.postId',
         'user.login',
+        'postsLikesInfo.myStatus as "myStatus"',
       ])
       .leftJoin('postsLikesInfo.user', 'user')
       .where('postsLikesInfo.postId IN (:...postsIds)', { postsIds })
@@ -288,13 +304,15 @@ export class PostsQueryRepository {
             like.postsLikesInfo_postId === p.id &&
             like.postsLikesInfo_userId === +userId,
         );
-        myStatus = reaction ? LikesStatusPosts.Like : myStatus;
+        myStatus = reaction ? reaction.myStatus : myStatus;
       }
       const newsLikes = postsLikesInfo
         .filter((like) => like.postId === p.id)
+        .slice(0, 3)
         .map((like) => {
           return {
-            ...like,
+            addedAt: like.addedAt,
+            login: like.login,
             userId: like.userId.toString(),
           };
         });

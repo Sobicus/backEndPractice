@@ -257,6 +257,7 @@ describe('integaration test for PostsService', () => {
             likeStatus: 'Like',
           })
           .expect(204);
+
         await request(app)
           .put(`/posts/${postsToLike[2].id}/like-status`)
           .set('Authorization', `Bearer ${users[0].accessToken}`)
@@ -300,6 +301,14 @@ describe('integaration test for PostsService', () => {
             likeStatus: 'Dislike',
           })
           .expect(204);
+
+        await request(app)
+          .put(`/posts/${postsToLike[5].id}/like-status`)
+          .set('Authorization', `Bearer ${users[0].accessToken}`)
+          .send({
+            likeStatus: 'Dislike',
+          })
+          .expect(204);
         //Get the posts by user 1 after all likes NewestLikes should be sorted in descending;
         const allPosts = await request(app)
           .get(`/posts`)
@@ -307,6 +316,8 @@ describe('integaration test for PostsService', () => {
 
           .expect(200);
 
+        console.log('Dislake postID', `${postsToLike[5].id}`);
+        console.log('allPosts.body.items', allPosts.body.items);
         expect(allPosts.body.items).toEqual(
           expect.arrayContaining([
             {
