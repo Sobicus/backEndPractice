@@ -1,9 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { statusType } from '../../../../base/oject-result';
+
 import { EmailService } from '../../../../base/mail/email-server.service';
-import { UsersRepository } from 'src/features/users/infrastructure/users.repository';
+import { statusType } from '../../../../base/oject-result';
 import { PasswordRecovery } from '../../domain/passwordRecovery.entity';
 import { PasswordRecoveryRepository } from '../../infrastructure/passwordRecovery.repository';
+import { UsersRepository } from '../../../users/infrastructure/users.repository';
 
 export class PasswordRecoveryCommand {
   constructor(public readonly email: string) {}

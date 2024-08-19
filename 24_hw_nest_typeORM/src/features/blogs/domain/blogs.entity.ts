@@ -1,4 +1,3 @@
-import { BlogInputModelType } from '../api/models/input/create-blog.input.model';
 import {
   Column,
   CreateDateColumn,
@@ -7,7 +6,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
 import { Posts } from '../../posts/domain/posts.entity';
+import { BlogInputModelType } from '../api/models/input/create-blog.input.model';
 
 @Entity()
 export class Blogs {

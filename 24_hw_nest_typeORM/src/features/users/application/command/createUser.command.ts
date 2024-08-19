@@ -1,4 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
 import { UserInputModelType } from '../../api/models/input/create-users.input.model';
 import { UsersService } from '../users.service';
 

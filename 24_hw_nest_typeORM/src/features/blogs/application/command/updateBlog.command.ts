@@ -1,6 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BlogInputModelType } from '../../api/models/input/create-blog.input.model';
+
 import { statusType } from '../../../../base/oject-result';
+import { BlogInputModelType } from '../../api/models/input/create-blog.input.model';
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
 
 export class UpdateBlogCommand {

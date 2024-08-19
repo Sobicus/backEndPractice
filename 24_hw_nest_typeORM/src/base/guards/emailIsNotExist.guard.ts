@@ -1,10 +1,11 @@
 import {
   registerDecorator,
+  ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
   ValidatorConstraintInterface,
-  ValidationArguments,
 } from 'class-validator';
+
 import { UsersRepository } from '../../features/users/infrastructure/users.repository';
 
 @ValidatorConstraint({ async: true })

@@ -1,9 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
 import { statusType } from '../../../../base/oject-result';
 import { LikesStatusComments } from '../../api/models/input/comments-likesInfo.input.model';
+import { CommentsLikesInfo } from '../../domain/comments-likesInfo.entity';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { CommentsLikesInfoRepository } from '../../infrastructure/comments-likesInfo.repository';
-import { CommentsLikesInfo } from '../../domain/comments-likesInfo.entity';
 
 export class LikeCommentUpdateCommand {
   constructor(

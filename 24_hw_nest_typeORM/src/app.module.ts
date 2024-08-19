@@ -4,86 +4,87 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { BlogsControllerSA } from './features/blogs/api/blogs_sa.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { PostsController } from './features/posts/api/models/posts.controller';
-import { CommentsController } from './features/comments/api/comments.controller';
-import { UsersController } from './features/users/api/users.controller';
-import { UsersService } from './features/users/application/users.service';
 import { ConfigModule } from '@nestjs/config';
-import { TestingAllDataController } from './features/dropAll/api/testing-all-data.controller';
-import { AuthController } from './features/auth/api/auth.controller';
-import { AuthService } from './features/auth/application/auth.service';
+import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
-import { JWTService } from './base/application/jwt.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { PassportModule } from '@nestjs/passport';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { EmailService } from './base/mail/email-server.service';
 import { join } from 'path';
-import { ConfirmationCodeIsValidConstraint } from './features/auth/decorators/validators/isValidConfirmationCode.decorator';
-import { LocalStrategy } from './base/guards/strategy/local/local.strategy';
-import { PassportModule } from '@nestjs/passport';
+
+import { JWTService } from './base/application/jwt.service';
+import { IsNotBlogExistConstraint } from './base/guards/blogIsNotExist.guard';
+import { IsNotBlogExistInBodyConstraint } from './base/guards/blogIsNotExistInBody.guard';
+import { IsNotEmailExistConstraint } from './base/guards/emailIsNotExist.guard';
+import { IsUserAlreadyExistConstraint } from './base/guards/emailOrLoginAlreadyExist.guard';
+import { JwtAccessAuthGuard } from './base/guards/jwt-access.guard';
 import { LoginGuard } from './base/guards/login.guard';
 import { JwtStrategy } from './base/guards/strategy/jwt/jwt-cookie.strategy';
 import { JwtAccessStrategy } from './base/guards/strategy/jwt/jwt-header.strategy';
-import { JwtAccessAuthGuard } from './base/guards/jwt-access.guard';
-import { IsUserAlreadyExistConstraint } from './base/guards/emailOrLoginAlreadyExist.guard';
-import { IsNotEmailExistConstraint } from './base/guards/emailIsNotExist.guard';
+import { LocalStrategy } from './base/guards/strategy/local/local.strategy';
+import { EmailService } from './base/mail/email-server.service';
 import { JwtSoftAccessMiddleware } from './base/middleware/jwt-soft-access.middleware';
-import { IsNotBlogExistConstraint } from './base/guards/blogIsNotExist.guard';
-import { IsNotBlogExistInBodyConstraint } from './base/guards/blogIsNotExistInBody.guard';
-import { CqrsModule } from '@nestjs/cqrs';
-import { CreateBlogHandler } from './features/blogs/application/command/createBlog.command';
-import { UpdateBlogHandler } from './features/blogs/application/command/updateBlog.command';
-import { DeleteBlogHandler } from './features/blogs/application/command/deleteBlog.command';
-import { DeleteCommentHandler } from './features/comments/application/command/deleteComment.command';
-import { UpdateCommentHandler } from './features/comments/application/command/updateComment.command';
-import { CreateCommentHandler } from './features/comments/application/command/createComment.command';
-import { LikeCommentUpdateHandler } from './features/comments/application/command/likeCommentUpdate.command';
-import { CreatePostHandler } from './features/posts/application/command/createPost.command';
-import { UpdatePostHandler } from './features/posts/application/command/updatePost.command';
-import { DeletePostHandler } from './features/posts/application/command/deletePost.command';
-import { UpdatePostLikeHandler } from './features/posts/application/command/updatePostLike.command';
-import { RegistrationUserHandler } from './features/auth/application/command/registrationUser.command';
+import configuration from './config/configuration';
+import { AuthController } from './features/auth/api/auth.controller';
+import { AuthService } from './features/auth/application/auth.service';
+import { NewPasswordHandler } from './features/auth/application/command/newPassword.command';
+import { PasswordRecoveryHandler } from './features/auth/application/command/passwordRecovery.command';
 import { RegistrationConfirmationHandler } from './features/auth/application/command/registrationConfirmation.command';
 import { RegistrationEmailResendingHandler } from './features/auth/application/command/registrationEmailResending.command';
-import { PasswordRecoveryHandler } from './features/auth/application/command/passwordRecovery.command';
-import { NewPasswordHandler } from './features/auth/application/command/newPassword.command';
-import { CreateUserHandler } from './features/users/application/command/createUser.command';
-import { DeleteUserHandler } from './features/users/application/command/deleteUser.command';
-import { CreateDeviceSessionHandler } from './features/SecurityDevices/application/command/createDeviceSession.command';
-import { FindSessionByUserIdAndDeviceIdHandler } from './features/SecurityDevices/application/command/findSessionByUserIdAndDeviceId.command';
-import { DeleteSessionHandler } from './features/SecurityDevices/application/command/deleteSession.command';
-import { UpdateSessionHandler } from './features/SecurityDevices/application/command/updateSession.command';
-import { FindActiveSessionHandler } from './features/SecurityDevices/application/command/getAllActiveSessions.command';
-import { DeleteSessionExceptThisHandler } from './features/SecurityDevices/application/command/deleteSessionsDevicesExceptThis.command';
-import { DeleteDeviceSessionHandler } from './features/SecurityDevices/application/command/deleteSessionDevice.command';
-import { SecurityDevicesController } from './features/SecurityDevices/api/securityDevices.controller';
-import configuration from './config/configuration';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersRepository } from './features/users/infrastructure/users.repository';
-import { UsersQueryRepository } from './features/users/infrastructure/users-query.repository';
-import { SessionsRepository } from './features/SecurityDevices/infrastructure/sessions.repository';
-import { PasswordRecoveryRepository } from './features/auth/infrastructure/passwordRecovery.repository';
-import { BlogsQueryRepository } from './features/blogs/infrastructure/blogs-query.repository';
-import { BlogsRepository } from './features/blogs/infrastructure/blogs.repository';
-import { BlogsController } from './features/blogs/api/blogs.controller';
-import { PostsRepository } from './features/posts/infrastructure/posts.repository';
-import { PostsQueryRepository } from './features/posts/infrastructure/posts-query.repository';
-import { CommentsRepository } from './features/comments/infrastructure/comments.repository';
-import { CommentsQueryRepository } from './features/comments/infrastructure/comments-query.repository';
-import { CommentsLikesInfoRepository } from './features/comments/infrastructure/comments-likesInfo.repository';
-import { PostsLikesInfoRepository } from './features/posts/infrastructure/posts-likesInfo.repository';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { EmailConfirmation } from './features/users/domain/emailConfirmation.entity';
-import { Users } from './features/users/domain/users.entity';
-import { Posts } from './features/posts/domain/posts.entity';
-import { Sessions } from './features/SecurityDevices/domain/sessions.entity';
+import { RegistrationUserHandler } from './features/auth/application/command/registrationUser.command';
+import { ConfirmationCodeIsValidConstraint } from './features/auth/decorators/validators/isValidConfirmationCode.decorator';
 import { PasswordRecovery } from './features/auth/domain/passwordRecovery.entity';
+import { PasswordRecoveryRepository } from './features/auth/infrastructure/passwordRecovery.repository';
+import { BlogsController } from './features/blogs/api/blogs.controller';
+import { BlogsControllerSA } from './features/blogs/api/blogs_sa.controller';
+import { CreateBlogHandler } from './features/blogs/application/command/createBlog.command';
+import { DeleteBlogHandler } from './features/blogs/application/command/deleteBlog.command';
+import { UpdateBlogHandler } from './features/blogs/application/command/updateBlog.command';
 import { Blogs } from './features/blogs/domain/blogs.entity';
+import { BlogsRepository } from './features/blogs/infrastructure/blogs.repository';
+import { BlogsQueryRepository } from './features/blogs/infrastructure/blogs-query.repository';
+import { CommentsController } from './features/comments/api/comments.controller';
+import { CreateCommentHandler } from './features/comments/application/command/createComment.command';
+import { DeleteCommentHandler } from './features/comments/application/command/deleteComment.command';
+import { LikeCommentUpdateHandler } from './features/comments/application/command/likeCommentUpdate.command';
+import { UpdateCommentHandler } from './features/comments/application/command/updateComment.command';
 import { Comments } from './features/comments/domain/comments.entity';
 import { CommentsLikesInfo } from './features/comments/domain/comments-likesInfo.entity';
+import { CommentsRepository } from './features/comments/infrastructure/comments.repository';
+import { CommentsLikesInfoRepository } from './features/comments/infrastructure/comments-likesInfo.repository';
+import { CommentsQueryRepository } from './features/comments/infrastructure/comments-query.repository';
+import { TestingAllDataController } from './features/dropAll/api/testing-all-data.controller';
+import { PostsController } from './features/posts/api/models/posts.controller';
+import { CreatePostHandler } from './features/posts/application/command/createPost.command';
+import { DeletePostHandler } from './features/posts/application/command/deletePost.command';
+import { UpdatePostHandler } from './features/posts/application/command/updatePost.command';
+import { UpdatePostLikeHandler } from './features/posts/application/command/updatePostLike.command';
+import { Posts } from './features/posts/domain/posts.entity';
 import { PostsLikesInfo } from './features/posts/domain/posts-likesInfo.entity';
+import { PostsRepository } from './features/posts/infrastructure/posts.repository';
+import { PostsLikesInfoRepository } from './features/posts/infrastructure/posts-likesInfo.repository';
+import { PostsQueryRepository } from './features/posts/infrastructure/posts-query.repository';
+import { SecurityDevicesController } from './features/SecurityDevices/api/securityDevices.controller';
+import { CreateDeviceSessionHandler } from './features/SecurityDevices/application/command/createDeviceSession.command';
+import { DeleteSessionHandler } from './features/SecurityDevices/application/command/deleteSession.command';
+import { DeleteDeviceSessionHandler } from './features/SecurityDevices/application/command/deleteSessionDevice.command';
+import { DeleteSessionExceptThisHandler } from './features/SecurityDevices/application/command/deleteSessionsDevicesExceptThis.command';
+import { FindSessionByUserIdAndDeviceIdHandler } from './features/SecurityDevices/application/command/findSessionByUserIdAndDeviceId.command';
+import { FindActiveSessionHandler } from './features/SecurityDevices/application/command/getAllActiveSessions.command';
+import { UpdateSessionHandler } from './features/SecurityDevices/application/command/updateSession.command';
+import { Sessions } from './features/SecurityDevices/domain/sessions.entity';
+import { SessionsRepository } from './features/SecurityDevices/infrastructure/sessions.repository';
+import { UsersController } from './features/users/api/users.controller';
+import { CreateUserHandler } from './features/users/application/command/createUser.command';
+import { DeleteUserHandler } from './features/users/application/command/deleteUser.command';
+import { UsersService } from './features/users/application/users.service';
+import { EmailConfirmation } from './features/users/domain/emailConfirmation.entity';
+import { Users } from './features/users/domain/users.entity';
+import { UsersRepository } from './features/users/infrastructure/users.repository';
+import { UsersQueryRepository } from './features/users/infrastructure/users-query.repository';
 
 const repositoriesSQL = [
   UsersRepository,
@@ -128,11 +129,11 @@ const commands = [
   DeleteSessionExceptThisHandler,
   DeleteDeviceSessionHandler,
 ];
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       logging: true,
+      url: process.env.DATABASE_URL,
       type: 'postgres',
       host: 'localhost',
       port: 5432,

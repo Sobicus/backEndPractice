@@ -1,5 +1,6 @@
-import { Posts } from 'src/features/posts/domain/posts.entity';
-import { Users } from 'src/features/users/domain/users.entity';
+import { Posts } from '../../posts/domain/posts.entity';
+import { Users } from '../../users/domain/users.entity';
+import { CommentsLikesInfo } from './comments-likesInfo.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,7 +11,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { CommentsLikesInfo } from './comments-likesInfo.entity';
 
 @Entity()
 export class Comments {

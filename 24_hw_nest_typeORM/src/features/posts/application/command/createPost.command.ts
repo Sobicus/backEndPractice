@@ -1,9 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
 import { ObjectClassResult, statusType } from '../../../../base/oject-result';
-import { PostInputModelType } from '../../api/models/input/create-post.input.model';
 import { BlogsRepository } from '../../../blogs/infrastructure/blogs.repository';
-import { PostsRepository } from '../../infrastructure/posts.repository';
+import { PostInputModelType } from '../../api/models/input/create-post.input.model';
 import { Posts } from '../../domain/posts.entity';
+import { PostsRepository } from '../../infrastructure/posts.repository';
 
 export class CreatePostCommand {
   constructor(public readonly post: PostInputModelType) {}

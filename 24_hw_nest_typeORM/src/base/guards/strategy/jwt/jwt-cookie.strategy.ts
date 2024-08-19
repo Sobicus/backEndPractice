@@ -1,8 +1,9 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { Request } from 'express';
+import { PassportStrategy } from '@nestjs/passport';
 import { config } from 'dotenv';
+import { Request } from 'express';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
 import { SessionsRepository } from '../../../../features/SecurityDevices/infrastructure/sessions.repository';
 
 config();

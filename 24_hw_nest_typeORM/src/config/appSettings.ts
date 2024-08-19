@@ -3,10 +3,11 @@ import {
   INestApplication,
   ValidationPipe,
 } from '@nestjs/common';
-import cookieParser from 'cookie-parser';
-import { HttpExceptionFilter } from '../base/exception.filter';
 import { useContainer } from 'class-validator';
+import cookieParser from 'cookie-parser';
+
 import { AppModule } from '../app.module';
+import { HttpExceptionFilter } from '../base/exception.filter';
 
 export const appSettings = (app: INestApplication) => {
   useContainer(app.select(AppModule), { fallbackOnErrors: true });

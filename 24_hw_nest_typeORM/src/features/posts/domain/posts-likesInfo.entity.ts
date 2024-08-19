@@ -1,4 +1,3 @@
-import { LikesStatusPosts } from '../api/models/input/posts-likesInfo.input.model';
 import {
   Column,
   CreateDateColumn,
@@ -8,8 +7,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Posts } from './posts.entity';
+
 import { Users } from '../../users/domain/users.entity';
+import { LikesStatusPosts } from '../api/models/input/posts-likesInfo.input.model';
+import { Posts } from './posts.entity';
 
 @Entity()
 export class PostsLikesInfo {

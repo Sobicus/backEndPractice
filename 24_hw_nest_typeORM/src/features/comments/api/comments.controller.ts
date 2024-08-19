@@ -10,15 +10,16 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAccessAuthGuard } from 'src/base/guards/jwt-access.guard';
+import { CommandBus } from '@nestjs/cqrs';
+
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
+import { DeleteCommentCommand } from '../application/command/deleteComment.command';
+import { LikeCommentUpdateCommand } from '../application/command/likeCommentUpdate.command';
+import { UpdateCommentCommand } from '../application/command/updateComment.command';
+import { CommentsQueryRepository } from '../infrastructure/comments-query.repository';
 import { InputUpdateCommentModel } from './models/input/comments.input.model';
 import { InputUpdateCommentLikesModel } from './models/input/comments-likesInfo.input.model';
-import { CommandBus } from '@nestjs/cqrs';
-import { DeleteCommentCommand } from '../application/command/deleteComment.command';
-import { UpdateCommentCommand } from '../application/command/updateComment.command';
-import { LikeCommentUpdateCommand } from '../application/command/likeCommentUpdate.command';
-import { CommentsQueryRepository } from '../infrastructure/comments-query.repository';
+import { JwtAccessAuthGuard } from '../../../base/guards/jwt-access.guard';
 
 @Controller('comments')
 export class CommentsController {

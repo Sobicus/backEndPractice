@@ -1,4 +1,3 @@
-import { UserInputModelType } from '../api/models/input/create-users.input.model';
 import {
   Column,
   CreateDateColumn,
@@ -10,10 +9,11 @@ import {
 } from 'typeorm';
 import { EmailConfirmation } from './emailConfirmation.entity';
 import { Sessions } from '../../SecurityDevices/domain/sessions.entity';
-import { PasswordRecovery } from 'src/features/auth/domain/passwordRecovery.entity';
-import { Comments } from 'src/features/comments/domain/comments.entity';
+import { PasswordRecovery } from '../../auth/domain/passwordRecovery.entity';
+import { Comments } from '../../comments/domain/comments.entity';
 import { CommentsLikesInfo } from '../../comments/domain/comments-likesInfo.entity';
-import { PostsLikesInfo } from 'src/features/posts/domain/posts-likesInfo.entity';
+import { PostsLikesInfo } from '../../posts/domain/posts-likesInfo.entity';
+import { UserInputModelType } from '../api/models/input/create-users.input.model';
 
 @Entity()
 export class Users {

@@ -1,7 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
-import { SessionsRepository } from '../../infrastructure/sessions.repository';
+
 import { Sessions } from '../../domain/sessions.entity';
+import { SessionsRepository } from '../../infrastructure/sessions.repository';
 
 export class CreateDeviceSessionCommand {
   constructor(

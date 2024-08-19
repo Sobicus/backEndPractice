@@ -1,10 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
 import { statusType } from '../../../../base/oject-result';
-import { LikesStatusPosts } from '../../api/models/input/posts-likesInfo.input.model';
-import { PostsLikesInfoRepository } from '../../infrastructure/posts-likesInfo.repository';
-import { PostsRepository } from '../../infrastructure/posts.repository';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { LikesStatusPosts } from '../../api/models/input/posts-likesInfo.input.model';
 import { PostsLikesInfo } from '../../domain/posts-likesInfo.entity';
+import { PostsRepository } from '../../infrastructure/posts.repository';
+import { PostsLikesInfoRepository } from '../../infrastructure/posts-likesInfo.repository';
 
 export class UpdatePostLikeCommand {
   constructor(

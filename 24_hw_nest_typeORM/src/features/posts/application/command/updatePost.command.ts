@@ -1,4 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
 import { ObjectClassResult, statusType } from '../../../../base/oject-result';
 import { PostChangeBody } from '../../api/models/input/create-post.input.model';
 import { PostsRepository } from '../../infrastructure/posts.repository';

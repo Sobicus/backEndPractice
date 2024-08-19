@@ -1,8 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { RegistrationUserModelType } from '../../api/models/input/auth-.input.model';
-import { UsersService } from '../../../users/application/users.service';
+
 import { EmailService } from '../../../../base/mail/email-server.service';
-import { UsersRepository } from 'src/features/users/infrastructure/users.repository';
+import { UsersService } from '../../../users/application/users.service';
+import { RegistrationUserModelType } from '../../api/models/input/auth-.input.model';
+import { UsersRepository } from '../../../users/infrastructure/users.repository';
 
 export class RegistrationUserCommand {
   constructor(public readonly registrationDTO: RegistrationUserModelType) {}

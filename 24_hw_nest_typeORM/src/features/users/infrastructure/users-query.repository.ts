@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, ILike, Repository } from 'typeorm';
 
+import { PaginationUsersOutModelType } from '../../../base/helpers/pagination-users-helper';
 import {
   UserAuthMeDTO,
   UserOutputDTO,
 } from '../api/models/output/users.output.module';
-import { PaginationUsersOutModelType } from '../../../base/helpers/pagination-users-helper';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, ILike, Repository } from 'typeorm';
 import { Users } from '../domain/users.entity';
 
 @Injectable()

@@ -1,7 +1,8 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-import { JwtService } from '@nestjs/jwt';
 import process from 'node:process';
+
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { NextFunction, Request, Response } from 'express';
 
 @Injectable()
 export class JwtSoftAccessMiddleware implements NestMiddleware {

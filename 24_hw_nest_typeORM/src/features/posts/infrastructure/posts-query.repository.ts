@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { PaginationPostsOutputModelType } from 'src/base/helpers/pagination-posts-helpers';
+import { DataSource, Repository } from 'typeorm';
+
+import { LikesStatusPosts } from '../api/models/input/posts-likesInfo.input.model';
 import {
   PaginationPostsType,
   PostOutputModelType,
 } from '../api/models/output/post.output.model';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
 import { Posts } from '../domain/posts.entity';
 import { PostsLikesInfo } from '../domain/posts-likesInfo.entity';
-import { LikesStatusPosts } from '../api/models/input/posts-likesInfo.input.model';
 
 @Injectable()
 export class PostsQueryRepository {

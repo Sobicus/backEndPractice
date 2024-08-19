@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { Users } from '../domain/users.entity';
-import { EmailConfirmation } from '../domain/emailConfirmation.entity';
+import { DataSource, Repository } from 'typeorm';
+
 import { UsersEmailConfirmationOutputDTO } from '../api/models/output/users.output.module';
+import { EmailConfirmation } from '../domain/emailConfirmation.entity';
+import { Users } from '../domain/users.entity';
 
 @Injectable()
 export class UsersRepository {

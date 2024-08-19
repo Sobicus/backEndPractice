@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+
 import {
   LikesStatusPosts,
   PostLikesInfoInputModel,
 } from '../api/models/input/posts-likesInfo.input.model';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
 import { PostsLikesInfo } from '../domain/posts-likesInfo.entity';
 
 @Injectable()

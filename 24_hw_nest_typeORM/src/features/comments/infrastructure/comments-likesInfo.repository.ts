@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { LikesStatusComments } from '../api/models/input/comments-likesInfo.input.model';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+
+import { LikesStatusComments } from '../api/models/input/comments-likesInfo.input.model';
 import { CommentsLikesInfo } from '../domain/comments-likesInfo.entity';
 
 @Injectable()

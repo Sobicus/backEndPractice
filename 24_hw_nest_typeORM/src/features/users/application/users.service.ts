@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { UserInputModelType } from '../api/models/input/create-users.input.model';
 import bcrypt from 'bcrypt';
+
+import { UserInputModelType } from '../api/models/input/create-users.input.model';
+import { EmailConfirmation } from '../domain/emailConfirmation.entity';
 import { Users } from '../domain/users.entity';
 import { UsersRepository } from '../infrastructure/users.repository';
-import { EmailConfirmation } from '../domain/emailConfirmation.entity';
 
 @Injectable()
 export class UsersService {

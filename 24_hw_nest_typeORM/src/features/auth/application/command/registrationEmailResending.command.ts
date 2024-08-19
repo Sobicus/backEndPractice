@@ -1,9 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { statusType } from '../../../../base/oject-result';
-import { EmailService } from '../../../../base/mail/email-server.service';
-import { UsersRepository } from 'src/features/users/infrastructure/users.repository';
 import { randomUUID } from 'crypto';
 import { add } from 'date-fns';
+
+import { EmailService } from '../../../../base/mail/email-server.service';
+import { statusType } from '../../../../base/oject-result';
+import { UsersRepository } from '../../../users/infrastructure/users.repository';
 
 export class RegistrationEmailResendingCommand {
   constructor(public readonly email: string) {}

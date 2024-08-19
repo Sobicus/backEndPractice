@@ -10,6 +10,24 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { randomUUID } from 'crypto';
+import { Response } from 'express';
+
+import { JwtAccessAuthGuard } from '../../../base/guards/jwt-access.guard';
+import { JwtRefreshAuthGuard } from '../../../base/guards/jwt-refreash.guard';
+import { LoginGuard } from '../../../base/guards/login.guard';
+import { CreateDeviceSessionCommand } from '../../SecurityDevices/application/command/createDeviceSession.command';
+import { DeleteSessionCommand } from '../../SecurityDevices/application/command/deleteSession.command';
+import { FindSessionByUserIdAndDeviceIdCommand } from '../../SecurityDevices/application/command/findSessionByUserIdAndDeviceId.command';
+import { UpdateSessionCommand } from '../../SecurityDevices/application/command/updateSession.command';
+import { UsersQueryRepository } from '../../users/infrastructure/users-query.repository';
+import { NewPasswordCommand } from '../application/command/newPassword.command';
+import { PasswordRecoveryCommand } from '../application/command/passwordRecovery.command';
+import { RegistrationConfirmationCommand } from '../application/command/registrationConfirmation.command';
+import { RegistrationEmailResendingCommand } from '../application/command/registrationEmailResending.command';
+import { RegistrationUserCommand } from '../application/command/registrationUser.command';
 import {
   InputCodeModel,
   InputEmailModel,
@@ -17,29 +35,11 @@ import {
   LoginInputModelType,
   RegistrationUserModelType,
 } from './models/input/auth-.input.model';
-import { Response } from 'express';
-import { JWTService } from 'src/base/application/jwt.service';
+import { JWTService } from '../../../base/application/jwt.service';
 import { UserAgent } from '../../../base/decorators/userAgent';
-import { CurrentUserId } from 'src/base/decorators/currentUserId';
-import { randomUUID } from 'crypto';
-import { LoginGuard } from '../../../base/guards/login.guard';
-
-import { RefreshPayload } from 'src/base/decorators/refreshPayload';
-import { JwtAccessAuthGuard } from '../../../base/guards/jwt-access.guard';
+import { CurrentUserId } from '../../../base/decorators/currentUserId';
+import { RefreshPayload } from '../../../base/decorators/accessPayload';
 import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
-import { CommandBus } from '@nestjs/cqrs';
-import { RegistrationUserCommand } from '../application/command/registrationUser.command';
-import { RegistrationConfirmationCommand } from '../application/command/registrationConfirmation.command';
-import { RegistrationEmailResendingCommand } from '../application/command/registrationEmailResending.command';
-import { PasswordRecoveryCommand } from '../application/command/passwordRecovery.command';
-import { NewPasswordCommand } from '../application/command/newPassword.command';
-import { CreateDeviceSessionCommand } from '../../SecurityDevices/application/command/createDeviceSession.command';
-import { FindSessionByUserIdAndDeviceIdCommand } from '../../SecurityDevices/application/command/findSessionByUserIdAndDeviceId.command';
-import { DeleteSessionCommand } from '../../SecurityDevices/application/command/deleteSession.command';
-import { UpdateSessionCommand } from '../../SecurityDevices/application/command/updateSession.command';
-import { JwtRefreshAuthGuard } from '../../../base/guards/jwt-refreash.guard';
-import { ThrottlerGuard } from '@nestjs/throttler';
-import { UsersQueryRepository } from '../../users/infrastructure/users-query.repository';
 
 @UseGuards(ThrottlerGuard)
 @Controller('auth')

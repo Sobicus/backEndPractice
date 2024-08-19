@@ -8,8 +8,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
 import { Blogs } from '../../blogs/domain/blogs.entity';
-import { Comments } from 'src/features/comments/domain/comments.entity';
+import { Comments } from '../../comments/domain/comments.entity';
 import { PostsLikesInfo } from './posts-likesInfo.entity';
 
 @Entity()

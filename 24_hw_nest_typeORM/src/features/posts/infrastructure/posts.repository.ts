@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PostUpdateDTO } from '../api/models/input/create-post.input.model';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+
+import { PostUpdateDTO } from '../api/models/input/create-post.input.model';
 import { Posts } from '../domain/posts.entity';
 
 @Injectable()

@@ -10,23 +10,24 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
+
+import { TakeUserId } from '../../../../base/decorators/authMeTakeIserId';
+import { JwtAccessAuthGuard } from '../../../../base/guards/jwt-access.guard';
 import {
   PaginationPostsInputModelType,
   postsPagination,
 } from '../../../../base/helpers/pagination-posts-helpers';
-import { JwtAccessAuthGuard } from '../../../../base/guards/jwt-access.guard';
-import { TakeUserId } from '../../../../base/decorators/authMeTakeIserId';
 import { InputUpdateCommentModel } from '../../../comments/api/models/input/comments.input.model';
-import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentCommand } from '../../../comments/application/command/createComment.command';
-import { PostsQueryRepository } from '../../infrastructure/posts-query.repository';
 import { CommentsQueryRepository } from '../../../comments/infrastructure/comments-query.repository';
-import {
-  PaginationCommentsInputModelType,
-  commentsPagination,
-} from 'src/base/helpers/pagination-comments-helpers';
-import { InputUpdatePostLikesModel } from './input/posts-likesInfo.input.model';
 import { UpdatePostLikeCommand } from '../../application/command/updatePostLike.command';
+import { PostsQueryRepository } from '../../infrastructure/posts-query.repository';
+import { InputUpdatePostLikesModel } from './input/posts-likesInfo.input.model';
+import {
+  commentsPagination,
+  PaginationCommentsInputModelType,
+} from '../../../../base/helpers/pagination-comments-helpers';
 
 @Controller('posts')
 export class PostsController {

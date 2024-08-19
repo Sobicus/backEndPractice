@@ -1,5 +1,6 @@
 import { IsString, Length, Matches } from 'class-validator';
-import { Trim } from 'src/base/decorators/trim';
+
+import { Trim } from '../../../../../base/decorators/trim';
 
 export interface IBlogInputModel {
   name: string;

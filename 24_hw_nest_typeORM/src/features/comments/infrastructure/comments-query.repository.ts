@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { makeLogger } from 'ts-loader/dist/logger';
+import { DataSource, Repository } from 'typeorm';
+
+import { PaginationCommentsOutputModelType } from '../../../base/helpers/pagination-comments-helpers';
 import {
   CommentOutputModel,
   CommentsOutputModel,
 } from '../api/models/input/comments.input.model';
 import { LikesStatusComments } from '../api/models/input/comments-likesInfo.input.model';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
-import { PaginationCommentsOutputModelType } from '../../../base/helpers/pagination-comments-helpers';
 import { Comments } from '../domain/comments.entity';
 import { CommentsLikesInfo } from '../domain/comments-likesInfo.entity';
-import { makeLogger } from 'ts-loader/dist/logger';
 
 @Injectable()
 export class CommentsQueryRepository {

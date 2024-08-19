@@ -1,7 +1,8 @@
 import { IsString, Length, Matches } from 'class-validator';
-import { ConfirmationCodeIsValid } from '../../../decorators/validators/isValidConfirmationCode.decorator';
-import { IsUserAlreadyExist } from '../../../../../base/guards/emailOrLoginAlreadyExist.guard';
+
 import { IsNotEmailExist } from '../../../../../base/guards/emailIsNotExist.guard';
+import { IsUserAlreadyExist } from '../../../../../base/guards/emailOrLoginAlreadyExist.guard';
+import { ConfirmationCodeIsValid } from '../../../decorators/validators/isValidConfirmationCode.decorator';
 
 export class LoginInputModelType {
   @IsString()

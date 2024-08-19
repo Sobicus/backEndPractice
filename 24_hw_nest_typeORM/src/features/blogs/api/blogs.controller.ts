@@ -5,6 +5,8 @@ import {
   Param,
   Query,
 } from '@nestjs/common';
+
+import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
 import {
   blogsPagination,
   paginationBlogsInputModelType,
@@ -13,9 +15,8 @@ import {
   PaginationPostsInputModelType,
   postsPagination,
 } from '../../../base/helpers/pagination-posts-helpers';
-import { TakeUserId } from '../../../base/decorators/authMeTakeIserId';
-import { BlogsQueryRepository } from '../infrastructure/blogs-query.repository';
 import { PostsQueryRepository } from '../../posts/infrastructure/posts-query.repository';
+import { BlogsQueryRepository } from '../infrastructure/blogs-query.repository';
 
 @Controller('blogs')
 export class BlogsController {

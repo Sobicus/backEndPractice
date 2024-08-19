@@ -1,8 +1,8 @@
+import { randomUUID } from 'crypto';
+import { add } from 'date-fns';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 
 import { Users } from './users.entity';
-import { randomUUID } from 'crypto';
-import { add } from 'date-fns';
 
 @Entity()
 export class EmailConfirmation {

@@ -10,16 +10,17 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UserInputModelType } from './models/input/create-users.input.model';
+import { CommandBus } from '@nestjs/cqrs';
+
+import { UserAuthGuard } from '../../../base/guards/basic.guard';
 import {
   PaginationUsersInputModelType,
   usersPagination,
 } from '../../../base/helpers/pagination-users-helper';
-import { UserAuthGuard } from '../../../base/guards/basic.guard';
-import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../application/command/createUser.command';
-import { UsersQueryRepository } from '../infrastructure/users-query.repository';
 import { DeleteUserCommand } from '../application/command/deleteUser.command';
+import { UsersQueryRepository } from '../infrastructure/users-query.repository';
+import { UserInputModelType } from './models/input/create-users.input.model';
 
 @Controller('sa/users')
 export class UsersController {

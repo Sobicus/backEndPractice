@@ -11,10 +11,10 @@ import {
 import { CommandBus } from '@nestjs/cqrs';
 
 import { RefreshPayload } from '../../../base/decorators/refreshPayload';
-import { FindActiveSessionCommand } from '../application/command/getAllActiveSessions.command';
-import { DeleteSessionExceptThisCommand } from '../application/command/deleteSessionsDevicesExceptThis.command';
-import { DeleteDeviceSessionCommand } from '../application/command/deleteSessionDevice.command';
 import { JwtRefreshAuthGuard } from '../../../base/guards/jwt-refreash.guard';
+import { DeleteDeviceSessionCommand } from '../application/command/deleteSessionDevice.command';
+import { DeleteSessionExceptThisCommand } from '../application/command/deleteSessionsDevicesExceptThis.command';
+import { FindActiveSessionCommand } from '../application/command/getAllActiveSessions.command';
 
 @Controller('security')
 export class SecurityDevicesController {

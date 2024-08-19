@@ -1,4 +1,3 @@
-import { LikesStatusComments } from '../api/models/input/comments-likesInfo.input.model';
 import {
   Column,
   CreateDateColumn,
@@ -8,8 +7,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { LikesStatusComments } from '../api/models/input/comments-likesInfo.input.model';
 import { Comments } from './comments.entity';
-import { Users } from 'src/features/users/domain/users.entity';
+import { Users } from '../../users/domain/users.entity';
 
 @Entity()
 export class CommentsLikesInfo {

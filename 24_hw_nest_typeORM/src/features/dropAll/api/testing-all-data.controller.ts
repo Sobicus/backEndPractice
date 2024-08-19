@@ -1,14 +1,15 @@
 import { Controller, Delete, HttpCode } from '@nestjs/common';
-import { UsersRepository } from '../../users/infrastructure/users.repository';
-import { SessionsRepository } from '../../SecurityDevices/infrastructure/sessions.repository';
-import { PasswordRecoveryRepository } from '../../auth/infrastructure/passwordRecovery.repository';
-import { PostsRepository } from '../../posts/infrastructure/posts.repository';
-import { BlogsRepository } from '../../blogs/infrastructure/blogs.repository';
-import { PostsLikesInfoRepository } from '../../posts/infrastructure/posts-likesInfo.repository';
-import { CommentsLikesInfoRepository } from '../../comments/infrastructure/comments-likesInfo.repository';
-import { CommentsRepository } from '../../comments/infrastructure/comments.repository';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+
+import { PasswordRecoveryRepository } from '../../auth/infrastructure/passwordRecovery.repository';
+import { BlogsRepository } from '../../blogs/infrastructure/blogs.repository';
+import { CommentsRepository } from '../../comments/infrastructure/comments.repository';
+import { CommentsLikesInfoRepository } from '../../comments/infrastructure/comments-likesInfo.repository';
+import { PostsRepository } from '../../posts/infrastructure/posts.repository';
+import { PostsLikesInfoRepository } from '../../posts/infrastructure/posts-likesInfo.repository';
+import { SessionsRepository } from '../../SecurityDevices/infrastructure/sessions.repository';
+import { UsersRepository } from '../../users/infrastructure/users.repository';
 
 @Controller('/testing/all-data')
 export class TestingAllDataController {

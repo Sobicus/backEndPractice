@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { config } from 'dotenv';
-import { ConfigService } from '@nestjs/config';
+
 import { ConfigurationType } from '../../config/configuration';
 config();
 

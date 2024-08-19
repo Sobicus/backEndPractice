@@ -1,10 +1,11 @@
-import { AppModule } from '../src/app.module';
-import { Test, TestingModule } from '@nestjs/testing';
-import { appSettings } from '../src/config/appSettings';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
-import { IBlogInputModel } from '../src/features/blogs/api/models/input/create-blog.input.model';
-import { IPost } from '../src/features/posts/api/models/input/create-post.input.model';
+
+import { AppModule } from '../../src/app.module';
+import { appSettings } from '../../src/config/appSettings';
+import { IBlogInputModel } from '../../src/features/blogs/api/models/input/create-blog.input.model';
+import { IPost } from '../../src/features/posts/api/models/input/create-post.input.model';
 
 type user = {
   accessToken: string;

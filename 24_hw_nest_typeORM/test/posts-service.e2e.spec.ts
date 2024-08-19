@@ -1,7 +1,8 @@
-import { AppModule } from '../src/app.module';
 import { Test, TestingModule } from '@nestjs/testing';
-import { appSettings } from '../src/config/appSettings';
 import { request } from 'express';
+
+import { AppModule } from '../src/app.module';
+import { appSettings } from '../src/config/appSettings';
 
 describe('integaration test for PostsService', () => {
   // describe('getPosts', () => {

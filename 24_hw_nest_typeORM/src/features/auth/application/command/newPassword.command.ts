@@ -1,9 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { statusType } from '../../../../base/oject-result';
-import { InputNewPasswordModel } from '../../api/models/input/auth-.input.model';
 import bcrypt from 'bcrypt';
-import { PasswordRecoveryRepository } from '../../infrastructure/passwordRecovery.repository';
+
+import { statusType } from '../../../../base/oject-result';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { InputNewPasswordModel } from '../../api/models/input/auth-.input.model';
+import { PasswordRecoveryRepository } from '../../infrastructure/passwordRecovery.repository';
 
 export class NewPasswordCommand {
   constructor(public readonly newPasswordModel: InputNewPasswordModel) {}

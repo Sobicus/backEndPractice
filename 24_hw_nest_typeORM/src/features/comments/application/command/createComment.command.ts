@@ -1,9 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
 import { ObjectClassResult, statusType } from '../../../../base/oject-result';
 import { PostsRepository } from '../../../posts/infrastructure/posts.repository';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { Comments } from '../../domain/comments.entity';
+import { CommentsRepository } from '../../infrastructure/comments.repository';
 
 export class CreateCommentCommand {
   constructor(

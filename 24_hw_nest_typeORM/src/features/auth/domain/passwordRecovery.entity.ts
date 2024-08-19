@@ -1,5 +1,3 @@
-import { randomUUID } from 'crypto';
-import { add } from 'date-fns';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Users } from '../../users/domain/users.entity';
+import { randomUUID } from 'crypto';
+import { add } from 'date-fns';
 
 @Entity()
 export class PasswordRecovery {

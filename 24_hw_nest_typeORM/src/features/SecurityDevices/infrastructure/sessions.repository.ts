@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { allActiveSessionViewType } from '../api/models/otput/sessions.output.module';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Not, Repository } from 'typeorm';
+
+import { allActiveSessionViewType } from '../api/models/otput/sessions.output.module';
 import { Sessions } from '../domain/sessions.entity';
 
 @Injectable()

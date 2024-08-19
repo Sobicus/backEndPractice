@@ -1,5 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
+
 import { SessionsRepository } from '../../infrastructure/sessions.repository';
 
 export class UpdateSessionCommand {
