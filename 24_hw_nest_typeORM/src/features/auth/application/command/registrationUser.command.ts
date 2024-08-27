@@ -1,5 +1,4 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-
 import { EmailService } from '../../../../base/mail/email-server.service';
 import { UsersService } from '../../../users/application/users.service';
 import { RegistrationUserModelType } from '../../api/models/input/auth-.input.model';
