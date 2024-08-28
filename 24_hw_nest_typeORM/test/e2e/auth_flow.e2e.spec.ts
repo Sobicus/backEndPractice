@@ -14,7 +14,7 @@ describe('Auth flow', () => {
   let server: INestApplication;
   let app;
   const mockedUUID = crypto.randomUUID();
-
+  let dataSource: DataSource;
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -23,7 +23,7 @@ describe('Auth flow', () => {
     appSettings(server);
     await server.init();
     //we can use this dataSource for manupulating data in db
-    const dataSource = await moduleRef.resolve(DataSource);
+    dataSource = await moduleRef.resolve(DataSource);
     app = server.getHttpServer();
     await request(app).delete('/testing/all-data').expect(204);
 

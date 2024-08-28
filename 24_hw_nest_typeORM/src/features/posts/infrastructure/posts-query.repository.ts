@@ -187,10 +187,6 @@ export class PostsQueryRepository {
         .where('postsLikesInfo.postId = :postId', { postId })
         .andWhere('postsLikesInfo.userId = :userId', { userId })
         .getOne();
-      console.log(
-        'reaction==============================================================',
-        reaction,
-      );
       myStatus = reaction ? reaction.myStatus : myStatus;
     }
     const newsLikes = await this.postsLikesInfoRepository
