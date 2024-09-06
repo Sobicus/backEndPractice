@@ -15,6 +15,7 @@ describe('Auth flow', () => {
   let app;
   const mockedUUID = crypto.randomUUID();
   let dataSource: DataSource;
+
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
