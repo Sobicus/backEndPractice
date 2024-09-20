@@ -8,6 +8,7 @@ import crypto from 'crypto';
 import dateFns from 'date-fns';
 import { UsersRepository } from '../../src/features/users/infrastructure/users.repository';
 import { DataSource } from 'typeorm';
+//TODO bad examples because that case has mock libraries/or method library
 
 describe('Auth flow', () => {
   //start server

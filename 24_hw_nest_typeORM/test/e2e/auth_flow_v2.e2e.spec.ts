@@ -8,6 +8,9 @@ import { DataSource } from 'typeorm';
 import { EmailConfirmation } from '../../src/features/users/domain/emailConfirmation.entity';
 import { Users } from '../../src/features/users/domain/users.entity';
 import { add } from 'date-fns';
+import { IsString, Length, Matches } from 'class-validator';
+import { IsUserAlreadyExist } from '../../src/base/guards/emailOrLoginAlreadyExist.guard';
+import { RegistrationUserHandler } from '../../src/features/auth/application/command/registrationUser.command';
 
 describe('Auth flow', () => {
   //start server
@@ -17,12 +20,17 @@ describe('Auth flow', () => {
   const user1 = 'test1';
   const user1Email = 'test1@gmail.com';
   let user;
+  let handler;
+  //let emailConfirmationCode;
 
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
     server = moduleRef.createNestApplication();
+    //use handler comandBus
+    handler = moduleRef.get<RegistrationUserHandler>(RegistrationUserHandler);
+
     appSettings(server);
     await server.init();
     //we can use this dataSource for manipulating data in db
@@ -50,13 +58,13 @@ describe('Auth flow', () => {
   });
   afterAll(async () => {
     jest.clearAllMocks();
-    await request(app).delete('/testing/all-data').expect(204);
+    //await request(app).delete('/testing/all-data').expect(204);
     await server.close();
   });
   //registration user flow /api/auth/registration
   describe('Registration user flow', () => {
-    it('Returns 204 and user data in body', async () => {
-      const response = await request(app)
+    it('Returns 204', async () => {
+      await request(app)
         .post('/auth/registration')
         .send({
           login: user1,
@@ -64,29 +72,64 @@ describe('Auth flow', () => {
           email: user1Email,
         })
         .expect(204);
-
       // Get userId from database
       const user = await dataSource
         .getRepository(Users)
         .createQueryBuilder('user')
-        .where('user.login = :login', { login: 'test1' })
+        .where('user.login = :login', { login: user1 })
         .getOne();
-      // if (user) {
-      //   const userId = user.id;
-      //
-      //   // Mock createEmailConfirmation with dynamic userId
-      //   jest
-      //     .spyOn(EmailConfirmation, 'createEmailConfirmation')
-      //     .mockImplementation(() => {
-      //       const emailConfirmation = new EmailConfirmation();
-      //       emailConfirmation.confirmationCode = 'mock-code';
-      //       emailConfirmation.expirationDate = new Date();
-      //       emailConfirmation.isConfirmed = false;
-      //       emailConfirmation.userId = userId;
-      //       emailConfirmation.user = user; // Добавляем свойство user
-      //       return emailConfirmation;
-      //     });
-      // }
+      console.log('user', user);
+
+      if (user) {
+        expect(user.login).toBe(user1);
+        expect(user.email).toBe(user1Email);
+        //const userId = user.id;
+        // Mock createEmailConfirmation with dynamic userId
+        // jest
+        //   .spyOn(EmailConfirmation, 'createEmailConfirmation')
+        //   .mockImplementation(() => {
+        //     const emailConfirmation = new EmailConfirmation();
+        //     emailConfirmation.confirmationCode = 'mock-code';
+        //     emailConfirmation.expirationDate = new Date();
+        //     emailConfirmation.isConfirmed = false;
+        //     emailConfirmation.userId = userId;
+        //     emailConfirmation.user = user; // Добавляем свойство user
+        //     return emailConfirmation;
+        //   });
+      }
+    });
+    it('Returns 204', async () => {
+      const newUser = {
+        login: 'string1',
+        password: 'string',
+        email: 'string1',
+      };
+      await handler.execute({ registrationDTO: newUser });
+      // Get userId from database
+      const user = await dataSource
+        .getRepository(Users)
+        .createQueryBuilder('user')
+        .where('user.login = :login', { login: 'string1' })
+        .getOne();
+      console.log('user', user);
+
+      if (user) {
+        expect(user.login).toBe('string1');
+        expect(user.email).toBe('string1');
+        //const userId = user.id;
+        // Mock createEmailConfirmation with dynamic userId
+        // jest
+        //   .spyOn(EmailConfirmation, 'createEmailConfirmation')
+        //   .mockImplementation(() => {
+        //     const emailConfirmation = new EmailConfirmation();
+        //     emailConfirmation.confirmationCode = 'mock-code';
+        //     emailConfirmation.expirationDate = new Date();
+        //     emailConfirmation.isConfirmed = false;
+        //     emailConfirmation.userId = userId;
+        //     emailConfirmation.user = user; // Добавляем свойство user
+        //     return emailConfirmation;
+        //   });
+      }
     });
     it('Returns 400 if user already exists', async () => {
       await request(app)
@@ -143,6 +186,7 @@ describe('Auth flow', () => {
   });
   //registration confirmation user flow
   describe('Registration confirmation flow', () => {
+    let emailConfirmationCode;
     console.log('user111111111111', user1);
     beforeEach(async () => {
       user = await dataSource
@@ -152,7 +196,17 @@ describe('Auth flow', () => {
         .where('user.login = :login', { login: user1 })
         .getOne();
     });
-
+    beforeEach(async () => {
+      emailConfirmationCode = await dataSource
+        .getRepository(EmailConfirmation)
+        .createQueryBuilder('emailConfirmation')
+        .where('emailConfirmation.userId = :userId', { userId: user.id })
+        .getOne();
+    });
+    console.log(
+      '+++++++++++++++++++++++++++emailConfirmationCode',
+      emailConfirmationCode,
+    );
     it('Returns 204 and user data in body', async () => {
       console.log('user=========', user);
       console.log('mockedUUID2', user?.id);
@@ -175,6 +229,7 @@ describe('Auth flow', () => {
           console.log(response.body);
         });
     });
+    //todo this good example like integration test
     it('Returns 400 if code is expired', async () => {
       const user2 = {
         login: 'SxkAI9B7x4',

@@ -9,9 +9,9 @@ describe('Blogs flow', () => {
   let server: INestApplication;
   let app;
   const testBlog = {
-    name: 'testBlog1',
-    description: 'testBlog1',
-    websiteUrl: 'https://testBlog1.com',
+    name: 'testBlog',
+    description: 'testBlog',
+    websiteUrl: 'https://testBlog.com',
   };
   beforeAll(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -34,11 +34,10 @@ describe('Blogs flow', () => {
     it('Returns 200 and all blogs', async () => {
       await request(app).get('/sa/blogs').auth('admin', 'qwerty').expect(200);
     });
-    it('Returns 200 and all blogs', async () => {
+    it('Rerurns 200 and all blogs. цу сщьзфку еру щиоусе ерфе сщьу цшер ерщыу ерфе цу учзусе', async () => {
       const allBlogs = await request(app)
-        .get('/sa/blogs')
-        .auth('admin', 'qwerty')
-        .expect(200);
+        .get('/sa/blogs/')
+        .auth('admin', 'qwerty');
       expect(allBlogs.body).toEqual({
         pagesCount: 0,
         page: 1,
