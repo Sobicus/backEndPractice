@@ -38,7 +38,10 @@ import { DeleteBlogCommand } from '../application/command/deleteBlog.command';
 import { UpdateBlogCommand } from '../application/command/updateBlog.command';
 import { BlogsQueryRepository } from '../infrastructure/blogs-query.repository';
 import { BlogInputModelType } from './models/input/create-blog.input.model';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PaginationBlogsType } from './models/output/blog.output.model';
 
+@ApiTags('sa/blogs')
 @Controller('sa/blogs')
 export class BlogsControllerSA {
   constructor(
@@ -47,6 +50,8 @@ export class BlogsControllerSA {
     private commandBus: CommandBus,
   ) {}
 
+  @ApiOperation({ summary: 'Get all blogs' })
+  @ApiResponse({ status: 200, type: PaginationBlogsType })
   @UseGuards(UserAuthGuard)
   @Get()
   async getAllBlogs(@Query() pagination: paginationBlogsInputModelType) {

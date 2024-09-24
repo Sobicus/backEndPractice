@@ -10,11 +10,15 @@ export interface IBlogInputModel {
 export class BlogInputModelType {
   @IsString()
   @Trim()
+  @IsString()
   @Length(1, 15)
+  @IsString()
   name: string;
   @IsString()
+  @Trim()
   @Length(1, 500)
   description: string;
+  @IsString()
   @Trim()
   @Length(1, 100)
   @Matches(

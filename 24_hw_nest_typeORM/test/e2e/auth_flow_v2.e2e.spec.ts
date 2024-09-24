@@ -8,8 +8,6 @@ import { DataSource } from 'typeorm';
 import { EmailConfirmation } from '../../src/features/users/domain/emailConfirmation.entity';
 import { Users } from '../../src/features/users/domain/users.entity';
 import { add } from 'date-fns';
-import { IsString, Length, Matches } from 'class-validator';
-import { IsUserAlreadyExist } from '../../src/base/guards/emailOrLoginAlreadyExist.guard';
 import { RegistrationUserHandler } from '../../src/features/auth/application/command/registrationUser.command';
 
 describe('Auth flow', () => {
@@ -28,7 +26,7 @@ describe('Auth flow', () => {
       imports: [AppModule],
     }).compile();
     server = moduleRef.createNestApplication();
-    //use handler comandBus
+    //use handler commandBus
     handler = moduleRef.get<RegistrationUserHandler>(RegistrationUserHandler);
 
     appSettings(server);
