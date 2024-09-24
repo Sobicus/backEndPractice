@@ -290,5 +290,27 @@ describe('Blogs flow', () => {
       },
     );
   });
-  describe('Delete blog', () => {});
+  describe('Delete blog', () => {
+    it('Return 401 because user is not authorized', async () => {
+      await request(app).delete(`/sa/blogs/${blogsId}`).expect(401);
+    });
+    it('Return 404 because blog is not found', async () => {
+      await request(app)
+        .delete(`/sa/blogs/${blogsId + 1}`)
+        .auth('admin', 'qwerty')
+        .expect(404);
+    });
+    it('Return 204 and delete blog', async () => {
+      await request(app)
+        .delete(`/sa/blogs/${blogsId}`)
+        .auth('admin', 'qwerty')
+        .expect(204);
+    });
+    it('Return 404 because blog has been deleted', async () => {
+      await request(app)
+        .delete(`/sa/blogs/${blogsId}`)
+        .auth('admin', 'qwerty')
+        .expect(404);
+    });
+  });
 });
