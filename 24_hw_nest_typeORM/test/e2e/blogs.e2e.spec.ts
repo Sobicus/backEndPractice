@@ -3,25 +3,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { appSettings } from '../../src/config/appSettings';
 import request from 'supertest';
-import {
-  Column,
-  CreateDateColumn,
-  DataSource,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { DataSource } from 'typeorm';
 import { Blogs } from '../../src/features/blogs/domain/blogs.entity';
-import { BlogsQueryRepository } from '../../src/features/blogs/infrastructure/blogs-query.repository';
 import { BlogsRepository } from '../../src/features/blogs/infrastructure/blogs.repository';
-import { Posts } from '../../src/features/posts/domain/posts.entity';
-import { BlogInputModelType } from '../../src/features/blogs/api/models/input/create-blog.input.model';
 
 describe('Blogs flow', () => {
   //start server
   let server: INestApplication;
   let app;
   let dataSource: DataSource;
+  let blogsRepository1: BlogsRepository;
   let blogsRepository;
   const testBlog = {
     name: 'testBlog',
@@ -45,6 +36,7 @@ describe('Blogs flow', () => {
     await request(app).delete('/testing/all-data').expect(204);
     dataSource = await moduleRef.resolve(DataSource);
     blogsRepository = await dataSource.getRepository(Blogs);
+    blogsRepository1 = await moduleRef.get<BlogsRepository>(BlogsRepository);
   });
 
   afterAll(async () => {
@@ -57,7 +49,7 @@ describe('Blogs flow', () => {
     it('Returns 200 and all blogs', async () => {
       await request(app).get('/sa/blogs').auth('admin', 'qwerty').expect(200);
     });
-    it('Rerurns 200 and all blogs. цу сщьзфку еру щиоусе ерфе сщьу цшер ерщыу ерфе цу учзусе', async () => {
+    it('Returns 200 and all blogs and empty array', async () => {
       const allBlogs = await request(app)
         .get('/sa/blogs/')
         .auth('admin', 'qwerty');
@@ -84,14 +76,13 @@ describe('Blogs flow', () => {
     });
   });
   describe('Create blog', () => {
-    it('Returns 200 and new blog', async () => {
+    it('Returns 201 and new blog', async () => {
       const newBlog = await request(app)
         .post('/sa/blogs')
         .auth('admin', 'qwerty')
         .send(testBlog)
         .expect(201);
       blogsId = Number(newBlog.body.id);
-      console.log('blogsId!!!!!!!!!!!!!!', blogsId);
       expect(newBlog.body).toEqual({
         id: expect.any(String),
         name: testBlog.name,

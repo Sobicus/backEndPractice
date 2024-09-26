@@ -23,7 +23,6 @@ import {
   PaginationPostsInputModelType,
   postsPagination,
 } from '../../../base/helpers/pagination-posts-helpers';
-import { ObjectClassResult } from '../../../base/oject-result';
 import {
   BlogExistModel,
   PostChangeBody,

@@ -24,7 +24,7 @@ export class PostsQueryRepository {
   async getAllPosts(
     pagination: PaginationPostsOutputModelType,
     userId?: string,
-  ) /*: Promise<PaginationPostsType>*/ {
+  ): Promise<PaginationPostsType> {
     const sortBy = `"${pagination.sortBy}"` ?? '"createdAt"';
     const sortDirection = pagination.sortDirection === 'asc' ? 'ASC' : 'DESC';
 
@@ -53,8 +53,16 @@ export class PostsQueryRepository {
       .getRawMany();
     //take all postsId from postData
     const postsIds = postsData.map((p) => p.id);
-    console.log('getAllPosts postsIds', postsIds);
     //get 3 last likes by postsIds
+    if (postsIds.length === 0) {
+      return {
+        pagesCount: 0,
+        page: 0,
+        pageSize: 0,
+        totalCount: 0,
+        items: [],
+      };
+    }
     const postsLikesInfo = await this.postsLikesInfoRepository
       .createQueryBuilder('postsLikesInfo')
       .select([
@@ -69,7 +77,6 @@ export class PostsQueryRepository {
       .orderBy('postsLikesInfo.createdAt', 'DESC')
       //.limit(3)
       .getRawMany();
-    console.log('getAllPosts postsLikesInfo', postsLikesInfo);
 
     const allPostsLikesInfo = await this.postsLikesInfoRepository
       .createQueryBuilder('postsLikesInfo')
@@ -92,11 +99,6 @@ export class PostsQueryRepository {
             like.postsLikesInfo_postId === p.id &&
             like.postsLikesInfo_userId === +userId,
         );
-        console.log(
-          'getAllPosts reaction===============================',
-          reaction,
-        );
-        console.log('p.id', p.id);
 
         myStatus = reaction ? reaction.myStatus : myStatus;
       }
@@ -110,7 +112,6 @@ export class PostsQueryRepository {
             userId: like.userId.toString(),
           };
         });
-      console.log('getAllPosts newsLikes', newsLikes);
       return {
         id: p.id.toString(),
         title: p.title,

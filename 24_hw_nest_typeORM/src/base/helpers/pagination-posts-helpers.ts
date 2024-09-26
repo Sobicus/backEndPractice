@@ -10,7 +10,6 @@ export const postsPagination = (
   };
   if (
     query.pageNumber &&
-    !isNaN(parseInt(query.pageNumber.toString(), 10)) &&
     parseInt(query.pageNumber.toString(), 10) > 0
   ) {
     defaultValues.pageNumber = +query.pageNumber;
