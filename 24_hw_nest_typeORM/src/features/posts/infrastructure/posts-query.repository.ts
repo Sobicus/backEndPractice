@@ -175,7 +175,6 @@ export class PostsQueryRepository {
       }, 'dislikesCount')
       .where('post.id = :postId', { postId })
       .getRawOne();
-    console.log(postData);
 
     if (!postData) {
       return null;
@@ -210,10 +209,7 @@ export class PostsQueryRepository {
         login: like.login,
       };
     });
-    console.log(
-      '0000000000000000000000000000000000000000000000000000000',
-      postData,
-    );
+
     return {
       id: postData.post_id.toString(),
       title: postData.post_title,
