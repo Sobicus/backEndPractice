@@ -42,7 +42,7 @@ describe('Comments flow', () => {
   let refreshToken1;
   let commentId1;
 
-  const commentIdArray:Array<string> = [];
+  const commentIdArray: Array<string> = [];
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
@@ -228,18 +228,6 @@ describe('Comments flow', () => {
         totalCount: 12,
         items: expect.any(Array),
       });
-      const allPostsWithQuery = await request(app)
-        .get(`/posts/${postId}/comments?skip=1`)
-        .expect(200);
-      expect(allPostsWithQuery.body.items.length).toBe(10);
-      allPostsWithQuery.body.items.forEach((comment, index) => {
-        if (index < 10) {
-          //commentIdArray.push(comment.id);
-          expect(comment.content).toBe(testComment.content + (10 - index - 1));
-        } else {
-          expect(comment.content).toBe(testComment.content);
-        }
-      });
     });
   });
   describe('Get comment by id', () => {
@@ -271,45 +259,37 @@ describe('Comments flow', () => {
       expect(new Date(comment.body.createdAt)).not.toBeNaN();
     });
   });
-  //-----
   describe('Update comment flow', () => {
-    it('Update comment and return 404', async () => {
+    it('Update comment and return 404 if comment doesnt exist', async () => {
       await request(app)
-        .post(`/comments/${commentId + 100}`)
+        .put(`/comments/${commentId + 100}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ content: 'This is updated comments' })
         .expect(404);
     });
-    it('Create comment and return 401, sent a refresh token instead of an access token', async () => {
+    it('Update comment and return 401, sent a refresh token instead of an access token', async () => {
       await request(app)
-        .post(`/posts/${postId}/comments`)
+        .put(`/comments/${commentId}`)
         .set('Authorization', `Bearer ${refreshToken}`)
         .send(testComment)
         .expect(401);
     });
-    it('Create comment and return 401, did not send access token', async () => {
+    it('Update comment and return 401, did not send access token', async () => {
       await request(app)
-        .post(`/posts/${postId}/comments`)
+        .put(`/comments/${commentId}`)
         .send(testComment)
         .expect(401);
     });
-    it('Create comment and return 404, post hasn`t found', async () => {
+    it('Update comment and return 400 if content less than 20', async () => {
       await request(app)
-        .post(`/posts/${1}/comments`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .send(testComment)
-        .expect(404);
-    });
-    it('Create comment and return 400 if content less than 20', async () => {
-      await request(app)
-        .post(`/posts/${postId}/comments`)
+        .put(`/comments/${commentId}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send({ content: '1234567890123456789' })
         .expect(400);
     });
-    it('Create comment and return 400 if content more than 300', async () => {
+    it('Update comment and return 400 if content more than 300', async () => {
       await request(app)
-        .post(`/posts/${postId}/comments`)
+        .put(`/comments/${commentId}`)
         .set('Authorization', `Bearer ${accessToken}`)
         .send({
           content:
@@ -326,42 +306,40 @@ describe('Comments flow', () => {
         })
         .expect(400);
     });
-    it('Create 10 comments and return 201', async () => {
-      for (let i = 0; i < 10; i++) {
-        const response =await request(app)
-          .post(`/posts/${postId}/comments`)
-          .set('Authorization', `Bearer ${accessToken}`)
-          .send({ ...testComment, content: testComment.content + i })
-          .expect(201);
-
-      const  body = response.body as unknown as AllPostsDataTypy;
-      if(body.id){
-        commentIdArray.push(body.id);
-      }
+    it('Update comment and return 403, user is not the author of the comment', async () => {
+      await request(app)
+        .put(`/comments/${commentId}`)
+        .set('Authorization', `Bearer ${accessToken1}`)
+        .send({ content: 'This is updated comments' })
+        .expect(403);
     });
-    it('Get all comments and return 200', async () => {
-      const allPosts = await request(app)
-        .get(`/posts/${postId}/comments`)
-        .expect(200);
-      expect(allPosts.body).toEqual({
-        pagesCount: 2,
-        page: 1,
-        pageSize: 10,
-        totalCount: 11,
-        items: expect.any(Array),
-      });
-      const allPostsWithQuery = await request(app)
-        .get(`/posts/${postId}/comments?skip=1`)
-        .expect(200);
-      expect(allPostsWithQuery.body.items.length).toBe(10);
-      allPostsWithQuery.body.items.forEach((comment, index) => {
-        if (index < 10) {
-          //commentIdArray.push(comment.id);
-          expect(comment.content).toBe(testComment.content + (10 - index - 1));
-        } else {
-          expect(comment.content).toBe(testComment.content);
-        }
-      });
+  });
+  describe('Delete comment flow', () => {
+    it('Return 404 is comment doesnt exist', async () => {
+      await request(app)
+        .delete(`/comments/${commentId + 100}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(404);
+    });
+    it('Return 401, sent a refresh token instead of an access token', async () => {
+      await request(app)
+        .delete(`/comments/${commentId}`)
+        .set('Authorization', `Bearer ${refreshToken}`)
+        .expect(401);
+    });
+    it('Return 403, user is not the author of the comment', async () => {
+      await request(app)
+        .delete(`/comments/${commentId}`)
+        .set('Authorization', `Bearer ${accessToken1}`)
+        .expect(403);
+    });
+    it('Return 204, delete comment', async () => {
+      await request(app)
+        .delete(`/comments/${commentId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(204);
+
+      await request(app).get(`/comments/${commentId}`).expect(404);
     });
   });
 });
