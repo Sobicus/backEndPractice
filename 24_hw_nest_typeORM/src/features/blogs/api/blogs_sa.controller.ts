@@ -37,11 +37,15 @@ import { DeleteBlogCommand } from '../application/command/deleteBlog.command';
 import { UpdateBlogCommand } from '../application/command/updateBlog.command';
 import { BlogsQueryRepository } from '../infrastructure/blogs-query.repository';
 import { BlogInputModelType } from './models/input/create-blog.input.model';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { PaginationBlogsType } from './models/output/blog.output.model';
+import { ApiHeaders, ApiTags } from '@nestjs/swagger';
+import {
+  CreateBlogEndpoint,
+  GetAllBlogsEndpoint,
+} from '../../../base/swagger/sa_blogs_endpoints';
 
-@ApiTags('sa/blogs')
-@Controller('sa/blogs')
+@ApiTags('sa_blogs_endpoints.ts/blogs')
+@ApiHeaders([{ name: 'Authorization' }])
+@Controller('sa_blogs_endpoints.ts/blogs')
 export class BlogsControllerSA {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
@@ -49,15 +53,21 @@ export class BlogsControllerSA {
     private commandBus: CommandBus,
   ) {}
 
-  @ApiOperation({ summary: 'Get all blogs' })
-  @ApiResponse({ status: 200, type: PaginationBlogsType })
-  @UseGuards(UserAuthGuard)
   @Get()
+  //We have two ways how to use swagger decorators:
+  //1. Use them as a function and pass the parameters to them
+  //2. Use them as a decorator
+  @GetAllBlogsEndpoint()
+  // @ApiOperation({ summary: 'Get all blogs' })
+  // @ApiResponse({ status: 200, type: PaginationBlogsType })
+  // @ApiResponse({ status: 400, description: 'Unauthorized' })
+  // @ApiSecurity('basic')
+  @UseGuards(UserAuthGuard)
   async getAllBlogs(@Query() pagination: paginationBlogsInputModelType) {
     const query = blogsPagination(pagination);
     return await this.blogsQueryRepository.getAllBlogs(query);
   }
-
+  @CreateBlogEndpoint()
   @UseGuards(UserAuthGuard)
   @Post()
   async createBlog(@Body() inputModel: BlogInputModelType) {

@@ -55,8 +55,8 @@ describe('e2e test for PostsService', () => {
     });
 
     it(
-      'POST -> "/sa/users": should create new user; status 201; ' +
-        'content: created user; used additional methods: GET => /sa/users;',
+      'POST -> "/sa_blogs_endpoints.ts/users": should create new user; status 201; ' +
+        'content: created user; used additional methods: GET => /sa_blogs_endpoints.ts/users;',
       async () => {
         const expectedUser = {
           id: expect.any(String),
@@ -106,7 +106,7 @@ describe('e2e test for PostsService', () => {
       },
     );
 
-    it('POST -> "/sa/users", "/auth/login": should create and login 4 users; status 201; content: created users;', async () => {
+    it('POST -> "/sa_blogs_endpoints.ts/users", "/auth/login": should create and login 4 users; status 201; content: created users;', async () => {
       for (let i = 0; i < 4; i++) {
         console.log('userCreateResponse iteration: ', i);
         const userCreateResponse = await request(app)
@@ -149,8 +149,8 @@ describe('e2e test for PostsService', () => {
         ' like post 5 by user 2, dislike by user 3;' +
         ' like post 6 by user 1, dislike by user 2.' +
         ' Get the posts by user 1 after all likes NewestLikes should be sorted in descending;' +
-        ' status 200; content: posts array with pagination; used additional methods: POST => /sa/blogs,' +
-        ' POST => /sa/blogs/:blogId/posts, PUT -> posts/:postId/like-status;',
+        ' status 200; content: posts array with pagination; used additional methods: POST => /sa_blogs_endpoints.ts/blogs,' +
+        ' POST => /sa_blogs_endpoints.ts/blogs/:blogId/posts, PUT -> posts/:postId/like-status;',
       async () => {
         // like post 1 by user 1, user 2;
         // like post 2 by user 2, user 3;

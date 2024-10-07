@@ -18,7 +18,8 @@ export const appSettings = (app: INestApplication) => {
       stopAtFirstError: true,
       transform: true,
       exceptionFactory: (errors) => {
-        const errorsForResponse: { message: string; field: string }[] = [];
+        //const errorsForResponse: { message: string; field: string }[] = [];
+        const errorsForResponse: ErrorMessage[] = []; //use our type DTO
         errors.forEach((e) => {
           const constraintsKeys = Object.keys(e.constraints!);
           constraintsKeys.forEach((ckey) => {
@@ -28,9 +29,21 @@ export const appSettings = (app: INestApplication) => {
             });
           });
         });
-        throw new BadRequestException(errorsForResponse);
+        // throw new BadRequestException(errorsForResponse);
+        throw new BadRequestException({
+          errorsMessages: errorsForResponse,
+        } as ErrorsMessagesType); // Приведение к типу DTO
       },
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
 };
+
+export class ErrorMessage {
+  message: string;
+  field: string;
+}
+
+export class ErrorsMessagesType {
+  errorsMessages: ErrorMessage[];
+}

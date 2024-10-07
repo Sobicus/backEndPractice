@@ -22,7 +22,7 @@ import { DeleteUserCommand } from '../application/command/deleteUser.command';
 import { UsersQueryRepository } from '../infrastructure/users-query.repository';
 import { UserInputModelType } from './models/input/create-users.input.model';
 
-@Controller('sa/users')
+@Controller('sa_blogs_endpoints.ts/users')
 export class UsersController {
   constructor(
     private commandBus: CommandBus,

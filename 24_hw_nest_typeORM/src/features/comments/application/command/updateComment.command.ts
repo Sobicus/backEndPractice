@@ -18,6 +18,13 @@ export class UpdateCommentHandler
   constructor(private commentsRepository: CommentsRepository) {}
 
   async execute(command: UpdateCommentCommand) {
+    if (!Number(command.userId)) {
+      return {
+        status: statusType.NotFound,
+        statusMessages: 'Comments has been not found',
+        data: null,
+      };
+    }
     const comment = await this.commentsRepository.getCommentById(
       Number(command.commentId),
     );

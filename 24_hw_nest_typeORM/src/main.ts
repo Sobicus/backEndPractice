@@ -11,13 +11,14 @@ async function bootstrap() {
   appSettings(app);
   //swagger
   const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
+    .setTitle(' RESTful API with Swagger')
+    .setDescription('The application API description')
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('Start tag')
+    .addSecurity('basic', { type: 'http', scheme: 'basic' })
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('swagger', app, document);
 
   await app.listen(PORT);
 }

@@ -103,14 +103,14 @@ describe('Comments flow', () => {
   describe('Create comment', () => {
     it('Create comments and return 201', async () => {
       // const newBlog = await request(app)
-      //   .post('/sa/blogs')
+      //   .post('/sa_blogs_endpoints.ts/blogs')
       //   .auth('admin', 'qwerty')
       //   .send(testBlog)
       //   .expect(201);
       // blogId = Number(newBlog.body.id);
       blogId = await createBlogHelper(app, testBlog);
       // const newPost = await request(app)
-      //   .post(`/sa/blogs/${blogId}/posts`)
+      //   .post(`/sa_blogs_endpoints.ts/blogs/${blogId}/posts`)
       //   .auth('admin', 'qwerty')
       //   .send(testPost)
       //   .expect(201);
@@ -312,6 +312,13 @@ describe('Comments flow', () => {
         .set('Authorization', `Bearer ${accessToken1}`)
         .send({ content: 'This is updated comments' })
         .expect(403);
+    });
+    it('Update comment and return 204, update comment', async () => {
+      await request(app)
+        .put(`/comments/${commentId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ content: 'This is updated comments' })
+        .expect(204);
     });
   });
   describe('Delete comment flow', () => {

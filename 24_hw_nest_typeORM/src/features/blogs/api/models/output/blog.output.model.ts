@@ -11,7 +11,9 @@ export class BlogOutputModelType {
   websiteUrl: string;
   @ApiProperty()
   createdAt: Date;
-  @ApiProperty()
+  @ApiProperty({
+    description: 'True if user has not expired membership subscription to blog',
+  })
   isMembership: boolean;
 }
 
