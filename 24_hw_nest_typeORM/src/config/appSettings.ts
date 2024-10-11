@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 
 import { AppModule } from '../app.module';
 import { HttpExceptionFilter } from '../base/exception.filter';
+import { ApiProperty } from '@nestjs/swagger';
 
 export const appSettings = (app: INestApplication) => {
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -19,7 +20,7 @@ export const appSettings = (app: INestApplication) => {
       transform: true,
       exceptionFactory: (errors) => {
         //const errorsForResponse: { message: string; field: string }[] = [];
-        const errorsForResponse: ErrorMessage[] = []; //use our type DTO
+        const errorsForResponse: ErrorMessageSwagger[] = []; //use our type DTO
         errors.forEach((e) => {
           const constraintsKeys = Object.keys(e.constraints!);
           constraintsKeys.forEach((ckey) => {
@@ -32,18 +33,21 @@ export const appSettings = (app: INestApplication) => {
         // throw new BadRequestException(errorsForResponse);
         throw new BadRequestException({
           errorsMessages: errorsForResponse,
-        } as ErrorsMessagesType); // Приведение к типу DTO
+        } as ErrorsMessagesSwaggerType); // Приведение к типу DTO
       },
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
 };
 
-export class ErrorMessage {
+export class ErrorMessageSwagger {
+  @ApiProperty({ example: 'Name is required' })
   message: string;
+  @ApiProperty({ example: 'name' })
   field: string;
 }
 
-export class ErrorsMessagesType {
-  errorsMessages: ErrorMessage[];
+export class ErrorsMessagesSwaggerType {
+  @ApiProperty({ type: () => ErrorMessageSwagger, isArray: true })
+  errorsMessages: ErrorMessageSwagger[];
 }

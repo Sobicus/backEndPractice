@@ -37,15 +37,21 @@ import { DeleteBlogCommand } from '../application/command/deleteBlog.command';
 import { UpdateBlogCommand } from '../application/command/updateBlog.command';
 import { BlogsQueryRepository } from '../infrastructure/blogs-query.repository';
 import { BlogInputModelType } from './models/input/create-blog.input.model';
-import { ApiHeaders, ApiTags } from '@nestjs/swagger';
+import { ApiHeaders, ApiParam, ApiTags } from '@nestjs/swagger';
 import {
   CreateBlogEndpoint,
+  CreatePostByBlogIdEndpoint,
+  DeleteBlogEndpoint,
+  DeletePostByBlogIdEndpoint,
   GetAllBlogsEndpoint,
+  GetPosByBlogIdEndpoint,
+  PutUpdatePostThrowBlogIdEndpoint,
+  UpdateBlogEndpoint,
 } from '../../../base/swagger/sa_blogs_endpoints';
 
-@ApiTags('sa_blogs_endpoints.ts/blogs')
-@ApiHeaders([{ name: 'Authorization' }])
-@Controller('sa_blogs_endpoints.ts/blogs')
+@ApiTags('sa/blogs')
+//@ApiHeaders([{ name: 'Authorization' }])
+@Controller('sa/blogs')
 export class BlogsControllerSA {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
@@ -67,6 +73,7 @@ export class BlogsControllerSA {
     const query = blogsPagination(pagination);
     return await this.blogsQueryRepository.getAllBlogs(query);
   }
+
   @CreateBlogEndpoint()
   @UseGuards(UserAuthGuard)
   @Post()
@@ -77,6 +84,8 @@ export class BlogsControllerSA {
     return this.blogsQueryRepository.getBlogById(newBlogId);
   }
 
+  @ApiParam({ name: 'id', required: true, description: 'Blog id' })
+  @UpdateBlogEndpoint()
   @UseGuards(UserAuthGuard)
   @Put(':id')
   @HttpCode(204)
@@ -92,6 +101,8 @@ export class BlogsControllerSA {
     }
   }
 
+  @DeleteBlogEndpoint()
+  @ApiParam({ name: 'id', required: true, description: 'Blog id' })
   @UseGuards(UserAuthGuard)
   @Delete(':id')
   @HttpCode(204)
@@ -103,6 +114,8 @@ export class BlogsControllerSA {
     return;
   }
 
+  @CreatePostByBlogIdEndpoint()
+  @ApiParam({ name: 'blogId', required: true, description: 'Blog id' })
   @UseGuards(UserAuthGuard)
   @Post(':blogId/posts')
   async createPostByBlogId(
@@ -121,6 +134,8 @@ export class BlogsControllerSA {
     return await this.postQueryRepository.getPostById(post.data);
   }
 
+  @ApiParam({ name: 'id', required: true, description: 'Blog id' })
+  @GetPosByBlogIdEndpoint()
   @UseGuards(UserAuthGuard)
   @Get(':id/posts')
   async getPostsByBlogId(
@@ -136,6 +151,9 @@ export class BlogsControllerSA {
     return this.postQueryRepository.getPostByBlogId(blogId, pagination, userId);
   }
 
+  @ApiParam({ name: 'blogId', required: true, description: 'Blog id' })
+  @ApiParam({ name: 'postId', required: true, description: 'Post id' })
+  @PutUpdatePostThrowBlogIdEndpoint()
   @UseGuards(UserAuthGuard)
   @Put(':blogId/posts/:postId')
   @HttpCode(204)
@@ -156,7 +174,9 @@ export class BlogsControllerSA {
       throw new NotFoundException();
     }
   }
-
+  @ApiParam({ name: 'blogId', required: true, description: 'Blog id' })
+  @ApiParam({ name: 'postId', required: true, description: 'Post id' })
+  @DeletePostByBlogIdEndpoint()
   @UseGuards(UserAuthGuard)
   @Delete(':blogId/posts/:postId')
   @HttpCode(204)

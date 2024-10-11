@@ -44,12 +44,18 @@ const getConfig = (
   };
 };
 
+const validation = (env) => {
+  if(!env.env) throw new Error('ENV is required');
+}
+
 export default () => {
   const environmentVariables = process.env;
 
   console.log('process.env.ENV =', environmentVariables.ENV);
   const currentEnvironment: Environments =
     environmentVariables.ENV as Environments;
+
+  validation({env: currentEnvironment});
 
   return getConfig(environmentVariables, currentEnvironment);
 };

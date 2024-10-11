@@ -53,15 +53,15 @@ export class paginationBlogsInputModelType {
   sortBy: string;
   @ApiProperty({
     example: 'desc',
-     description: 'Sort direction',
+    description: 'Sort direction',
     enum: sortDirection,
     required: false,
     default: 'desc',
   })
   sortDirection: sortDirection;
-  @ApiProperty({ example: 1, description: 'Page number', minimum: 1,default: 1,required: false })
+  @ApiProperty({ example: 1, description: 'Page number', minimum: 1, default: 1, required: false })
   pageNumber: number;
-  @ApiProperty({ example: 10, description: 'Number of items per page', minimum: 1,default: 10,required: false })
+  @ApiProperty({ example: 10, description: 'Number of items per page', minimum: 1, default: 10, required: false })
   pageSize: number;
 };
 export type paginationBlogsOutModelType = {

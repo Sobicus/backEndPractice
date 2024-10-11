@@ -3,6 +3,7 @@ import { IsString, Length } from 'class-validator';
 import { Trim } from '../../../../../base/decorators/trim';
 import { IsNotBlogExist } from '../../../../../base/guards/blogIsNotExist.guard';
 import { IsNotBlogExistInBody } from '../../../../../base/guards/blogIsNotExistInBody.guard';
+import { ApiParam, ApiProperty } from '@nestjs/swagger';
 
 export class PostInputModelType {
   @IsString()
@@ -36,12 +37,30 @@ export type IPost = {
   content: string;
 };
 export class PostChangeBody {
+  @ApiProperty({
+    required: true,
+    description: 'post title',
+    minLength: 1,
+    maxLength: 30,
+  })
   @Trim()
   @Length(1, 30)
   title: string;
+  @ApiProperty({
+    required: true,
+    description: 'posr short description',
+    minLength: 1,
+    maxLength: 100,
+  })
   @Trim()
   @Length(1, 100)
   shortDescription: string;
+  @ApiProperty({
+    required: true,
+    description: 'post content',
+    minLength: 1,
+    maxLength: 1000,
+  })
   @Trim()
   @Length(1, 1000)
   content: string;

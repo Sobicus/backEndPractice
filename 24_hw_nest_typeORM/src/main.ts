@@ -16,6 +16,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('Start tag')
     .addSecurity('basic', { type: 'http', scheme: 'basic' })
+    //.addBasicAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
